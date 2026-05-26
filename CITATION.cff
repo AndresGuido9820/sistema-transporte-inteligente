@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+message: "Si usas este proyecto, cita el repositorio."
+title: "Sistema Inteligente Integrado para Transporte"
+authors:
+  - family-names: Guido Montoya
+    given-names: Andres Felipe
+  - family-names: Martinez
+    given-names: Juan Jose
+  - family-names: Lemus
+    given-names: Andres
+year: 2026
+license: MIT
+url: "https://github.com/AndresGuido9820/sistema-transporte-inteligente"
+

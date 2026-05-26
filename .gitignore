@@ -1,0 +1,17 @@
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+*.pyc
+*.pkl
+*.joblib
+*.pt
+.DS_Store
+data/raw/*.zip
+data/raw/**/*.jpg
+data/raw/**/*.png
+data/raw/**
+!data/raw/
+!data/raw/README.md
+kaggle_transport_demand/
+outputs/**/*.tmp

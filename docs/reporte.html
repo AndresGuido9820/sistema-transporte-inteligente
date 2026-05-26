@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reporte tecnico - Sistema Inteligente de Transporte</title>
+  <style>
+:root { color-scheme: light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --bg:#f5f7fa; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 56px; }
+.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 34px; }
+.brand { font-weight: 800; letter-spacing: .2px; }
+.nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+.hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; align-items: center; padding: 42px 0 34px; border-bottom: 1px solid var(--line); }
+.hero h1 { margin: 0; max-width: 850px; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: 0; }
+.hero p { margin: 18px 0 0; max-width: 680px; color: var(--muted); font-size: 18px; }
+.badge { display: inline-flex; margin-bottom: 14px; color: var(--green); font-weight: 700; font-size: 14px; }
+.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.kpi { border: 1px solid var(--line); background: white; border-radius: 8px; padding: 14px; }
+.kpi strong { display: block; font-size: 22px; }
+.hero-visual { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px; box-shadow: 0 14px 36px rgba(23,32,38,.08); }
+.route-chart { height: 178px; display: flex; align-items: end; gap: 8px; padding: 14px 8px 8px; border-bottom: 1px solid var(--line); }
+.route-chart i { flex: 1; min-width: 10px; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, #2f6fff, #11a87d); }
+.route-chart i:nth-child(2n) { background: linear-gradient(180deg, #f6a531, #e06d2f); }
+.visual-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 13px; }
+.visual-caption strong { color: var(--ink); display: block; font-size: 16px; }
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
+.card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px; min-height: 230px; display: flex; flex-direction: column; }
+.card h2 { margin: 0 0 8px; font-size: 21px; }
+.card p { margin: 0 0 12px; color: var(--muted); }
+.card ul { padding-left: 18px; margin: 0 0 16px; color: var(--muted); }
+.card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+.icon { width: 42px; height: 42px; border-radius: 8px; display: grid; place-items: center; font-weight: 900; color: white; background: var(--blue); }
+.icon.green { background: var(--green); }
+.icon.amber { background: var(--amber); }
+.mini-bars { display: flex; align-items: end; gap: 5px; height: 46px; margin: 6px 0 14px; }
+.mini-bars i { flex: 1; border-radius: 4px 4px 0 0; background: #c9d8ff; }
+.mini-bars i:nth-child(2n) { background: #afe3d2; }
+.mini-bars i:nth-child(3n) { background: #ffd69a; }
+.button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 12px; margin-top: auto; border-radius: 6px; background: var(--blue); color: white; font-weight: 700; }
+.button:hover { text-decoration: none; background: #174bd0; }
+.section { margin-top: 34px; }
+.panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
+.section h2 { margin: 0 0 10px; }
+.pipeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
+.step { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 16px; position: relative; }
+.step span { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #edf3ff; color: var(--blue); font-weight: 800; margin-bottom: 10px; }
+.step h3 { margin: 0 0 6px; font-size: 17px; }
+.step p { margin: 0; color: var(--muted); font-size: 14px; }
+.evidence { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; align-items: stretch; }
+.shot { background: white; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.shot img { display: block; width: 100%; height: 100%; max-height: 310px; object-fit: cover; object-position: top left; background: #eef3f8; }
+.metric-list { display: grid; gap: 10px; }
+.metric { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+.metric b { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+.meter { height: 8px; border-radius: 999px; overflow: hidden; background: #e8edf3; }
+.meter i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); }
+.links-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.ghost { background: white; color: var(--blue); border: 1px solid var(--line); }
+.ghost:hover { background: #edf3ff; }
+.report { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 28px; }
+.report h1 { font-size: 36px; line-height: 1.12; margin-top: 0; }
+.report h2 { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 22px; }
+.report table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
+.report th, .report td { border: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
+.report th { background: #eef3f8; }
+code { background: #edf1f5; padding: 2px 5px; border-radius: 4px; }
+@media (max-width: 820px) { .hero, .grid, .pipeline, .evidence { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="topbar">
+    <div class="brand">Reporte Técnico</div>
+    <nav class="nav">
+      <a href="./">Herramientas</a>
+      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+    </nav>
+  </header>
+  <article class="report">
+    <h1 id="sistema-inteligente-integrado-para-predicción-clasificación-y-recomendación-en-una-empresa-de-transporte">Sistema Inteligente Integrado para Predicción, Clasificación y Recomendación en una Empresa de Transporte</h1>
+<p><strong>Curso:</strong> Aplicaciones en sistemas de recomendación e imágenes <strong>Profesor:</strong> Juan David Ospina Arango <strong>Universidad:</strong> Universidad Nacional de Colombia <strong>Autores:</strong> Andrés F. Guido Montoya, Juan José Martínez, Andrés Lemus <strong>Fecha:</strong> Mayo de 2026 <strong>Repositorio:</strong> <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">https://github.com/AndresGuido9820/sistema-transporte-inteligente</a></p>
+<h2 id="resumen-ejecutivo">Resumen Ejecutivo</h2>
+<p>Este proyecto propone un sistema inteligente para una empresa de transporte que integra tres capacidades de aprendizaje profundo y aprendizaje automático: predicción de demanda por ruta, clasificación de comportamientos distractivos en conductores a partir de imágenes y recomendación personalizada de destinos. La solución busca mejorar la asignación de vehículos y personal, fortalecer la seguridad vial y aumentar la relevancia de las sugerencias de viaje para los usuarios.</p>
+<p>El sistema se implementó en Python, con módulos independientes para datos, modelos, evaluación y visualización. Además de la demo web, se construyeron tres herramientas en Google Colab: una para pronóstico de demanda, una para clasificación de imágenes y una para recomendación personalizada de destinos. El reporte técnico se publica aparte en GitHub Pages para separar la documentación de las herramientas ejecutables.</p>
+<h2 id="1-introducción">1. Introducción</h2>
+<p>Las empresas de transporte operan bajo incertidumbre diaria: la demanda cambia por ruta, temporada, día de la semana, eventos externos y comportamiento de los usuarios. Al mismo tiempo, la seguridad del servicio depende de detectar prácticas de conducción riesgosa, como uso del celular, somnolencia o distracción visual. Finalmente, la experiencia del cliente puede mejorar si la plataforma sugiere destinos coherentes con su historial y preferencias.</p>
+<p>El objetivo general es desarrollar una solución integrada que combine modelos predictivos, clasificación visual y sistemas de recomendación. El alcance académico incluye entrenamiento, evaluación, documentación técnica, análisis ético y una demo web funcional.</p>
+<h2 id="2-metodología">2. Metodología</h2>
+<p>El proyecto se organizó en cuatro fases:</p>
+<p>1. Preparación de datos: limpieza, transformación, partición de entrenamiento/prueba y generación de muestras procesadas livianas a partir de los datasets reales. 2. Modelado: entrenamiento independiente de los tres módulos usando modelos base y modelos principales. 3. Evaluación: cálculo de métricas específicas para cada problema y generación de gráficas. 4. Integración: construcción de una herramienta web para visualizar resultados y probar los modelos.</p>
+<p>La arquitectura sigue una separación por módulos para facilitar la reproducibilidad: <code>src/transport_ai/demand.py</code>, <code>src/transport_ai/vision.py</code> y <code>src/transport_ai/recommendation.py</code>.</p>
+<h3 id="2-1-ideación-y-canvas">2.1 Ideación y Canvas</h3>
+<p>La propuesta se diseñó a partir de un enfoque Canvas orientado a una empresa de transporte:</p>
+<table><thead><tr>
+<th>Elemento</th>
+<th>Definición</th>
+</tr></thead><tbody>
+<tr>
+<td>Usuarios principales</td>
+<td>Planeadores de operación, equipo de seguridad vial y clientes de la plataforma</td>
+</tr>
+<tr>
+<td>Problemas clave</td>
+<td>Demanda variable, riesgo por distracción del conductor y baja personalización de destinos</td>
+</tr>
+<tr>
+<td>Propuesta de valor</td>
+<td>Reducir incertidumbre operativa, apoyar prevención de incidentes y mejorar experiencia del usuario</td>
+</tr>
+<tr>
+<td>Datos necesarios</td>
+<td>Historial de rutas, imágenes etiquetadas de conducción e interacciones usuario-destino</td>
+</tr>
+<tr>
+<td>Métricas de éxito</td>
+<td>Menor error de pronóstico, mayor F1 visual y mejor Recall@K en recomendaciones</td>
+</tr>
+<tr>
+<td>Riesgos</td>
+<td>Sesgos de datos, privacidad de imágenes, sobreajuste y baja cobertura de usuarios nuevos</td>
+</tr>
+</tbody></table>
+<h3 id="2-2-plan-de-calidad">2.2 Plan de Calidad</h3>
+<p>La calidad se validó con tres niveles: pruebas automatizadas, ejecución completa de scripts y revisión manual de salidas. Las pruebas verifican generación de datos, entrenamiento de modelos, notebooks válidos y carga de la app. La ejecución completa produce métricas, figuras, predicciones y modelos serializados.</p>
+<h2 id="3-desarrollo-técnico-por-módulo">3. Desarrollo Técnico por Módulo</h2>
+<h3 id="3-1-predicción-de-demanda-de-transporte">3.1 Predicción de Demanda de Transporte</h3>
+<p>El primer módulo predice la demanda diaria por rutas específicas de bus. Para este módulo se usa el dataset *CTA - Ridership - Bus Routes - Daily Totals by Route*, publicado por Chicago Transit Authority en Chicago Data Portal.</p>
+<p>El archivo se conserva completo en el repositorio con datos desde 2001 hasta 2026. Para el entrenamiento se filtra desde 2021 y se seleccionan las 10 rutas con mayor demanda reciente. La variable <code>rides</code> se usa como <code>passengers</code>, y <code>daytype</code> permite diferenciar días laborales, sábados y domingos/festivos.</p>
+<p>El modelo implementado es un <code>RandomForestRegressor</code> con variables temporales, rezagos y medias móviles. Las métricas promedio obtenidas sobre las rutas seleccionadas fueron MAE 1096.71, RMSE 1452.42 y MAPE 8.24%; el error absoluto se interpreta como pasajeros diarios por ruta.</p>
+<p>Como salida operativa adicional, el módulo genera <code>outputs/predictions/demand_forecast_30_days.csv</code>, con una estimación diaria para los próximos 30 días por ruta. Esta tabla es la base para decisiones de asignación de vehículos, turnos de conductores y refuerzo de rutas con mayor demanda esperada.</p>
+<h3 id="3-2-clasificación-de-conducción-distractiva">3.2 Clasificación de Conducción Distractiva</h3>
+<p>El segundo módulo clasifica imágenes de conductores en categorías del dataset Multi-Class Driver Behavior Image Dataset de Kaggle: <code>safe_driving</code>, <code>talking_phone</code>, <code>texting_phone</code>, <code>turning</code> y <code>other_activities</code>.</p>
+<p>Para mantener ejecución rápida en Colab y CI se entrenó un clasificador liviano sobre una muestra real redimensionada. Las métricas fueron accuracy 0.46, macro precision 0.459, macro recall 0.460 y macro F1 0.448. La herramienta muestra también las probabilidades por clase para identificar casos ambiguos. Como mejora futura queda reemplazarlo por transferencia de aprendizaje con ResNet18, MobileNet o EfficientNet.</p>
+<h3 id="3-3-sistema-de-recomendación-de-destinos">3.3 Sistema de Recomendación de Destinos</h3>
+<p>El tercer módulo recomienda destinos de viaje a usuarios según historial, preferencias y comportamiento de reserva. Se usó Travel Recommendation Dataset de Kaggle, uniendo historial de usuario con metadatos de destinos.</p>
+<p>El enfoque implementado es filtrado colaborativo con similitud coseno usuario-usuario. Las métricas fueron Precision@5 = 0.20 y Recall@5 = 1.00 en la evaluación leave-one-out implementada. Además, la herramienta entrega explicaciones simples de las recomendaciones, basadas en usuarios con historial similar.</p>
+<h2 id="4-herramienta-web">4. Herramienta Web</h2>
+<p>La demo web se construyó con Streamlit. Tiene tres vistas principales:</p>
+<ul>
+<li>Predicción de demanda: selección de ruta, gráfica histórica y predicción a 30 días.</li>
+<li>Clasificación de conducción: carga de imagen, clase predicha y confianza.</li>
+<li>Recomendación de destinos: selección de usuario y lista de destinos sugeridos.</li>
+</ul>
+<p>La interfaz se enfocó en una experiencia operativa, clara y fácil de demostrar en video.</p>
+<p>Además, se publicaron páginas estáticas en GitHub Pages:</p>
+<ul>
+<li>Portada de herramientas: <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/">https://andresguido9820.github.io/sistema-transporte-inteligente/</a></li>
+<li>Reporte técnico: <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/reporte.html">https://andresguido9820.github.io/sistema-transporte-inteligente/reporte.html</a></li>
+<li>Herramientas Colab: enlaces directos a los tres notebooks desde la portada.</li>
+</ul>
+<p>Capturas generadas:</p>
+<ul>
+<li><code>outputs/screenshots/app_demanda.png</code></li>
+<li><code>outputs/screenshots/app_mobile.png</code></li>
+</ul>
+<h2 id="5-resultados-generales-y-discusión">5. Resultados Generales y Discusión</h2>
+<p>Los tres módulos se ejecutan de extremo a extremo mediante <code>python scripts/run_all.py</code>. Las pruebas automatizadas validan generación de datos, entrenamiento, importación de la app y estructura de notebooks.</p>
+<table><thead><tr>
+<th>Módulo</th>
+<th>Resultado principal</th>
+<th>Archivo</th>
+</tr></thead><tbody>
+<tr>
+<td>Demanda</td>
+<td>MAE promedio 1096.71, RMSE promedio 1452.42, MAPE promedio 8.24%</td>
+<td><code>outputs/metrics/demand_metrics.json</code></td>
+</tr>
+<tr>
+<td>Visión</td>
+<td>Accuracy 0.46, macro F1 0.448</td>
+<td><code>outputs/metrics/vision_metrics.json</code></td>
+</tr>
+<tr>
+<td>Recomendación</td>
+<td>Precision@5 0.20, Recall@5 1.00</td>
+<td><code>outputs/metrics/recommender_metrics.json</code></td>
+</tr>
+</tbody></table>
+<p>La clasificación visual muestra el principal punto débil: el modelo liviano no reemplaza una CNN profunda. Sin embargo, el pipeline completo de datos reales, entrenamiento, evaluación y demo web ya está listo para sustituir el clasificador por una arquitectura de transferencia.</p>
+<h3 id="5-1-evidencias-reproducibles">5.1 Evidencias Reproducibles</h3>
+<table><thead><tr>
+<th>Evidencia</th>
+<th>Ubicación</th>
+</tr></thead><tbody>
+<tr>
+<td>Predicciones históricas de demanda</td>
+<td><code>outputs/predictions/demand_predictions.csv</code></td>
+</tr>
+<tr>
+<td>Pronóstico de 30 días</td>
+<td><code>outputs/predictions/demand_forecast_30_days.csv</code></td>
+</tr>
+<tr>
+<td>Recomendaciones de muestra</td>
+<td><code>outputs/predictions/recommendations_sample.csv</code></td>
+</tr>
+<tr>
+<td>Métricas por módulo</td>
+<td><code>outputs/metrics/</code></td>
+</tr>
+<tr>
+<td>Gráficas generadas</td>
+<td><code>outputs/figures/</code></td>
+</tr>
+<tr>
+<td>Capturas de la herramienta web</td>
+<td><code>outputs/screenshots/</code></td>
+</tr>
+</tbody></table>
+<h3 id="5-2-pruebas-de-funcionamiento">5.2 Pruebas de Funcionamiento</h3>
+<p>El flujo se valida con <code>pytest</code>, que ejecuta pruebas sobre datos, entrenamiento, estructura de notebooks e importación de la app. También se configuró GitHub Actions para ejecutar la validación en cada actualización de <code>main</code>.</p>
+<h2 id="6-aspectos-éticos-y-creatividad">6. Aspectos Éticos y Creatividad</h2>
+<p>El uso de imágenes de conductores requiere manejo responsable de datos personales, consentimiento, anonimización y control de acceso. El sistema no debe utilizarse como mecanismo automático de sanción sin revisión humana. En recomendación, deben evitarse sesgos que limiten la diversidad de destinos o refuercen patrones históricos injustos.</p>
+<p>La creatividad del proyecto está en integrar tres capacidades distintas en una sola herramienta de operación para transporte: planificación, seguridad y experiencia de usuario.</p>
+<h2 id="7-conclusiones-y-recomendaciones">7. Conclusiones y Recomendaciones</h2>
+<p>El sistema propuesto permite abordar problemas reales de una empresa de transporte desde una perspectiva integrada. La predicción de demanda ayuda a planificar recursos, la clasificación de imágenes apoya la seguridad vial y la recomendación de destinos mejora la personalización del servicio.</p>
+<p>Como trabajo futuro se recomienda incorporar clima real, eventos de ciudad, más rutas, datos reales anonimizados de usuarios y validación con usuarios finales.</p>
+<h3 id="7-1-contribuciones-del-equipo">7.1 Contribuciones del Equipo</h3>
+<table><thead><tr>
+<th>Integrante</th>
+<th>Contribución principal</th>
+</tr></thead><tbody>
+<tr>
+<td>Andrés F. Guido Montoya</td>
+<td>Integración del repositorio, demo web, automatización y reporte</td>
+</tr>
+<tr>
+<td>Juan José Martínez</td>
+<td>Módulo de demanda, análisis de series de tiempo y visualizaciones</td>
+</tr>
+<tr>
+<td>Andrés Lemus</td>
+<td>Módulo de imágenes, recomendación y revisión de resultados</td>
+</tr>
+</tbody></table>
+<h2 id="8-anexos">8. Anexos</h2>
+<ul>
+<li>Repositorio: <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">https://github.com/AndresGuido9820/sistema-transporte-inteligente</a></li>
+<li>Notebook 01: <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb">https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb</a></li>
+<li>Notebook 02: <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb">https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb</a></li>
+<li>Notebook 03: <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb">https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb</a></li>
+<li>Capturas: <code>outputs/screenshots/</code></li>
+<li>Videos de demostración: pendiente para el cierre final de entrega.</li>
+</ul>
+<h2 id="9-bibliografía">9. Bibliografía</h2>
+<ul>
+<li>Chicago Data Portal. (s. f.). *CTA - Ridership - Bus Routes - Daily Totals by Route*. <a href="https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm">https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm</a></li>
+<li>Kaggle. (s. f.). *Multi-Class Driver Behavior Image Dataset*. <a href="https://www.kaggle.com/datasets/arafatsahinafridi/multi-class-driver-behavior-image-dataset/data">https://www.kaggle.com/datasets/arafatsahinafridi/multi-class-driver-behavior-image-dataset/data</a></li>
+<li>Kaggle. (s. f.). *Travel Recommendation Dataset*. <a href="https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset">https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset</a></li>
+<li>Ricci, F., Rokach, L., &amp; Shapira, B. (2015). *Recommender Systems Handbook*. Springer.</li>
+<li>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). *Deep Learning*. MIT Press.</li>
+</ul>
+  </article>
+</main>
+</body>
+</html>
