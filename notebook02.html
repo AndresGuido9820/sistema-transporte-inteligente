@@ -345,7 +345,7 @@ async function cargarModelo() {
     await tf.ready();
 
     setProgress(40, 'Descargando modelo MobileNetV2 (~10 MB)…');
-    model = await tf.loadLayersModel(MODEL_URL);
+    model = await tf.loadGraphModel(MODEL_URL);
     model.predict(tf.zeros([1, INPUT_SIZE, INPUT_SIZE, 3])).dispose(); // warm-up
 
     setProgress(100, 'Modelo listo — sube una imagen para clasificar.', 'ready');
