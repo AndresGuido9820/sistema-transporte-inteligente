@@ -4,6 +4,7 @@ __pycache__/
 venv/
 *.pyc
 *.pkl
+!data/processed/modelo_conduccion.pkl
 *.joblib
 *.pt
 .DS_Store
