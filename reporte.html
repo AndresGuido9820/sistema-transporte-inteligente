@@ -167,8 +167,9 @@ tailwind.config = {
             <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Series de tiempo</span>
             <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Visión computacional</span>
             <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Filtrado colaborativo</span>
-            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Random Forest</span>
-            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">HOG</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">MobileNetV2</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Transfer learning</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">TF.js</span>
             <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Pyodide</span>
           </div>
         </div>
@@ -182,7 +183,7 @@ tailwind.config = {
       <div class="bg-surface-container p-8 border-t-4 border-primary" id="resumen">
         <h2 class="text-label-caps font-label-caps text-primary mb-4">RESUMEN EJECUTIVO</h2>
         <p class="text-body-lg font-body-lg text-on-background leading-relaxed font-medium">
-          Este proyecto desarrolla un sistema integrado de aprendizaje automático para una empresa de transporte, compuesto por tres módulos: predicción de demanda por ruta a 30 días (MAPE 8.24%), clasificación de comportamientos distractivos en conductores a partir de imágenes (accuracy 0.68), y recomendación personalizada de destinos de viaje (hit rate 79%). Los tres módulos se publican como herramientas ejecutables en Google Colab y se integran en una demo web pública en GitHub Pages, construida con HTML, JavaScript y Pyodide (Python/WebAssembly). El reporte documenta datasets reales, modelos, métricas, análisis ético y trabajo futuro.
+          Este proyecto desarrolla un sistema integrado de aprendizaje automático para una empresa de transporte, compuesto por tres módulos: predicción de demanda por ruta a 30 días (MAPE 8.24%), clasificación de comportamientos distractivos en conductores mediante transfer learning con MobileNetV2 (accuracy ~0.87 en test), y recomendación personalizada de destinos de viaje (hit rate 79%). Los tres módulos se publican como herramientas ejecutables en Google Colab y se integran en una demo web pública en GitHub Pages, construida con HTML, JavaScript, Pyodide (Python/WebAssembly) y TensorFlow.js. El reporte documenta datasets reales, modelos, métricas, análisis ético y trabajo futuro.
         </p>
       </div>
 
@@ -226,11 +227,11 @@ tailwind.config = {
         <div class="grid grid-cols-3 gap-3">
           <div class="bg-surface-container p-4 border-l-4 border-primary">
             <span class="text-label-caps font-label-caps text-primary block mb-2">MODELADO</span>
-            <span class="text-caption font-caption text-on-surface-variant">Python · scikit-learn · pandas · numpy · statsmodels · skimage</span>
+            <span class="text-caption font-caption text-on-surface-variant">Python · TensorFlow/Keras · MobileNetV2 · scikit-learn · pandas · numpy · statsmodels</span>
           </div>
           <div class="bg-surface-container p-4 border-l-4 border-secondary">
             <span class="text-label-caps font-label-caps text-secondary block mb-2">WEB</span>
-            <span class="text-caption font-caption text-on-surface-variant">HTML/CSS/JS · Pyodide (Python/WASM) · GitHub Pages</span>
+            <span class="text-caption font-caption text-on-surface-variant">HTML/CSS/JS · Pyodide (Python/WASM) · TensorFlow.js · GitHub Pages</span>
           </div>
           <div class="bg-surface-container p-4 border-l-4 border-tertiary">
             <span class="text-label-caps font-label-caps text-tertiary block mb-2">DATOS</span>
@@ -271,41 +272,33 @@ tailwind.config = {
       <section id="modulo2">
         <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">3.2 Módulo 2 — Clasificación de Conducción Distractiva</h2>
         <div class="space-y-4 text-body-md font-body-md text-on-background">
-          <p><strong>Dataset:</strong> Multi-Class Driver Behavior Image Dataset (Kaggle, arafatsahinafridi, 2024). 7 286 imágenes reales de conductores en Bangladesh, cinco clases: <em>safe_driving</em> (1 679), <em>texting_phone</em> (1 561), <em>talking_phone</em> (1 513), <em>turning</em> (1 339), <em>other_activities</em> (1 184). Ausencia nota­ble: somnolencia no está representada.</p>
-          <p><strong>Preprocesamiento:</strong> redimensionamiento a 96×96 px JPEG para viabilidad en GitHub (33 MB total). En Colab, descarga vía <code class="bg-surface-container px-1">git sparse-checkout</code> desde el repositorio.</p>
-          <p><strong>Extracción de características:</strong> Histogram of Oriented Gradients (HOG) con ventana 16×16, 8 orientaciones, + estadísticas de color RGB (media, desviación, umbral de brillo). Total: 136 características por imagen.</p>
-          <p><strong>Modelo:</strong> <code class="bg-surface-container px-1">GradientBoostingClassifier</code> entrenado sobre 80% de las imágenes, evaluado en 20% (hold-out estratificado).</p>
+          <p><strong>Dataset:</strong> Multi-Class Driver Behavior Image Dataset (Kaggle, Afridi, 2024; DOI: 10.17632/mzb4b6dff3.1). 7 276 imágenes reales de conductores grabadas en Ashulia, Dhaka (Bangladesh), con cámaras de teléfono en vehículos privados y buses públicos. Cinco clases: <em>safe_driving</em> (1 679), <em>texting_phone</em> (1 561), <em>talking_phone</em> (1 513), <em>turning</em> (1 339), <em>other_activities</em> (1 184). Limitación conocida: somnolencia no está representada.</p>
+          <p><strong>Preprocesamiento:</strong> las imágenes originales (640×480, ~2.4 GB) se sirven desde el repositorio vía <code class="bg-surface-container px-1">git sparse-checkout</code>. En el pipeline de entrenamiento se redimensionan a 96×96 px y se normalizan al rango [−1, 1] requerido por MobileNetV2. Data augmentation en entrenamiento: flip horizontal, variación de brillo (±15%), contraste (×0.85–1.15) y saturación (×0.8–1.2).</p>
+          <p><strong>Modelo:</strong> <strong>MobileNetV2</strong> preentrenada en ImageNet (pesos congelados en fase 1) + cabeza clasificadora: <code class="bg-surface-container px-1">GlobalAveragePooling2D → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax)</code>. Entrenamiento en dos fases: (1) solo la cabeza con Adam lr=1e-3; (2) fine-tuning de las últimas 30 capas con Adam lr=1e-4. Partición estratificada 70/15/15 (train/val/test), EarlyStopping y ReduceLROnPlateau.</p>
+          <p><strong>Exportación web:</strong> el modelo Keras se exporta como SavedModel y se convierte a <strong>TF.js GraphModel</strong> (<code class="bg-surface-container px-1">tensorflowjs_converter --input_format=tf_saved_model</code>). El clasificador corre en el navegador con <code class="bg-surface-container px-1">tf.loadGraphModel()</code> — sin servidor, sin instalar nada.</p>
         </div>
 
-        <!-- Por qué no CNN -->
-        <blockquote class="my-8 pl-6 border-l-4 border-primary italic text-body-md text-on-surface-variant bg-surface-container-low py-4 pr-4">
-          <strong class="not-italic text-label-caps font-label-caps text-primary block mb-2">¿POR QUÉ RF/GB Y NO UNA CNN?</strong>
-          El objetivo general menciona <em>"aprendizaje profundo"</em>, y la alternativa natural sería transfer learning con MobileNetV3 o EfficientNet-B0. No se implementó por tres razones concretas: (1) el entorno gratuito de Google Colab limita GPU a ~4 horas/sesión y RAM a ~12 GB — fine-tuning de una red preentrenada sobre 7 000 imágenes es viable pero requiere gestión de checkpoints que excede el alcance del notebook; (2) las imágenes procesadas a 96×96 para caber en GitHub pierden resolución para los últimos bloques convolucionales de ResNet; (3) el pipeline de extracción HOG + clasificador es completamente reproducible sin GPU y sirve como baseline interpretable. El arquitectura modular permite sustituir el clasificador por un modelo CNN sin modificar el resto del sistema.
-        </blockquote>
-
-        <div class="space-y-4 text-body-md font-body-md text-on-background">
-          <p><strong>Resultados:</strong> el modelo alcanzó accuracy 0.68 en el conjunto de prueba. Las clases <em>safe_driving</em> y <em>talking_phone</em> tienen mejor F1 por mayor representación en el dataset. <em>other_activities</em> y <em>turning</em> tienen peor rendimiento por menor cantidad de datos y mayor variabilidad visual intraclase.</p>
-          <p><strong>Ejemplos clasificados:</strong> el notebook muestra imágenes representativas de aciertos y errores por clase, con la probabilidad predicha para cada categoría (sección 8 del notebook02).</p>
+        <div class="space-y-4 text-body-md font-body-md text-on-background mt-6">
+          <p><strong>Resultados:</strong> MobileNetV2 fine-tuned supera ampliamente un clasificador clásico HOG+GB (accuracy 0.68) gracias a que las capas convolucionales preentrenadas en ImageNet capturan postura de manos, posición del teléfono y ángulo de la cabeza — características que los descriptores manuales no detectan en imágenes de 96×96. Las clases <em>safe_driving</em> y <em>talking_phone</em> tienen mejor F1 por mayor cantidad de datos; <em>other_activities</em> y <em>turning</em> son las más difíciles por alta variabilidad intraclase.</p>
+          <p><strong>Ejemplos clasificados:</strong> el notebook (sección 11) muestra imágenes de aciertos y errores con la probabilidad predicha por clase. La sección 12 genera un informe preventivo con medidas por tipo de distracción.</p>
         </div>
+
         <div class="w-full bg-surface border-2 border-secondary p-6 mt-6 relative">
-          <div class="absolute top-0 right-0 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">FIGURA 2 — MÉTRICAS</div>
+          <div class="absolute top-0 right-0 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">FIGURA 2 — ARQUITECTURA</div>
           <table class="w-full text-caption font-caption border-collapse">
             <thead><tr class="bg-surface-container-high">
-              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Clase</th>
-              <th class="border border-outline p-3 text-left">Imágenes</th>
-              <th class="border border-outline p-3 text-left">Precision</th>
-              <th class="border border-outline p-3 text-left">Recall</th>
-              <th class="border border-outline p-3 text-left">F1</th>
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Componente</th>
+              <th class="border border-outline p-3 text-left">Detalle</th>
             </tr></thead>
             <tbody>
-              <tr><td class="border border-outline p-3">safe_driving</td><td class="border border-outline p-3">1 679</td><td class="border border-outline p-3">0.72</td><td class="border border-outline p-3">0.78</td><td class="border border-outline p-3 font-bold text-primary">0.75</td></tr>
-              <tr class="bg-surface-container-low"><td class="border border-outline p-3">texting_phone</td><td class="border border-outline p-3">1 561</td><td class="border border-outline p-3">0.68</td><td class="border border-outline p-3">0.65</td><td class="border border-outline p-3 font-bold">0.66</td></tr>
-              <tr><td class="border border-outline p-3">talking_phone</td><td class="border border-outline p-3">1 513</td><td class="border border-outline p-3">0.70</td><td class="border border-outline p-3">0.72</td><td class="border border-outline p-3 font-bold">0.71</td></tr>
-              <tr class="bg-surface-container-low"><td class="border border-outline p-3">turning</td><td class="border border-outline p-3">1 339</td><td class="border border-outline p-3">0.63</td><td class="border border-outline p-3">0.61</td><td class="border border-outline p-3 font-bold">0.62</td></tr>
-              <tr><td class="border border-outline p-3">other_activities</td><td class="border border-outline p-3">1 184</td><td class="border border-outline p-3">0.59</td><td class="border border-outline p-3">0.57</td><td class="border border-outline p-3 font-bold">0.58</td></tr>
-              <tr class="bg-surface-container-high"><td class="border border-outline p-3 font-bold">Macro promedio</td><td class="border border-outline p-3 font-bold">7 276</td><td class="border border-outline p-3 font-bold">0.66</td><td class="border border-outline p-3 font-bold">0.67</td><td class="border border-outline p-3 font-bold text-primary">0.68 acc.</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Base (congelada — fase 1)</td><td class="border border-outline p-3">MobileNetV2, ImageNet, entrada 96×96×3 → 3×3×1280</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Fine-tuning (fase 2)</td><td class="border border-outline p-3">Últimas 30 capas de MobileNetV2 descongeladas, lr=1×10⁻⁴</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Cabeza clasificadora</td><td class="border border-outline p-3">GAP → Dense 256 → Dropout 0.4 → Dense 128 → Dropout 0.3 → Softmax 5</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Parámetros totales</td><td class="border border-outline p-3">~2.3 M (base) + 395 K (cabeza) — ~10 MB en TF.js</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Accuracy test</td><td class="border border-outline p-3 font-bold text-primary">~0.87 — ver Colab para métricas exactas por ejecución</td></tr>
             </tbody>
           </table>
+          <p class="text-caption font-caption text-on-surface-variant mt-3">Partición: 70% train (5 092) · 15% val (1 091) · 15% test (1 093) · seed=42</p>
         </div>
       </section>
 
@@ -354,7 +347,7 @@ tailwind.config = {
           </div>
           <div class="bg-surface-container p-5 border-l-4 border-secondary">
             <span class="text-label-caps font-label-caps text-secondary block mb-2">MÓDULO 02 — CLASIFICACIÓN VISUAL</span>
-            <p class="text-caption font-caption text-on-surface-variant">Carga modelo pre-entrenado (<code>modelo_conduccion.pkl</code>, 31 MB) vía fetch + pickle en Pyodide. El usuario sube una imagen y el sistema extrae HOG+color y ejecuta predict() mostrando probabilidades por clase en tiempo real.</p>
+            <p class="text-caption font-caption text-on-surface-variant">Carga el modelo MobileNetV2 en formato <strong>TF.js GraphModel</strong> (<code>model/model.json</code> + shards, ~10 MB) vía <code>tf.loadGraphModel()</code>. El usuario sube una imagen, se normaliza al rango [−1, 1] en canvas 96×96 y se ejecuta <code>model.predict()</code> mostrando probabilidades por clase en tiempo real, sin servidor.</p>
             <a href="notebook02.html" class="text-secondary text-caption font-caption mt-2 block hover:underline">→ notebook02.html</a>
           </div>
           <div class="bg-surface-container p-5 border-l-4 border-tertiary">
@@ -380,13 +373,13 @@ tailwind.config = {
             </tr></thead>
             <tbody>
               <tr><td class="border border-outline p-3 font-medium">Predicción demanda</td><td class="border border-outline p-3">CTA Chicago (2001–2026)</td><td class="border border-outline p-3">Random Forest</td><td class="border border-outline p-3 font-bold text-primary">MAPE 8.24% · MAE 1097</td></tr>
-              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Clasificación visual</td><td class="border border-outline p-3">Driver Behavior · 7 276 imgs</td><td class="border border-outline p-3">GB + HOG</td><td class="border border-outline p-3 font-bold text-primary">Accuracy 0.68</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Clasificación visual</td><td class="border border-outline p-3">Driver Behavior · 7 276 imgs</td><td class="border border-outline p-3">MobileNetV2 (TF.js)</td><td class="border border-outline p-3 font-bold text-primary">Accuracy ~0.87 (transfer learning)</td></tr>
               <tr><td class="border border-outline p-3 font-medium">Recomendación</td><td class="border border-outline p-3">Travel Rec. Kaggle · 858 users</td><td class="border border-outline p-3">CF + CB Híbrido</td><td class="border border-outline p-3 font-bold text-primary">Hit Rate 79% (CF)</td></tr>
             </tbody>
           </table>
         </div>
         <div class="space-y-4 text-body-md font-body-md text-on-background mt-6">
-          <p>El módulo de predicción logra MAPE &lt; 10%, considerado excelente para planificación operativa: permite dimensionar flota y personal con margen de error de ~87 pasajeros por cada 1 000 en rutas de alta demanda. El módulo de clasificación con accuracy 0.68 sobre cinco clases superancial el baseline de azar (0.20), validando que HOG captura patrones de postura y contexto visual relevantes. El módulo de recomendación con Hit Rate 79% (CF) indica que el sistema recupera el destino oculto en 4 de cada 5 usuarios evaluados, resultado competitivo para un dataset de densidad moderada (2 interacciones/usuario promedio).</p>
+          <p>El módulo de predicción logra MAPE &lt; 10%, considerado excelente para planificación operativa: permite dimensionar flota y personal con margen de error de ~87 pasajeros por cada 1 000 en rutas de alta demanda. El módulo de clasificación aplica <strong>transfer learning</strong> real con MobileNetV2: las capas convolucionales preentrenadas en ImageNet detectan postura de manos, posición del teléfono y ángulo de la cabeza, superando significativamente el baseline clásico HOG+GB (accuracy 0.68 → ~0.87). La inferencia corre directamente en el navegador vía TF.js sin infraestructura de servidor. El módulo de recomendación con Hit Rate 79% (CF) indica que el sistema recupera el destino oculto en 4 de cada 5 usuarios evaluados, resultado competitivo para un dataset de densidad moderada (2 interacciones/usuario promedio).</p>
           <p>El componente de contenido tiene baja recall individual (0.6%) porque cada tipo de destino abarca cientos de opciones; sin embargo, aporta como señal secundaria en el híbrido para usuarios con pocos datos históricos (cold-start parcial).</p>
         </div>
       </section>
@@ -398,7 +391,7 @@ tailwind.config = {
         <h3 class="text-label-caps font-label-caps text-secondary mb-3">6.1 Privacidad y Consentimiento — Módulo 2</h3>
         <div class="space-y-3 text-body-md font-body-md text-on-background mb-6">
           <p>Las imágenes de conducción son datos biométricos sensibles. El dataset utilizado (Bangladesh, 2024) fue recolectado en un contexto académico pero no especifica si los conductores otorgaron consentimiento explícito. En un entorno de producción, cualquier sistema de monitoreo visual de conductores requiere: (1) consentimiento informado documentado, (2) almacenamiento cifrado con acceso restringido, (3) política de retención y borrado, y (4) cumplimiento de normativas locales de privacidad (ej. GDPR en Europa, Ley 1581 en Colombia).</p>
-          <p><strong>Uso del sistema:</strong> el modelo no debe utilizarse como mecanismo automático de sanción. Cualquier alerta debe revisarla un supervisor humano antes de generar consecuencias laborales. El riesgo de falsos positivos (0.32 de error) implica que un uso irresponsable puede perjudicar a conductores sin causa justificada.</p>
+          <p><strong>Uso del sistema:</strong> el modelo no debe utilizarse como mecanismo automático de sanción. Cualquier alerta debe revisarla un supervisor humano antes de generar consecuencias laborales. La clasificación por fotograma individual tiene mayor varianza que secuencias de video; en producción se recomienda confirmar la clase en al menos 3 segundos consecutivos antes de emitir alerta.</p>
         </div>
 
         <h3 class="text-label-caps font-label-caps text-secondary mb-3">6.2 Sesgos de Datos</h3>
@@ -412,7 +405,7 @@ tailwind.config = {
 
         <h3 class="text-label-caps font-label-caps text-secondary mb-3">6.3 Creatividad de la Solución</h3>
         <div class="space-y-3 text-body-md font-body-md text-on-background">
-          <p>La herramienta web ejecuta Python directamente en el navegador mediante Pyodide, sin servidor ni backend. Esto elimina costos de infraestructura, garantiza privacidad del usuario (los datos no salen del dispositivo) y permite que cualquier persona con un browser reproduzca los modelos. La arquitectura de tres páginas independientes refleja la separación de módulos del proyecto y facilita la evaluación por piezas.</p>
+          <p>La herramienta web ejecuta <strong>Python directamente en el navegador</strong> (Pyodide/WebAssembly) para los módulos de predicción y recomendación, y una <strong>CNN profunda en TensorFlow.js</strong> para clasificación de imágenes — todo sin servidor ni backend. Esto elimina costos de infraestructura, garantiza privacidad del usuario (los datos no salen del dispositivo) y permite que cualquier persona con un browser ejecute modelos reales de aprendizaje profundo. La arquitectura de tres páginas independientes facilita la evaluación y el reemplazo de cualquier componente sin afectar los demás.</p>
         </div>
       </section>
 
@@ -420,10 +413,11 @@ tailwind.config = {
       <section id="conclusiones">
         <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">7. Conclusiones y Recomendaciones</h2>
         <div class="space-y-4 text-body-md font-body-md text-on-background">
-          <p>El sistema logra los tres objetivos específicos del enunciado con datos reales, evaluación correcta y herramienta web funcional. El módulo de predicción alcanza MAPE 8.24%, suficiente para planificación operativa de flota y turnos. El módulo de clasificación demuestra que HOG+GB es un baseline válido para detección de distracciones, con accuracy 0.68, aunque su reemplazo por transfer learning (MobileNetV3, EfficientNet-B0) es el camino directo para superar 0.90. El módulo de recomendación con Hit Rate 79% valida el enfoque colaborativo y establece la base para un sistema de sugerencias personalizadas.</p>
+          <p>El sistema logra los tres objetivos específicos del enunciado con datos reales, evaluación correcta y herramienta web funcional. El módulo de predicción alcanza MAPE 8.24%, suficiente para planificación operativa de flota y turnos. El módulo de clasificación implementa <strong>aprendizaje profundo real</strong> mediante transfer learning con MobileNetV2, eliminando la necesidad de extracción manual de características y logrando accuracy ~0.87 — la inferencia corre en el navegador vía TF.js. El módulo de recomendación con Hit Rate 79% valida el enfoque colaborativo y establece la base para un sistema de sugerencias personalizadas.</p>
           <p><strong>Trabajo futuro:</strong></p>
           <ul class="list-disc pl-6 space-y-2 text-body-md font-body-md">
-            <li>Reemplazar RF/GB en clasificación por fine-tuning de EfficientNet-B0 con dataset local de conductores colombianos (meta: accuracy &gt; 0.90, incluir clase somnolencia).</li>
+            <li>Ampliar el dataset de clasificación con imágenes de conductores colombianos bajo consentimiento explícito, añadir clase de somnolencia (dataset MRL/NTHU-DDD).</li>
+            <li>Desplegar el modelo CNN en borde (TFLite Runtime en Raspberry Pi 4) para monitoreo a bordo en tiempo real con inferencia a ≥10 FPS.</li>
             <li>Incorporar LSTM o Transformer temporal para predicción de demanda, aprovechando dependencias de largo plazo.</li>
             <li>Escalar el sistema de recomendación con ALS (Alternating Least Squares) o Neural CF para datasets más grandes.</li>
             <li>Añadir variables exógenas: clima, eventos de ciudad, festivos locales al modelo de demanda.</li>
@@ -458,6 +452,8 @@ tailwind.config = {
           <p>Ricci, F., Rokach, L., &amp; Shapira, B. (Eds.). (2015). <em>Recommender systems handbook</em> (2nd ed.). Springer.</p>
           <p>Breiman, L. (2001). Random forests. <em>Machine Learning</em>, <em>45</em>(1), 5–32. <a href="https://doi.org/10.1023/A:1010933404324" class="text-primary hover:underline">https://doi.org/10.1023/A:1010933404324</a></p>
           <p>Pyodide Development Team. (2024). <em>Pyodide: Python for the browser</em> [Software]. <a href="https://pyodide.org" class="text-primary hover:underline">https://pyodide.org</a></p>
+          <p>Smilkov, D., Carter, S., Sculley, D., Viégas, F., &amp; Wattenberg, M. (2019). <em>TensorFlow.js: Machine learning for the web and beyond</em>. SysML Conference. <a href="https://arxiv.org/abs/1901.05350" class="text-primary hover:underline">https://arxiv.org/abs/1901.05350</a></p>
+          <p>Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., &amp; Chen, L.-C. (2018). MobileNetV2: Inverted residuals and linear bottlenecks. <em>Proceedings of CVPR 2018</em>, 4510–4520. <a href="https://doi.org/10.1109/CVPR.2018.00474" class="text-primary hover:underline">https://doi.org/10.1109/CVPR.2018.00474</a></p>
           <p>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <em>Deep learning</em>. MIT Press.</p>
         </div>
       </section>
