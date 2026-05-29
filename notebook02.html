@@ -1,0 +1,558 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notebook 02 — Clasificación de conducción | Sistema Inteligente de Transporte</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+  <style>
+    :root { color-scheme: light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --red:#c0392b; --bg:#f5f7fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 64px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 34px; }
+    .brand { font-weight: 800; letter-spacing: .2px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+    .hero { padding: 42px 0 34px; border-bottom: 1px solid var(--line); }
+    .hero h1 { margin: 0; font-size: clamp(28px, 4vw, 50px); line-height: 1.08; }
+    .hero p { margin: 14px 0 0; color: var(--muted); font-size: 17px; max-width: 720px; }
+    .badge { display: inline-flex; margin-bottom: 14px; color: var(--green); font-weight: 700; font-size: 14px; }
+    .section { margin-top: 36px; }
+    .section > h2 { margin: 0 0 12px; font-size: 20px; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
+    .run-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 20px; border-radius: 6px; background: var(--blue); color: white; font-weight: 700; border: none; cursor: pointer; font-size: 15px; transition: background .15s; }
+    .button:hover:not(:disabled) { background: #174bd0; }
+    .button:disabled { opacity: .45; cursor: not-allowed; }
+    .button.green { background: var(--green); }
+    .button.green:hover:not(:disabled) { background: #095f49; }
+    .status-text { color: var(--muted); font-size: 14px; }
+    .progress { height: 6px; background: #e8edf3; border-radius: 999px; overflow: hidden; margin-top: 14px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); border-radius: 999px; width: 0%; transition: width .5s ease; }
+    .log-box { font-family: ui-monospace, monospace; font-size: 12.5px; background: #f0f2f5; border-radius: 6px; padding: 10px 14px; max-height: 130px; overflow-y: auto; color: var(--muted); margin-top: 12px; white-space: pre-wrap; border: 1px solid var(--line); }
+    .skeleton { background: linear-gradient(90deg, #eef0f3 25%, #f5f7fa 50%, #eef0f3 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite; border-radius: 6px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .placeholder { height: 180px; }
+    .placeholder-sm { height: 80px; }
+    .output-table { width: 100%; border-collapse: collapse; font-size: 13.5px; overflow-x: auto; display: block; }
+    .output-table th, .output-table td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; white-space: nowrap; }
+    .output-table th { background: #eef3f8; font-weight: 600; }
+    .output-table tr:hover td { background: #f7f9fc; }
+    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .chart-box { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+    .chart-box img { max-width: 100%; border-radius: 4px; display: block; }
+    .note { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+    .step-label { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #edf3ff; color: var(--blue); font-weight: 800; font-size: 13px; margin-right: 8px; vertical-align: middle; }
+    /* dataset info cards */
+    .class-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-top: 12px; }
+    .class-card { background: #f7f9fc; border: 1px solid var(--line); border-radius: 8px; padding: 12px; text-align: center; }
+    .class-card strong { display: block; font-size: 18px; color: var(--blue); }
+    .class-card span { font-size: 12px; color: var(--muted); }
+    /* upload zone */
+    .upload-zone { border: 2px dashed var(--line); border-radius: 8px; padding: 32px; text-align: center; cursor: pointer; transition: border-color .2s, background .2s; }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--blue); background: #f0f4ff; }
+    .upload-zone input { display: none; }
+    .upload-zone p { margin: 8px 0 0; color: var(--muted); font-size: 14px; }
+    .result-box { display: grid; grid-template-columns: auto 1fr; gap: 20px; align-items: start; margin-top: 16px; }
+    .result-img img { max-width: 200px; border-radius: 8px; border: 1px solid var(--line); }
+    .pred-label { font-size: 28px; font-weight: 800; margin: 0 0 4px; }
+    .pred-conf { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+    .prob-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; font-size: 13px; }
+    .prob-bar-label { width: 140px; flex-shrink: 0; }
+    .prob-bar-track { flex: 1; height: 10px; background: #e8edf3; border-radius: 999px; overflow: hidden; }
+    .prob-bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--blue), var(--green)); transition: width .4s; }
+    .prob-bar-pct { width: 42px; text-align: right; font-weight: 600; }
+    @media (max-width: 700px) { .charts-grid, .class-grid { grid-template-columns: 1fr 1fr; } .result-box { grid-template-columns: 1fr; } }
+    @media (max-width: 480px) { .class-grid { grid-template-columns: 1fr 1fr; } }
+  </style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="topbar">
+    <div class="brand">Sistema Inteligente de Transporte</div>
+    <nav class="nav">
+      <a href="index.html">Inicio</a>
+      <a href="notebook01.html">Notebook 01</a>
+      <a href="reporte.html">Reporte técnico</a>
+      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <span class="badge">Notebook 02 — ejecutado en el navegador</span>
+    <h1>Clasificación de conducción distractiva</h1>
+    <p>
+      Entrena un clasificador de comportamiento del conductor directamente en el navegador con
+      <strong>Pyodide</strong>. Usa características HOG + color sobre 200 imágenes reales del dataset
+      público CTA Bangladesh 2024. Al terminar, sube una foto para clasificarla en vivo.
+    </p>
+  </section>
+
+  <!-- ── Dataset info ── -->
+  <section class="section">
+    <h2><span class="step-label">1</span>Dataset</h2>
+    <div class="panel">
+      <p class="note">
+        <strong>Fuente:</strong>
+        <a href="https://zenodo.org/records/14908802" target="_blank">Multi-Class Driver Behavior Image Dataset</a>
+        — Zenodo / Mendeley Data, Bangladesh 2024.
+        Artículo: <em>A multi-class driver behavior dataset for real-time detection and road safety enhancement</em> (PMC 2025).
+        7,286 imágenes totales · 5 clases · el notebook usa 200 preprocesadas (40/clase).
+      </p>
+      <div class="class-grid">
+        <div class="class-card"><strong>40</strong><span>safe_driving</span></div>
+        <div class="class-card"><strong>40</strong><span>texting_phone</span></div>
+        <div class="class-card"><strong>40</strong><span>talking_phone</span></div>
+        <div class="class-card"><strong>40</strong><span>turning</span></div>
+        <div class="class-card"><strong>40</strong><span>other_activities</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Control ── -->
+  <section class="section">
+    <div class="panel">
+      <div class="run-bar">
+        <button class="button" id="btn-run" onclick="iniciarEjecucion()">Entrenar modelo</button>
+        <span class="status-text" id="status-text">Presiona para cargar Python y entrenar el clasificador.</span>
+      </div>
+      <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="log-box" id="log-box">Los pasos aparecerán aquí...</div>
+    </div>
+  </section>
+
+  <!-- ── Exploración visual ── -->
+  <section class="section">
+    <h2><span class="step-label">2</span>Exploración visual — ejemplos por clase</h2>
+    <div class="panel">
+      <div id="out-ejemplos"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── Métricas ── -->
+  <section class="section">
+    <h2><span class="step-label">3</span>Métricas del modelo</h2>
+    <div class="charts-grid">
+      <div class="panel">
+        <p class="note" style="margin-top:0">Reporte de clasificación (accuracy, F1, precisión, recall por clase)</p>
+        <div id="out-reporte"><div class="skeleton placeholder"></div></div>
+      </div>
+      <div class="chart-box">
+        <div id="out-confusion"><div class="skeleton placeholder"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Aciertos y errores ── -->
+  <section class="section">
+    <h2><span class="step-label">4</span>Aciertos y errores</h2>
+    <div class="panel">
+      <div id="out-errores"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── Clasificar imagen ── -->
+  <section class="section">
+    <h2><span class="step-label">5</span>Clasificar una imagen nueva</h2>
+    <div class="panel">
+      <p class="note">Entrena primero el modelo, luego sube cualquier imagen de un conductor para clasificarla.</p>
+      <label class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <input type="file" id="file-input" accept="image/*" onchange="clasificarImagen(event)">
+        <div style="font-size:36px">📷</div>
+        <strong>Haz clic o arrastra una imagen aquí</strong>
+        <p>JPG, PNG, WEBP — se clasifica en el navegador, sin subir a ningún servidor</p>
+      </label>
+      <div id="out-clasificacion" style="margin-top:16px"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+let pyodide = null;
+let modeloListo = false;
+
+function log(msg) {
+  const box = document.getElementById('log-box');
+  const ts = new Date().toLocaleTimeString('es-CO', { hour12: false });
+  box.textContent += '\n[' + ts + '] ' + msg;
+  box.scrollTop = box.scrollHeight;
+}
+
+function setProgress(pct, msg) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('status-text').textContent = msg;
+  log(msg);
+}
+
+function inject(id, html) {
+  document.getElementById(id).innerHTML = html;
+}
+
+function dragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
+function dragLeave(e) { document.getElementById('upload-zone').classList.remove('drag-over'); }
+function dropFile(e) {
+  e.preventDefault();
+  dragLeave(e);
+  const file = e.dataTransfer.files[0];
+  if (file) procesarArchivo(file);
+}
+function clasificarImagen(e) {
+  const file = e.target.files[0];
+  if (file) procesarArchivo(file);
+}
+
+async function procesarArchivo(file) {
+  if (!modeloListo) {
+    inject('out-clasificacion', '<p style="color:var(--amber);font-weight:600">Primero entrena el modelo con el botón de arriba.</p>');
+    return;
+  }
+  inject('out-clasificacion', '<div class="skeleton" style="height:120px;border-radius:8px"></div>');
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const bytes = new Uint8Array(e.target.result);
+    const previewSrc = URL.createObjectURL(file);
+    try {
+      const result = await pyodide.runPythonAsync(`
+import io, base64
+import numpy as np
+from PIL import Image as PILImage
+from skimage.feature import hog as hog_features
+
+img_bytes_arr = bytes(img_upload_bytes)
+img_pil = PILImage.open(io.BytesIO(img_bytes_arr)).convert('RGB').resize((64, 64))
+img_gray = img_pil.convert('L')
+arr      = np.asarray(img_pil,  dtype=float) / 255.0
+arr_gray = np.asarray(img_gray, dtype=float) / 255.0
+
+medias      = arr.mean(axis=(0, 1))
+desvios     = arr.std(axis=(0, 1))
+brillo      = arr.mean(axis=2)
+dark_ratio  = (brillo < 0.20).mean()
+bright_ratio= (brillo > 0.80).mean()
+color_feats = np.concatenate([medias, desvios, [dark_ratio, bright_ratio]])
+hog_feats   = hog_features(arr_gray, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
+feats = np.concatenate([color_feats, hog_feats]).reshape(1, -1)
+
+clase  = modelo_clf.predict(feats)[0]
+probas = dict(zip(modelo_clf.classes_, modelo_clf.predict_proba(feats)[0].tolist()))
+import json
+json.dumps({'clase': clase, 'probas': probas})
+`);
+      pyodide.globals.set('img_upload_bytes', bytes);
+      // Re-run to get result after setting bytes
+      const result2 = await pyodide.runPythonAsync(`
+import io, json
+import numpy as np
+from PIL import Image as PILImage
+from skimage.feature import hog as hog_features
+
+img_bytes_arr = bytes(img_upload_bytes)
+img_pil = PILImage.open(io.BytesIO(img_bytes_arr)).convert('RGB').resize((64, 64))
+img_gray = img_pil.convert('L')
+arr      = np.asarray(img_pil,  dtype=float) / 255.0
+arr_gray = np.asarray(img_gray, dtype=float) / 255.0
+medias      = arr.mean(axis=(0, 1))
+desvios     = arr.std(axis=(0, 1))
+brillo      = arr.mean(axis=2)
+dark_ratio  = (brillo < 0.20).mean()
+bright_ratio= (brillo > 0.80).mean()
+color_feats = np.concatenate([medias, desvios, [dark_ratio, bright_ratio]])
+hog_feats   = hog_features(arr_gray, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
+feats = np.concatenate([color_feats, hog_feats]).reshape(1, -1)
+clase  = modelo_clf.predict(feats)[0]
+probas = dict(zip(modelo_clf.classes_, modelo_clf.predict_proba(feats)[0].tolist()))
+json.dumps({'clase': clase, 'probas': probas})
+`);
+      const data = JSON.parse(result2);
+      renderResultado(previewSrc, data.clase, data.probas);
+    } catch(err) {
+      console.error(err);
+      inject('out-clasificacion', '<p style="color:var(--red)">Error al clasificar: ' + err.message + '</p>');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+async function clasificarConBytes(bytes, previewSrc) {
+  pyodide.globals.set('img_upload_bytes', bytes);
+  const result = await pyodide.runPythonAsync(`
+import io, json
+import numpy as np
+from PIL import Image as PILImage
+from skimage.feature import hog as hog_features
+
+img_pil  = PILImage.open(io.BytesIO(bytes(img_upload_bytes))).convert('RGB').resize((64,64))
+img_gray = img_pil.convert('L')
+arr      = np.asarray(img_pil,  dtype=float) / 255.0
+arr_gray = np.asarray(img_gray, dtype=float) / 255.0
+medias      = arr.mean(axis=(0,1))
+desvios     = arr.std(axis=(0,1))
+brillo      = arr.mean(axis=2)
+color_feats = np.concatenate([medias, desvios, [(brillo<0.20).mean(), (brillo>0.80).mean()]])
+hog_feats   = hog_features(arr_gray, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
+feats  = np.concatenate([color_feats, hog_feats]).reshape(1, -1)
+clase  = modelo_clf.predict(feats)[0]
+probas = dict(zip(modelo_clf.classes_, modelo_clf.predict_proba(feats)[0].tolist()))
+json.dumps({'clase': clase, 'probas': probas})
+`);
+  const data = JSON.parse(result);
+  renderResultado(previewSrc, data.clase, data.probas);
+}
+
+function renderResultado(imgSrc, clase, probas) {
+  const labels = {
+    safe_driving:     'Conducción segura',
+    texting_phone:    'Escribiendo en el teléfono',
+    talking_phone:    'Hablando por teléfono',
+    turning:          'Girando',
+    other_activities: 'Otras actividades',
+  };
+  const sorted = Object.entries(probas).sort((a,b) => b[1]-a[1]);
+  const barsHTML = sorted.map(([k,v]) => {
+    const pct = (v*100).toFixed(1);
+    const isTop = k === clase;
+    return `<div class="prob-bar-row">
+      <div class="prob-bar-label" style="${isTop?'font-weight:700;color:var(--blue)':''}">${labels[k]||k}</div>
+      <div class="prob-bar-track"><div class="prob-bar-fill" style="width:${pct}%;background:${isTop?'linear-gradient(90deg,var(--blue),var(--green))':'#c9d8ff'}"></div></div>
+      <div class="prob-bar-pct">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  inject('out-clasificacion', `
+    <div class="result-box">
+      <div class="result-img"><img src="${imgSrc}" alt="Imagen clasificada"></div>
+      <div>
+        <div class="pred-label" style="color:var(--blue)">${labels[clase]||clase}</div>
+        <div class="pred-conf">Clase detectada: <code>${clase}</code></div>
+        ${barsHTML}
+      </div>
+    </div>
+  `);
+}
+
+async function iniciarEjecucion() {
+  const btn = document.getElementById('btn-run');
+  btn.disabled = true;
+  document.getElementById('log-box').textContent = '';
+  modeloListo = false;
+
+  try {
+    // ── Pyodide + paquetes ──────────────────────────────────────────
+    if (!pyodide) {
+      setProgress(5, 'Cargando entorno Python (Pyodide)...');
+      pyodide = await loadPyodide();
+      setProgress(15, 'Instalando numpy, pandas, pillow, matplotlib, scikit-learn, scikit-image...');
+      await pyodide.loadPackage(['numpy', 'pandas', 'matplotlib', 'scikit-learn', 'pillow', 'scikit-image']);
+      setProgress(30, 'Paquetes instalados.');
+    }
+
+    // ── Setup global ────────────────────────────────────────────────
+    await pyodide.runPythonAsync(`
+import warnings; warnings.filterwarnings('ignore')
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io, base64
+
+def fig_to_img():
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=96, bbox_inches='tight')
+    buf.seek(0)
+    b64 = base64.b64encode(buf.read()).decode()
+    plt.close('all')
+    return f'<img src="data:image/png;base64,{b64}" style="max-width:100%;border-radius:4px;">'
+`);
+
+    // ── Cargar metadata ─────────────────────────────────────────────
+    setProgress(35, 'Cargando metadata del dataset...');
+    await pyodide.runPythonAsync(`
+from pyodide.http import open_url
+BASE = 'https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main'
+metadata = pd.read_csv(open_url(f'{BASE}/data/processed/driver_images.csv'))
+print('Total imágenes:', len(metadata))
+print(metadata['label'].value_counts().to_string())
+`);
+
+    // ── Descargar imágenes en paralelo ──────────────────────────────
+    setProgress(40, 'Descargando 200 imágenes en paralelo...');
+    await pyodide.runPythonAsync(`
+import asyncio
+from pyodide.http import pyfetch
+from PIL import Image as PILImage
+
+async def fetch_img_bytes(path):
+    url = f"{BASE}/{path}"
+    r = await pyfetch(url)
+    return await r.bytes()
+
+paths = metadata['image_path'].tolist()
+tasks = [fetch_img_bytes(p) for p in paths]
+all_bytes = await asyncio.gather(*tasks)
+
+def bytes_to_img(b, size=(64,64)):
+    return PILImage.open(io.BytesIO(b)).convert('RGB').resize(size)
+
+images_rgb = [bytes_to_img(b) for b in all_bytes]
+print('Imágenes descargadas:', len(images_rgb))
+`);
+    setProgress(58, 'Imágenes listas. Generando exploración visual...');
+
+    // ── Exploración visual ──────────────────────────────────────────
+    const ejemplosHTML = await pyodide.runPythonAsync(`
+clases = sorted(metadata['label'].unique())
+n_cols = 4
+fig, axes = plt.subplots(len(clases), n_cols, figsize=(12, len(clases)*2.4))
+for r, clase in enumerate(clases):
+    idxs = metadata[metadata['label'] == clase].index.tolist()[:n_cols]
+    for c, idx in enumerate(idxs):
+        axes[r][c].imshow(images_rgb[idx])
+        axes[r][c].set_title(clase, fontsize=8)
+        axes[r][c].axis('off')
+    for c in range(len(idxs), n_cols):
+        axes[r][c].axis('off')
+plt.suptitle('Ejemplos por clase (4 por fila)', fontsize=12)
+plt.tight_layout()
+fig_to_img()
+`);
+    inject('out-ejemplos', ejemplosHTML);
+    setProgress(64, 'Exploración lista. Extrayendo características HOG + color...');
+
+    // ── Feature extraction ──────────────────────────────────────────
+    await pyodide.runPythonAsync(`
+from skimage.feature import hog as hog_features
+
+def extraer_caracteristicas(img_rgb):
+    img_gray = img_rgb.convert('L')
+    arr      = np.asarray(img_rgb,  dtype=float) / 255.0
+    arr_gray = np.asarray(img_gray, dtype=float) / 255.0
+    medias      = arr.mean(axis=(0,1))
+    desvios     = arr.std(axis=(0,1))
+    brillo      = arr.mean(axis=2)
+    color_feats = np.concatenate([medias, desvios, [(brillo<0.20).mean(), (brillo>0.80).mean()]])
+    hog_feats   = hog_features(arr_gray, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
+    return np.concatenate([color_feats, hog_feats])
+
+X = np.vstack([extraer_caracteristicas(img) for img in images_rgb])
+y = metadata['label'].values
+print('Matriz de features:', X.shape)
+`);
+    setProgress(73, 'Features listas. Entrenando Random Forest...');
+
+    // ── Entrenamiento ───────────────────────────────────────────────
+    await pyodide.runPythonAsync(`
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
+
+X_train, X_test, y_train, y_test, idx_train, idx_test = train_test_split(
+    X, y, list(range(len(images_rgb))),
+    test_size=0.25, random_state=42, stratify=y
+)
+
+modelo_clf = RandomForestClassifier(n_estimators=160, random_state=42, class_weight='balanced')
+modelo_clf.fit(X_train, y_train)
+pred = modelo_clf.predict(X_test)
+acc  = accuracy_score(y_test, pred)
+print(f'Accuracy: {acc:.3f}')
+print(classification_report(y_test, pred, zero_division=0))
+`);
+    setProgress(84, 'Modelo entrenado. Generando métricas...');
+
+    // ── Reporte de clasificación ────────────────────────────────────
+    const reporteHTML = await pyodide.runPythonAsync(`
+import json
+from sklearn.metrics import classification_report
+
+report = classification_report(y_test, pred, zero_division=0, output_dict=True)
+acc_val = accuracy_score(y_test, pred)
+
+rows = []
+for clase in sorted(modelo_clf.classes_):
+    r = report[clase]
+    rows.append({
+        'Clase': clase,
+        'Precision': round(r['precision'],3),
+        'Recall':    round(r['recall'],3),
+        'F1-score':  round(r['f1-score'],3),
+        'Soporte':   int(r['support']),
+    })
+df_report = pd.DataFrame(rows)
+
+acc_html = f"<p style='margin:0 0 10px;font-size:15px'><strong>Accuracy: {acc_val:.3f}</strong> — {int(acc_val*len(y_test))}/{len(y_test)} correctas</p>"
+acc_html + df_report.to_html(index=False, classes='output-table', border=0)
+`);
+    inject('out-reporte', reporteHTML);
+
+    // ── Matriz de confusión ─────────────────────────────────────────
+    const confHTML = await pyodide.runPythonAsync(`
+fig, ax = plt.subplots(figsize=(6,5))
+ConfusionMatrixDisplay.from_predictions(y_test, pred, ax=ax, cmap='Blues', xticks_rotation=30)
+ax.set_title('Matriz de confusión', fontsize=12)
+plt.tight_layout()
+fig_to_img()
+`);
+    inject('out-confusion', confHTML);
+    setProgress(93, 'Métricas listas. Generando análisis de errores...');
+
+    // ── Aciertos y errores ──────────────────────────────────────────
+    const erroresHTML = await pyodide.runPythonAsync(`
+revision = pd.DataFrame({'idx': idx_test, 'real': y_test, 'prediccion': pred})
+revision['correcta'] = revision['real'] == revision['prediccion']
+
+tabla = revision.groupby(['real','prediccion']).size().reset_index(name='casos').sort_values('casos', ascending=False).head(8)
+tabla_html = tabla.to_html(index=False, classes='output-table', border=0)
+
+muestras = pd.concat([revision[revision['correcta']].head(3), revision[~revision['correcta']].head(3)])
+n = len(muestras)
+fig, axes = plt.subplots(1, n, figsize=(2.2*n, 3))
+for ax, (_, row) in zip(axes, muestras.iterrows()):
+    ax.imshow(images_rgb[row['idx']])
+    color = '#0a7a5f' if row['correcta'] else '#c0392b'
+    ax.set_title(f"R: {row['real']}\\nP: {row['prediccion']}", fontsize=7, color=color)
+    ax.axis('off')
+plt.suptitle('Verde = correcto   Rojo = error', fontsize=10)
+plt.tight_layout()
+chart_html = fig_to_img()
+
+"<h3 style='margin:0 0 10px;font-size:16px'>Pares real → predicción más frecuentes</h3>" + tabla_html + "<br>" + chart_html
+`);
+    inject('out-errores', erroresHTML);
+
+    setProgress(100, 'Listo. Sube una imagen para clasificarla.');
+    modeloListo = true;
+
+  } catch(err) {
+    log('ERROR: ' + err.message);
+    document.getElementById('status-text').textContent = 'Error. Revisa la consola del navegador (F12).';
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+// File input handler — needs to set bytes then classify
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('file-input').addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!modeloListo) {
+      inject('out-clasificacion', '<p style="color:var(--amber);font-weight:600">Primero entrena el modelo.</p>');
+      return;
+    }
+    inject('out-clasificacion', '<div class="skeleton" style="height:140px;border-radius:8px"></div>');
+    const previewSrc = URL.createObjectURL(file);
+    const arrayBuffer = await file.arrayBuffer();
+    const bytes = new Uint8Array(arrayBuffer);
+    pyodide.globals.set('img_upload_bytes', bytes);
+    await clasificarConBytes(bytes, previewSrc);
+  });
+});
+</script>
+</body>
+</html>
