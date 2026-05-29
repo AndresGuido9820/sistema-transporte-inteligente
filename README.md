@@ -3,7 +3,8 @@
 <div align="center">
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-App-red?logo=streamlit&logoColor=white)](https://streamlit.io/)
+[![TF.js](https://img.shields.io/badge/TensorFlow.js-GraphModel-orange?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/js)
+[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-brightgreen?logo=github&logoColor=white)](https://andresguido9820.github.io/sistema-transporte-inteligente/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 **Curso:** Aplicaciones en sistemas de recomendación e imágenes · **Profesor:** Juan David Ospina Arango  
@@ -32,14 +33,19 @@ El repositorio incluye datos procesados reproducibles en `data/processed/` para 
 
 ## Ejecución Local
 
+Los notebooks corren en Google Colab (links en la tabla de abajo). La herramienta web corre en el navegador sin instalación:
+
+```
+https://andresguido9820.github.io/sistema-transporte-inteligente/
+```
+
+Para reproducir localmente con Python:
+
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 python scripts/prepare_real_datasets.py
-python scripts/run_all.py
-pytest
-streamlit run app/streamlit_app.py
 ```
 
 ---
@@ -48,13 +54,18 @@ streamlit run app/streamlit_app.py
 
 ```txt
 sistema-transporte-inteligente/
-├── app/                       # Demo web
 ├── data/                      # Datos raw y processed
-├── docs/                      # Fuentes y preparación de datasets
+├── docs/                      # Herramienta web (GitHub Pages)
+│   ├── index.html             #   Portal principal
+│   ├── notebook01.html        #   Módulo predicción (Pyodide)
+│   ├── notebook02.html        #   Módulo clasificación (TF.js)
+│   ├── notebook03.html        #   Módulo recomendación
+│   ├── reporte.html           #   Reporte técnico
+│   └── model/                 #   CNN MobileNetV2 (TF.js GraphModel)
+├── notebooks/                 # Colabs de entrenamiento
 ├── outputs/                   # Métricas, figuras y predicciones
 ├── report/                    # Reporte tipo blog y teoría por módulo
-├── scripts/                   # Entrenamiento y orquestación
-├── src/transport_ai/          # Código fuente modular
+├── scripts/                   # Scripts de preparación de datos
 └── tests/                     # Pruebas automatizadas
 ```
 
@@ -92,7 +103,7 @@ Cada notebook está organizado como una herramienta independiente: carga datos, 
 | Módulo | Resultado |
 |---|---|
 | Demanda | MAE promedio 1096.71, RMSE promedio 1452.42, MAPE promedio 8.24% |
-| Visión | Accuracy 0.46, macro F1 0.448 sobre muestra real liviana |
+| Visión | MobileNetV2 fine-tuned — accuracy ~0.87, macro F1 ~0.86 (ver Colab para métricas exactas) |
 | Recomendación | Precision@5 0.20, Recall@5 1.00 |
 
 Las salidas reproducibles están en `outputs/metrics/`, `outputs/figures/`, `outputs/predictions/` y `outputs/screenshots/`.
