@@ -1,0 +1,414 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Notebook 01 — Predicción de demanda | Sistema Inteligente de Transporte</title>
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+  <style>
+    :root { color-scheme: light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --bg:#f5f7fa; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 64px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 34px; }
+    .brand { font-weight: 800; letter-spacing: .2px; }
+    .nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
+    .hero { padding: 42px 0 34px; border-bottom: 1px solid var(--line); }
+    .hero h1 { margin: 0; font-size: clamp(28px, 4vw, 50px); line-height: 1.08; }
+    .hero p { margin: 14px 0 0; color: var(--muted); font-size: 17px; max-width: 720px; }
+    .badge { display: inline-flex; margin-bottom: 14px; color: var(--green); font-weight: 700; font-size: 14px; }
+    .section { margin-top: 36px; }
+    .section > h2 { margin: 0 0 12px; font-size: 20px; }
+    .panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
+    /* run bar */
+    .run-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 20px; border-radius: 6px; background: var(--blue); color: white; font-weight: 700; border: none; cursor: pointer; font-size: 15px; transition: background .15s; }
+    .button:hover:not(:disabled) { background: #174bd0; }
+    .button:disabled { opacity: .45; cursor: not-allowed; }
+    .status-text { color: var(--muted); font-size: 14px; }
+    .progress { height: 6px; background: #e8edf3; border-radius: 999px; overflow: hidden; margin-top: 14px; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); border-radius: 999px; width: 0%; transition: width .5s ease; }
+    /* log */
+    .log-box { font-family: ui-monospace, "Cascadia Code", monospace; font-size: 12.5px; background: #f0f2f5; border-radius: 6px; padding: 10px 14px; max-height: 130px; overflow-y: auto; color: var(--muted); margin-top: 12px; white-space: pre-wrap; border: 1px solid var(--line); }
+    /* skeleton */
+    .skeleton { background: linear-gradient(90deg, #eef0f3 25%, #f5f7fa 50%, #eef0f3 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite; border-radius: 6px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .placeholder { height: 180px; }
+    .placeholder-sm { height: 90px; }
+    /* output tables */
+    .output-table { width: 100%; border-collapse: collapse; font-size: 13.5px; overflow-x: auto; display: block; }
+    .output-table th, .output-table td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; white-space: nowrap; }
+    .output-table th { background: #eef3f8; font-weight: 600; }
+    .output-table tr:hover td { background: #f7f9fc; }
+    /* charts */
+    .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .chart-box { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
+    .chart-box img { max-width: 100%; border-radius: 4px; display: block; }
+    /* misc */
+    .note { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
+    .step-label { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #edf3ff; color: var(--blue); font-weight: 800; font-size: 13px; margin-right: 8px; vertical-align: middle; }
+    @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } .topbar { flex-direction: column; align-items: flex-start; } }
+  </style>
+</head>
+<body>
+<main class="wrap">
+
+  <header class="topbar">
+    <div class="brand">Sistema Inteligente de Transporte</div>
+    <nav class="nav">
+      <a href="index.html">Inicio</a>
+      <a href="reporte.html">Reporte técnico</a>
+      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <span class="badge">Notebook 01 — ejecutado en el navegador</span>
+    <h1>Predicción de demanda de transporte</h1>
+    <p>
+      Este módulo corre el mismo código del notebook directamente en tu navegador usando
+      <strong>Pyodide</strong> (Python/WebAssembly). Sin servidor: carga los datos reales del CTA,
+      entrena Random Forest y Gradient Boosting, y genera el pronóstico de 30 días.
+    </p>
+  </section>
+
+  <!-- ── Control de ejecución ── -->
+  <section class="section">
+    <div class="panel">
+      <div class="run-bar">
+        <button class="button" id="btn-run" onclick="iniciarEjecucion()">Ejecutar notebook</button>
+        <span class="status-text" id="status-text">Presiona el botón para cargar Python y correr el notebook.</span>
+      </div>
+      <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="log-box" id="log-box">Los pasos de ejecución aparecerán aquí...</div>
+    </div>
+  </section>
+
+  <!-- ── 1. Dataset ── -->
+  <section class="section">
+    <h2><span class="step-label">1</span>Dataset — CTA Bus Ridership</h2>
+    <div class="panel">
+      <p class="note" id="note-datos">Datos del Chicago Transit Authority (2001–2026). Se filtra desde 2021 y se toman las 10 rutas de mayor demanda.</p>
+      <div id="out-datos"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 2. Exploración ── -->
+  <section class="section">
+    <h2><span class="step-label">2</span>Exploración — Media móvil 7 días por ruta</h2>
+    <div class="panel">
+      <div id="out-exploracion"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 3. Ingeniería de variables ── -->
+  <section class="section">
+    <h2><span class="step-label">3</span>Ingeniería de variables</h2>
+    <div class="panel">
+      <p class="note">
+        Se añaden <strong>rezagos</strong> (lag_1 = pasajeros de ayer, lag_7 = mismo día semana anterior),
+        <strong>media móvil de 7 días</strong> (rolling_7) y <strong>variables de calendario</strong>
+        (día de semana, mes, fin de semana, festivo). Estas variables convierten la serie de tiempo
+        en un problema supervisado de regresión tabular.
+      </p>
+      <div id="out-variables"><div class="skeleton placeholder-sm"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 4. Resultados del modelo ── -->
+  <section class="section">
+    <h2><span class="step-label">4</span>Resultados del modelo por ruta</h2>
+    <div class="panel">
+      <p class="note">Partición temporal 80/20 — el 20% más reciente se usa como set de prueba. El modelo ganador por ruta se selecciona por menor RMSE.</p>
+      <div id="out-metricas"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 5. Validación gráfica ── -->
+  <section class="section">
+    <h2><span class="step-label">5</span>Validación — Real vs. Predicción (4 rutas)</h2>
+    <div class="charts-grid" id="out-graficas">
+      <div class="chart-box"><div class="skeleton placeholder"></div></div>
+      <div class="chart-box"><div class="skeleton placeholder"></div></div>
+      <div class="chart-box"><div class="skeleton placeholder"></div></div>
+      <div class="chart-box"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 6. Pronóstico 30 días ── -->
+  <section class="section">
+    <h2><span class="step-label">6</span>Pronóstico operativo — 30 días</h2>
+    <div class="panel">
+      <div id="out-pronostico"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+let pyodide = null;
+
+function log(msg) {
+  const box = document.getElementById('log-box');
+  const ts = new Date().toLocaleTimeString('es-CO', { hour12: false });
+  box.textContent += '\n[' + ts + '] ' + msg;
+  box.scrollTop = box.scrollHeight;
+}
+
+function setProgress(pct, msg) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('status-text').textContent = msg;
+  log(msg);
+}
+
+function inject(id, html) {
+  document.getElementById(id).innerHTML = html;
+}
+
+async function iniciarEjecucion() {
+  const btn = document.getElementById('btn-run');
+  btn.disabled = true;
+  document.getElementById('log-box').textContent = '';
+
+  try {
+
+    // ── Cargar Pyodide ──────────────────────────────────────────────
+    if (!pyodide) {
+      setProgress(5, 'Cargando entorno Python (Pyodide)...');
+      pyodide = await loadPyodide();
+      setProgress(15, 'Pyodide listo. Instalando numpy, pandas, matplotlib, scikit-learn...');
+      await pyodide.loadPackage(['numpy', 'pandas', 'matplotlib', 'scikit-learn']);
+      setProgress(32, 'Paquetes instalados.');
+    }
+
+    // ── Setup global ───────────────────────────────────────────────
+    await pyodide.runPythonAsync(`
+import warnings
+warnings.filterwarnings('ignore')
+import numpy as np
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+import io, base64
+
+SEED = 42
+np.random.seed(SEED)
+TRAIN_START_DATE = '2021-01-01'
+TOP_RUTAS = 10
+
+def fig_to_img():
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=96, bbox_inches='tight')
+    buf.seek(0)
+    b64 = base64.b64encode(buf.read()).decode()
+    plt.close('all')
+    return f'<img src="data:image/png;base64,{b64}" style="max-width:100%;border-radius:4px;">'
+`);
+
+    // ── 1. Cargar datos ────────────────────────────────────────────
+    setProgress(38, 'Cargando datos del CTA desde GitHub...');
+    const datosHTML = await pyodide.runPythonAsync(`
+from pyodide.http import open_url
+
+DATA_URL = 'https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main/data/processed/cta_bus_ridership_daily_by_route.csv'
+raw_demanda = pd.read_csv(open_url(DATA_URL))
+raw_demanda['date'] = pd.to_datetime(raw_demanda['date'], errors='coerce')
+raw_demanda['rides'] = pd.to_numeric(raw_demanda['rides'], errors='coerce')
+raw_demanda = raw_demanda.dropna(subset=['date', 'route', 'rides'])
+
+demanda = raw_demanda[raw_demanda['date'] >= pd.Timestamp(TRAIN_START_DATE)].copy()
+rutas_principales = demanda.groupby('route')['rides'].sum().nlargest(TOP_RUTAS).index
+demanda = demanda[demanda['route'].isin(rutas_principales)].copy()
+demanda = demanda.rename(columns={'rides': 'passengers'})
+demanda['holiday'] = demanda['daytype'].eq('U').astype(int)
+demanda = demanda[['date', 'route', 'passengers', 'holiday', 'daytype']].sort_values(['route', 'date']).reset_index(drop=True)
+
+resumen = demanda.groupby('route')['passengers'].agg(['count', 'mean', 'min', 'max']).round(1).reset_index()
+resumen.columns = ['Ruta', 'Días', 'Promedio/día', 'Mínimo', 'Máximo']
+
+info = (
+    f"<p class='note' style='margin-top:0'>Archivo completo: <strong>{raw_demanda.shape[0]:,} filas</strong> "
+    f"({raw_demanda['date'].min().date()} — {raw_demanda['date'].max().date()}) &nbsp;|&nbsp; "
+    f"Datos de entrenamiento desde {TRAIN_START_DATE}: <strong>{demanda.shape[0]:,} filas</strong> "
+    f"en <strong>{TOP_RUTAS} rutas</strong></p>"
+)
+info + resumen.to_html(index=False, classes='output-table', border=0)
+`);
+    inject('out-datos', datosHTML);
+    setProgress(50, 'Datos cargados. Generando gráfica exploratoria...');
+
+    // ── 2. Exploración ─────────────────────────────────────────────
+    const exploHTML = await pyodide.runPythonAsync(`
+plt.figure(figsize=(12, 4))
+for ruta, datos in demanda.groupby('route'):
+    serie = datos.sort_values('date').set_index('date')['passengers'].rolling(7).mean()
+    plt.plot(serie.index, serie.values, label=str(ruta), linewidth=1.5)
+plt.title('Media móvil 7 días por ruta (2021–2026)', fontsize=13)
+plt.xlabel('Fecha')
+plt.ylabel('Pasajeros')
+plt.legend(fontsize=8, ncol=2)
+plt.grid(alpha=0.25)
+plt.tight_layout()
+fig_to_img()
+`);
+    inject('out-exploracion', exploHTML);
+    setProgress(58, 'Gráfica lista. Creando variables de ingeniería...');
+
+    // ── 3. Feature engineering ─────────────────────────────────────
+    const varHTML = await pyodide.runPythonAsync(`
+def crear_variables(df):
+    data = df.copy()
+    data['date'] = pd.to_datetime(data['date'])
+    data = data.sort_values(['route', 'date'])
+    data['dayofweek']  = data['date'].dt.dayofweek
+    data['month']      = data['date'].dt.month
+    data['is_weekend'] = data['dayofweek'].isin([5, 6]).astype(int)
+    data['holiday']    = (data['dayofweek'] == 6).astype(int)
+    data['lag_1']      = data.groupby('route')['passengers'].shift(1)
+    data['lag_7']      = data.groupby('route')['passengers'].shift(7)
+    data['rolling_7']  = data.groupby('route')['passengers'].transform(
+        lambda s: s.shift(1).rolling(7, min_periods=1).mean()
+    )
+    return data.dropna().reset_index(drop=True)
+
+features   = ['dayofweek', 'month', 'is_weekend', 'holiday', 'lag_1', 'lag_7', 'rolling_7']
+model_data = crear_variables(demanda)
+
+sample = model_data[['date', 'route', 'passengers'] + features].head(8).copy()
+sample['date'] = sample['date'].dt.strftime('%Y-%m-%d')
+for col in ['lag_1', 'lag_7', 'rolling_7', 'passengers']:
+    sample[col] = sample[col].round(0).astype(int)
+sample.to_html(index=False, classes='output-table', border=0)
+`);
+    inject('out-variables', varHTML);
+    setProgress(65, 'Variables listas. Entrenando modelos (puede tardar ~40 s)...');
+
+    // ── 4. Entrenar modelos + métricas ─────────────────────────────
+    const metHTML = await pyodide.runPythonAsync(`
+from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error
+
+modelos_def = {
+    'Random Forest':    RandomForestRegressor(n_estimators=100, min_samples_leaf=2, random_state=SEED),
+    'Gradient Boosting': GradientBoostingRegressor(random_state=SEED),
+}
+
+resultados   = []
+mejores_modelos = {}
+predicciones = []
+
+for ruta, datos_ruta in model_data.groupby('route'):
+    datos_ruta = datos_ruta.sort_values('date')
+    corte = int(len(datos_ruta) * 0.8)
+    train, test = datos_ruta.iloc[:corte], datos_ruta.iloc[corte:]
+    mejor_rmse = float('inf')
+    for nombre, modelo in modelos_def.items():
+        modelo.fit(train[features], train['passengers'])
+        pred = modelo.predict(test[features])
+        mae  = mean_absolute_error(test['passengers'], pred)
+        rmse = float(np.sqrt(mean_squared_error(test['passengers'], pred)))
+        mape = float(np.mean(np.abs((test['passengers'] - pred) / test['passengers'])) * 100)
+        resultados.append({
+            'Ruta': ruta, 'Modelo': nombre,
+            'MAE': round(mae, 1), 'RMSE': round(rmse, 1), 'MAPE (%)': round(mape, 2)
+        })
+        if rmse < mejor_rmse:
+            mejor_rmse = rmse
+            mejores_modelos[ruta] = modelo
+            tmp = test[['date', 'route', 'passengers']].copy()
+            tmp['prediction'] = pred
+            predicciones.append(tmp)
+
+metricas = pd.DataFrame(resultados).sort_values(['Ruta', 'RMSE'])
+metricas.to_html(index=False, classes='output-table', border=0)
+`);
+    inject('out-metricas', metHTML);
+    setProgress(84, 'Modelos entrenados. Generando gráficas de validación...');
+
+    // ── 5. Gráficas validación ─────────────────────────────────────
+    const chartsHTML = await pyodide.runPythonAsync(`
+pred_df   = pd.concat(predicciones, ignore_index=True)
+rutas_sel = pred_df['route'].unique()[:4]
+imgs      = []
+
+for ruta in rutas_sel:
+    graf = pred_df[pred_df['route'] == ruta].sort_values('date')
+    plt.figure(figsize=(9, 3.5))
+    plt.plot(graf['date'], graf['passengers'],  marker='o', ms=3, lw=1.5, label='Real')
+    plt.plot(graf['date'], graf['prediction'],  marker='o', ms=3, lw=1.5, ls='--', label='Predicción')
+    plt.title(f'Ruta {ruta} — Real vs. Predicción', fontsize=12)
+    plt.ylabel('Pasajeros')
+    plt.xticks(rotation=30, ha='right', fontsize=8)
+    plt.grid(alpha=0.25)
+    plt.legend(fontsize=9)
+    plt.tight_layout()
+    imgs.append(f'<div class="chart-box">{fig_to_img()}</div>')
+
+''.join(imgs)
+`);
+    inject('out-graficas', chartsHTML);
+    setProgress(93, 'Gráficas listas. Generando pronóstico 30 días...');
+
+    // ── 6. Pronóstico ──────────────────────────────────────────────
+    const forecastHTML = await pyodide.runPythonAsync(`
+def pronosticar_ruta(df, ruta, modelo, dias=30):
+    hist   = df[df['route'] == ruta].sort_values('date')[['date', 'passengers']].copy()
+    valores = hist['passengers'].astype(float).tolist()
+    ultima  = hist['date'].max()
+    filas   = []
+    for paso in range(1, dias + 1):
+        fecha = ultima + pd.Timedelta(days=paso)
+        fila  = pd.DataFrame([{
+            'dayofweek': fecha.dayofweek,
+            'month':     fecha.month,
+            'is_weekend': int(fecha.dayofweek >= 5),
+            'holiday':    int(fecha.dayofweek == 6),
+            'lag_1':      valores[-1],
+            'lag_7':      valores[-7] if len(valores) >= 7 else valores[-1],
+            'rolling_7':  float(np.mean(valores[-7:])),
+        }])[features]
+        pred = max(float(modelo.predict(fila)[0]), 0)
+        valores.append(pred)
+        filas.append({'Fecha': fecha.strftime('%Y-%m-%d'), 'Ruta': ruta, 'Pasajeros estimados': int(round(pred))})
+    return pd.DataFrame(filas)
+
+ruta_sel  = list(mejores_modelos.keys())[0]
+pronostico = pronosticar_ruta(demanda, ruta_sel, mejores_modelos[ruta_sel], 30)
+
+plt.figure(figsize=(11, 3.8))
+plt.plot(range(len(pronostico)), pronostico['Pasajeros estimados'],
+         marker='o', ms=4, lw=1.7, color='#1f5eff')
+plt.fill_between(range(len(pronostico)), pronostico['Pasajeros estimados'],
+                 alpha=0.12, color='#1f5eff')
+plt.xticks(range(len(pronostico)), pronostico['Fecha'], rotation=45, ha='right', fontsize=8)
+plt.title(f'Pronóstico 30 días — Ruta {ruta_sel}', fontsize=12)
+plt.ylabel('Pasajeros estimados')
+plt.grid(alpha=0.25)
+plt.tight_layout()
+chart_html = fig_to_img()
+
+table_html = pronostico.head(10).to_html(index=False, classes='output-table', border=0)
+(
+    f"<p class='note' style='margin-top:0'>Ruta <strong>{ruta_sel}</strong> — "
+    f"próximos 30 días (tabla: primeros 10)</p>"
+    + chart_html
+    + "<br><br>" + table_html
+)
+`);
+    inject('out-pronostico', forecastHTML);
+    setProgress(100, 'Ejecucion completa.');
+
+  } catch (err) {
+    log('ERROR: ' + err.message);
+    document.getElementById('status-text').textContent = 'Error en la ejecucion. Revisa la consola del navegador (F12).';
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
