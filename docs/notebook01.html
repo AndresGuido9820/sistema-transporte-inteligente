@@ -104,9 +104,18 @@
     </div>
   </section>
 
-  <!-- ── 3. Ingeniería de variables ── -->
+  <!-- ── 3. Estacionalidad ── -->
   <section class="section">
-    <h2><span class="step-label">3</span>Ingeniería de variables</h2>
+    <h2><span class="step-label">3</span>Estacionalidad y tendencias</h2>
+    <div class="panel">
+      <p class="note">Descomposición aditiva de la serie (tendencia + estacionalidad semanal + residuo), patrón promedio por día de semana y evolución anual por ruta.</p>
+      <div id="out-estacionalidad"><div class="skeleton placeholder"></div></div>
+    </div>
+  </section>
+
+  <!-- ── 4. Ingeniería de variables ── -->
+  <section class="section">
+    <h2><span class="step-label">4</span>Ingeniería de variables</h2>
     <div class="panel">
       <p class="note">
         Se añaden <strong>rezagos</strong> (lag_1 = pasajeros de ayer, lag_7 = mismo día semana anterior),
@@ -118,18 +127,18 @@
     </div>
   </section>
 
-  <!-- ── 4. Resultados del modelo ── -->
+  <!-- ── 5. Resultados del modelo ── -->
   <section class="section">
-    <h2><span class="step-label">4</span>Resultados del modelo por ruta</h2>
+    <h2><span class="step-label">5</span>Resultados del modelo por ruta</h2>
     <div class="panel">
       <p class="note">Partición temporal 80/20 — el 20% más reciente se usa como set de prueba. El modelo ganador por ruta se selecciona por menor RMSE.</p>
       <div id="out-metricas"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
 
-  <!-- ── 5. Validación gráfica ── -->
+  <!-- ── 6. Validación gráfica ── -->
   <section class="section">
-    <h2><span class="step-label">5</span>Validación — Real vs. Predicción (4 rutas)</h2>
+    <h2><span class="step-label">6</span>Validación — Real vs. Predicción (4 rutas)</h2>
     <div class="charts-grid" id="out-graficas">
       <div class="chart-box"><div class="skeleton placeholder"></div></div>
       <div class="chart-box"><div class="skeleton placeholder"></div></div>
@@ -138,9 +147,9 @@
     </div>
   </section>
 
-  <!-- ── 6. Pronóstico 30 días ── -->
+  <!-- ── 7. Pronóstico 30 días ── -->
   <section class="section">
-    <h2><span class="step-label">6</span>Pronóstico operativo — 30 días</h2>
+    <h2><span class="step-label">7</span>Pronóstico operativo — 30 días</h2>
     <div class="panel">
       <div id="out-pronostico"><div class="skeleton placeholder"></div></div>
     </div>
@@ -256,9 +265,69 @@ plt.tight_layout()
 fig_to_img()
 `);
     inject('out-exploracion', exploHTML);
-    setProgress(58, 'Gráfica lista. Creando variables de ingeniería...');
+    setProgress(55, 'Gráfica lista. Cargando statsmodels...');
 
-    // ── 3. Feature engineering ─────────────────────────────────────
+    // ── 3. Estacionalidad ──────────────────────────────────────────
+    await pyodide.loadPackage(['statsmodels']);
+    setProgress(60, 'Analizando estacionalidad y tendencias...');
+    const estacHTML = await pyodide.runPythonAsync(`
+from statsmodels.tsa.seasonal import seasonal_decompose
+
+ruta_ref = demanda.groupby('route')['passengers'].sum().idxmax()
+serie_ref = (
+    demanda[demanda['route'] == ruta_ref]
+    .sort_values('date')
+    .set_index('date')['passengers']
+    .asfreq('D')
+    .fillna(method='ffill')
+)
+
+decomp = seasonal_decompose(serie_ref, model='additive', period=7)
+fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
+serie_ref.plot(ax=axes[0], lw=1, color='#1f5eff', title='Original')
+decomp.trend.plot(ax=axes[1], lw=1.5, color='#a86200', title='Tendencia')
+decomp.seasonal.plot(ax=axes[2], lw=1, color='#0a7a5f', title='Estacionalidad semanal')
+decomp.resid.plot(ax=axes[3], lw=1, color='#c0392b', title='Residuo')
+for ax in axes:
+    ax.grid(alpha=0.25)
+    ax.set_xlabel('')
+plt.suptitle(f'Descomposición aditiva — Ruta {ruta_ref}', fontsize=12)
+plt.tight_layout()
+decomp_img = fig_to_img()
+
+tmp2 = demanda.copy()
+tmp2['dayofweek'] = tmp2['date'].dt.dayofweek
+patron = tmp2.groupby('dayofweek')['passengers'].mean()
+dias = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
+plt.figure(figsize=(8, 3.2))
+colores = ['#1f5eff' if i < 5 else '#f6a531' for i in range(7)]
+plt.bar(dias, patron.values, color=colores)
+plt.title('Demanda promedio por día de semana')
+plt.ylabel('Pasajeros promedio')
+plt.grid(axis='y', alpha=0.3)
+plt.tight_layout()
+week_img = fig_to_img()
+
+tmp2['year'] = tmp2['date'].dt.year
+anual = tmp2.groupby(['year','route'])['passengers'].mean().reset_index()
+plt.figure(figsize=(11, 3.8))
+for ruta, datos in anual.groupby('route'):
+    plt.plot(datos['year'], datos['passengers'], marker='o', label=str(ruta), lw=1.6)
+plt.title('Evolución anual — promedio diario por ruta')
+plt.xlabel('Año')
+plt.ylabel('Pasajeros/día promedio')
+plt.legend(fontsize=8, ncol=2)
+plt.grid(alpha=0.25)
+plt.xticks(sorted(tmp2['year'].unique()))
+plt.tight_layout()
+annual_img = fig_to_img()
+
+decomp_img + '<br><br>' + week_img + '<br><br>' + annual_img
+`);
+    inject('out-estacionalidad', estacHTML);
+    setProgress(66, 'Análisis listo. Creando variables de ingeniería...');
+
+    // ── 4. Feature engineering ─────────────────────────────────────
     const varHTML = await pyodide.runPythonAsync(`
 def crear_variables(df):
     data = df.copy()
@@ -285,7 +354,7 @@ for col in ['lag_1', 'lag_7', 'rolling_7', 'passengers']:
 sample.to_html(index=False, classes='output-table', border=0)
 `);
     inject('out-variables', varHTML);
-    setProgress(65, 'Variables listas. Entrenando modelos (puede tardar ~40 s)...');
+    setProgress(72, 'Variables listas. Entrenando modelos (puede tardar ~40 s)...');
 
     // ── 4. Entrenar modelos + métricas ─────────────────────────────
     const metHTML = await pyodide.runPythonAsync(`
@@ -327,7 +396,7 @@ metricas = pd.DataFrame(resultados).sort_values(['Ruta', 'RMSE'])
 metricas.to_html(index=False, classes='output-table', border=0)
 `);
     inject('out-metricas', metHTML);
-    setProgress(84, 'Modelos entrenados. Generando gráficas de validación...');
+    setProgress(86, 'Modelos entrenados. Generando gráficas de validación...');
 
     // ── 5. Gráficas validación ─────────────────────────────────────
     const chartsHTML = await pyodide.runPythonAsync(`
@@ -351,7 +420,7 @@ for ruta in rutas_sel:
 ''.join(imgs)
 `);
     inject('out-graficas', chartsHTML);
-    setProgress(93, 'Gráficas listas. Generando pronóstico 30 días...');
+    setProgress(94, 'Gráficas listas. Generando pronóstico 30 días...');
 
     // ── 6. Pronóstico ──────────────────────────────────────────────
     const forecastHTML = await pyodide.runPythonAsync(`
