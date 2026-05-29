@@ -160,7 +160,7 @@
     <div class="panel">
       <p class="note">Entrena primero el modelo, luego sube cualquier imagen de un conductor para clasificarla.</p>
       <label class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
-        <input type="file" id="file-input" accept="image/*" onchange="clasificarImagen(event)">
+        <input type="file" id="file-input" accept="image/*">
         <div style="font-size:36px">📷</div>
         <strong>Haz clic o arrastra una imagen aquí</strong>
         <p>JPG, PNG, WEBP — se clasifica en el navegador, sin subir a ningún servidor</p>
@@ -194,87 +194,24 @@ function inject(id, html) {
 
 function dragOver(e) { e.preventDefault(); document.getElementById('upload-zone').classList.add('drag-over'); }
 function dragLeave(e) { document.getElementById('upload-zone').classList.remove('drag-over'); }
-function dropFile(e) {
+
+async function dropFile(e) {
   e.preventDefault();
   dragLeave(e);
   const file = e.dataTransfer.files[0];
-  if (file) procesarArchivo(file);
-}
-function clasificarImagen(e) {
-  const file = e.target.files[0];
-  if (file) procesarArchivo(file);
+  if (file) await handleFile(file);
 }
 
-async function procesarArchivo(file) {
+async function handleFile(file) {
   if (!modeloListo) {
     inject('out-clasificacion', '<p style="color:var(--amber);font-weight:600">Primero entrena el modelo con el botón de arriba.</p>');
     return;
   }
-  inject('out-clasificacion', '<div class="skeleton" style="height:120px;border-radius:8px"></div>');
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const bytes = new Uint8Array(e.target.result);
-    const previewSrc = URL.createObjectURL(file);
-    try {
-      const result = await pyodide.runPythonAsync(`
-import io, base64
-import numpy as np
-from PIL import Image as PILImage
-from skimage.feature import hog as hog_features
-
-img_bytes_arr = bytes(img_upload_bytes)
-img_pil = PILImage.open(io.BytesIO(img_bytes_arr)).convert('RGB').resize((64, 64))
-img_gray = img_pil.convert('L')
-arr      = np.asarray(img_pil,  dtype=float) / 255.0
-arr_gray = np.asarray(img_gray, dtype=float) / 255.0
-
-medias      = arr.mean(axis=(0, 1))
-desvios     = arr.std(axis=(0, 1))
-brillo      = arr.mean(axis=2)
-dark_ratio  = (brillo < 0.20).mean()
-bright_ratio= (brillo > 0.80).mean()
-color_feats = np.concatenate([medias, desvios, [dark_ratio, bright_ratio]])
-hog_feats   = hog_features(arr_gray, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
-feats = np.concatenate([color_feats, hog_feats]).reshape(1, -1)
-
-clase  = modelo_clf.predict(feats)[0]
-probas = dict(zip(modelo_clf.classes_, modelo_clf.predict_proba(feats)[0].tolist()))
-import json
-json.dumps({'clase': clase, 'probas': probas})
-`);
-      pyodide.globals.set('img_upload_bytes', bytes);
-      // Re-run to get result after setting bytes
-      const result2 = await pyodide.runPythonAsync(`
-import io, json
-import numpy as np
-from PIL import Image as PILImage
-from skimage.feature import hog as hog_features
-
-img_bytes_arr = bytes(img_upload_bytes)
-img_pil = PILImage.open(io.BytesIO(img_bytes_arr)).convert('RGB').resize((64, 64))
-img_gray = img_pil.convert('L')
-arr      = np.asarray(img_pil,  dtype=float) / 255.0
-arr_gray = np.asarray(img_gray, dtype=float) / 255.0
-medias      = arr.mean(axis=(0, 1))
-desvios     = arr.std(axis=(0, 1))
-brillo      = arr.mean(axis=2)
-dark_ratio  = (brillo < 0.20).mean()
-bright_ratio= (brillo > 0.80).mean()
-color_feats = np.concatenate([medias, desvios, [dark_ratio, bright_ratio]])
-hog_feats   = hog_features(arr_gray, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
-feats = np.concatenate([color_feats, hog_feats]).reshape(1, -1)
-clase  = modelo_clf.predict(feats)[0]
-probas = dict(zip(modelo_clf.classes_, modelo_clf.predict_proba(feats)[0].tolist()))
-json.dumps({'clase': clase, 'probas': probas})
-`);
-      const data = JSON.parse(result2);
-      renderResultado(previewSrc, data.clase, data.probas);
-    } catch(err) {
-      console.error(err);
-      inject('out-clasificacion', '<p style="color:var(--red)">Error al clasificar: ' + err.message + '</p>');
-    }
-  };
-  reader.readAsArrayBuffer(file);
+  inject('out-clasificacion', '<div class="skeleton" style="height:140px;border-radius:8px"></div>');
+  const previewSrc = URL.createObjectURL(file);
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
+  await clasificarConBytes(bytes, previewSrc);
 }
 
 async function clasificarConBytes(bytes, previewSrc) {
@@ -536,22 +473,9 @@ chart_html = fig_to_img()
   }
 }
 
-// File input handler — needs to set bytes then classify
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('file-input').addEventListener('change', async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (!modeloListo) {
-      inject('out-clasificacion', '<p style="color:var(--amber);font-weight:600">Primero entrena el modelo.</p>');
-      return;
-    }
-    inject('out-clasificacion', '<div class="skeleton" style="height:140px;border-radius:8px"></div>');
-    const previewSrc = URL.createObjectURL(file);
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-    pyodide.globals.set('img_upload_bytes', bytes);
-    await clasificarConBytes(bytes, previewSrc);
-  });
+document.getElementById('file-input').addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (file) await handleFile(file);
 });
 </script>
 </body>
