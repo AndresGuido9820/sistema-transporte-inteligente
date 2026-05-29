@@ -185,7 +185,7 @@ table.cm .zero { color:#bbb; }
       <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
       <div class="mt-4 bg-surface-container p-4 border-l-4 border-secondary">
         <p class="text-label-caps font-label-caps text-on-surface-variant mb-2">ARQUITECTURA</p>
-        <p class="text-caption font-caption text-on-surface-variant">MobileNetV2 (ImageNet) → GlobalAvgPooling → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax). Dos fases: base congelada (lr=1e-3) → fine-tune últimas 30 capas (lr=1e-4). Exportado a TFLite con cuantización DEFAULT.</p>
+        <p class="text-caption font-caption text-on-surface-variant">MobileNetV2 (ImageNet) → GlobalAvgPooling → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax). Dos fases: base congelada (lr=1e-3) → fine-tune últimas 30 capas (lr=1e-4). Exportado a TFLite float32 (sin cuantización, compatible con runtime web).</p>
       </div>
     </div>
   </section>
@@ -265,7 +265,7 @@ table.cm .zero { color:#bbb; }
 let tfliteModel = null;
 let modeloListo = false;
 
-const MODEL_URL = 'https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main/data/processed/modelo_conduccion.tflite';
+const MODEL_URL = 'https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main/data/processed/modelo_conduccion_f32.tflite';
 const CLASSES = ['other_activities', 'safe_driving', 'talking_phone', 'texting_phone', 'turning'];
 const LABELS = {
   safe_driving:     'Conducción segura',
@@ -364,10 +364,10 @@ async function cargarModelo() {
     setProgress(10, 'Inicializando TensorFlow.js…');
     await tf.ready();
 
-    setProgress(30, 'Configurando TFLite runtime…');
-    tflite.setWasmPath('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/wasm/');
+    
 
-    setProgress(50, 'Descargando modelo TFLite (2.8 MB)…');
+
+    setProgress(40, 'Descargando modelo CNN float32 (9.9 MB)…');
     tfliteModel = await tflite.loadTFLiteModel(MODEL_URL);
 
     setProgress(100, 'Modelo listo — sube una imagen para clasificar.', 'ready');
