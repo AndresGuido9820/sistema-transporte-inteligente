@@ -1,260 +1,554 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reporte tecnico - Sistema Inteligente de Transporte</title>
-  <style>
-:root { color-scheme: light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --bg:#f5f7fa; }
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
-a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 56px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 34px; }
-.brand { font-weight: 800; letter-spacing: .2px; }
-.nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
-.hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; align-items: center; padding: 42px 0 34px; border-bottom: 1px solid var(--line); }
-.hero h1 { margin: 0; max-width: 850px; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: 0; }
-.hero p { margin: 18px 0 0; max-width: 680px; color: var(--muted); font-size: 18px; }
-.badge { display: inline-flex; margin-bottom: 14px; color: var(--green); font-weight: 700; font-size: 14px; }
-.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.kpi { border: 1px solid var(--line); background: white; border-radius: 8px; padding: 14px; }
-.kpi strong { display: block; font-size: 22px; }
-.hero-visual { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px; box-shadow: 0 14px 36px rgba(23,32,38,.08); }
-.route-chart { height: 178px; display: flex; align-items: end; gap: 8px; padding: 14px 8px 8px; border-bottom: 1px solid var(--line); }
-.route-chart i { flex: 1; min-width: 10px; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, #2f6fff, #11a87d); }
-.route-chart i:nth-child(2n) { background: linear-gradient(180deg, #f6a531, #e06d2f); }
-.visual-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 13px; }
-.visual-caption strong { color: var(--ink); display: block; font-size: 16px; }
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
-.card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px; min-height: 230px; display: flex; flex-direction: column; }
-.card h2 { margin: 0 0 8px; font-size: 21px; }
-.card p { margin: 0 0 12px; color: var(--muted); }
-.card ul { padding-left: 18px; margin: 0 0 16px; color: var(--muted); }
-.card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.icon { width: 42px; height: 42px; border-radius: 8px; display: grid; place-items: center; font-weight: 900; color: white; background: var(--blue); }
-.icon.green { background: var(--green); }
-.icon.amber { background: var(--amber); }
-.mini-bars { display: flex; align-items: end; gap: 5px; height: 46px; margin: 6px 0 14px; }
-.mini-bars i { flex: 1; border-radius: 4px 4px 0 0; background: #c9d8ff; }
-.mini-bars i:nth-child(2n) { background: #afe3d2; }
-.mini-bars i:nth-child(3n) { background: #ffd69a; }
-.button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 12px; margin-top: auto; border-radius: 6px; background: var(--blue); color: white; font-weight: 700; }
-.button:hover { text-decoration: none; background: #174bd0; }
-.section { margin-top: 34px; }
-.panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
-.section h2 { margin: 0 0 10px; }
-.pipeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
-.step { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 16px; position: relative; }
-.step span { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #edf3ff; color: var(--blue); font-weight: 800; margin-bottom: 10px; }
-.step h3 { margin: 0 0 6px; font-size: 17px; }
-.step p { margin: 0; color: var(--muted); font-size: 14px; }
-.evidence { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; align-items: stretch; }
-.shot { background: white; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.shot img { display: block; width: 100%; height: 100%; max-height: 310px; object-fit: cover; object-position: top left; background: #eef3f8; }
-.metric-list { display: grid; gap: 10px; }
-.metric { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
-.metric b { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
-.meter { height: 8px; border-radius: 999px; overflow: hidden; background: #e8edf3; }
-.meter i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); }
-.links-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-.ghost { background: white; color: var(--blue); border: 1px solid var(--line); }
-.ghost:hover { background: #edf3ff; }
-.report { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 28px; }
-.report h1 { font-size: 36px; line-height: 1.12; margin-top: 0; }
-.report h2 { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 22px; }
-.report table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
-.report th, .report td { border: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
-.report th { background: #eef3f8; }
-code { background: #edf1f5; padding: 2px 5px; border-radius: 4px; }
-@media (max-width: 820px) { .hero, .grid, .pipeline, .evidence { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
-</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reporte Técnico — Sistema Inteligente de Transporte</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "background":"#fbf9f4","surface":"#fbf9f4","surface-container":"#f0eee9",
+      "surface-container-low":"#f5f3ee","surface-container-high":"#eae8e3",
+      "surface-container-lowest":"#ffffff","surface-dim":"#dbdad5",
+      "surface-variant":"#e4e2dd","surface-bright":"#fbf9f4",
+      "on-background":"#1b1c19","on-surface":"#1b1c19",
+      "on-surface-variant":"#56423d","inverse-on-surface":"#f2f1ec",
+      "inverse-surface":"#30312e","outline":"#89726c","outline-variant":"#ddc0b9",
+      "primary":"#8f361d","on-primary":"#ffffff","primary-container":"#af4d32",
+      "on-primary-container":"#ffe8e2","primary-fixed":"#ffdbd1",
+      "primary-fixed-dim":"#ffb5a1","inverse-primary":"#ffb5a1",
+      "secondary":"#4d6356","on-secondary":"#ffffff","secondary-container":"#cde6d5",
+      "on-secondary-container":"#52685a","secondary-fixed":"#d0e8d7",
+      "secondary-fixed-dim":"#b4ccbc","on-secondary-fixed":"#0b1f15",
+      "on-secondary-fixed-variant":"#364b3f",
+      "tertiary":"#5f5136","on-tertiary":"#ffffff","tertiary-container":"#79694c",
+      "on-tertiary-container":"#ffeac9","tertiary-fixed":"#f5e0bd",
+      "tertiary-fixed-dim":"#d8c4a2","on-tertiary-fixed":"#241a05",
+      "on-tertiary-fixed-variant":"#52452b",
+      "error":"#ba1a1a","on-error":"#ffffff","error-container":"#ffdad6",
+      "on-error-container":"#93000a","surface-tint":"#9f4127"
+    },
+    borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},
+    spacing:{
+      "stack-lg":"48px","stack-md":"24px","gutter":"24px",
+      "margin-desktop":"64px","stack-sm":"8px","margin-mobile":"16px",
+      "unit":"4px","max-content-width":"1280px"
+    },
+    fontFamily:{
+      "body-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],
+      "headline-lg":["Libre Caslon Text"],"headline-md":["Libre Caslon Text"],
+      "display-lg":["Libre Caslon Text"],"display-lg-mobile":["Libre Caslon Text"],
+      "label-caps":["JetBrains Mono"],"caption":["Hanken Grotesk"]
+    },
+    fontSize:{
+      "body-lg":["18px",{"lineHeight":"1.7","fontWeight":"400"}],
+      "body-md":["16px",{"lineHeight":"1.5","fontWeight":"400"}],
+      "headline-lg":["32px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "headline-md":["22px",{"lineHeight":"1.3","fontWeight":"600"}],
+      "display-lg":["60px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"700"}],
+      "display-lg-mobile":["38px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "label-caps":["11px",{"lineHeight":"1.0","letterSpacing":"0.1em","fontWeight":"500"}],
+      "caption":["14px",{"lineHeight":"1.4","fontWeight":"400"}]
+    }
+  }}
+}
+</script>
 </head>
-<body>
-<main class="wrap">
-  <header class="topbar">
-    <div class="brand">Reporte Técnico</div>
-    <nav class="nav">
-      <a href="./">Herramientas</a>
-      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+<body class="bg-background text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container flex flex-col min-h-screen">
+
+<!-- Header -->
+<header class="bg-surface border-b-4 border-primary sticky top-0 z-50 w-full">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-max-content-width mx-auto py-stack-md">
+    <div class="text-headline-md font-headline-md text-primary uppercase tracking-wider text-sm md:text-base">
+      Sistemas Inteligentes
+    </div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="index.html">Herramientas</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook01.html">Módulo 01</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook02.html">Módulo 02</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook03.html">Módulo 03</a>
     </nav>
-  </header>
-  <article class="report">
-    <h1 id="sistema-inteligente-integrado-para-predicción-clasificación-y-recomendación-en-una-empresa-de-transporte">Sistema Inteligente Integrado para Predicción, Clasificación y Recomendación en una Empresa de Transporte</h1>
-<p><strong>Curso:</strong> Aplicaciones en sistemas de recomendación e imágenes <strong>Profesor:</strong> Juan David Ospina Arango <strong>Universidad:</strong> Universidad Nacional de Colombia <strong>Autores:</strong> Andrés F. Guido Montoya, Juan José Martínez, Andrés Lemus <strong>Fecha:</strong> Mayo de 2026 <strong>Repositorio:</strong> <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">https://github.com/AndresGuido9820/sistema-transporte-inteligente</a></p>
-<h2 id="resumen-ejecutivo">Resumen Ejecutivo</h2>
-<p>Este proyecto propone un sistema inteligente para una empresa de transporte que integra tres capacidades de aprendizaje profundo y aprendizaje automático: predicción de demanda por ruta, clasificación de comportamientos distractivos en conductores a partir de imágenes y recomendación personalizada de destinos. La solución busca mejorar la asignación de vehículos y personal, fortalecer la seguridad vial y aumentar la relevancia de las sugerencias de viaje para los usuarios.</p>
-<p>El sistema se implementó en Python, con módulos independientes para datos, modelos, evaluación y visualización. Además de la demo web, se construyeron tres herramientas en Google Colab: una para pronóstico de demanda, una para clasificación de imágenes y una para recomendación personalizada de destinos. El reporte técnico se publica aparte en GitHub Pages para separar la documentación de las herramientas ejecutables.</p>
-<h2 id="1-introducción">1. Introducción</h2>
-<p>Las empresas de transporte operan bajo incertidumbre diaria: la demanda cambia por ruta, temporada, día de la semana, eventos externos y comportamiento de los usuarios. Al mismo tiempo, la seguridad del servicio depende de detectar prácticas de conducción riesgosa, como uso del celular, somnolencia o distracción visual. Finalmente, la experiencia del cliente puede mejorar si la plataforma sugiere destinos coherentes con su historial y preferencias.</p>
-<p>El objetivo general es desarrollar una solución integrada que combine modelos predictivos, clasificación visual y sistemas de recomendación. El alcance académico incluye entrenamiento, evaluación, documentación técnica, análisis ético y una demo web funcional.</p>
-<h2 id="2-metodología">2. Metodología</h2>
-<p>El proyecto se organizó en cuatro fases:</p>
-<p>1. Preparación de datos: limpieza, transformación, partición de entrenamiento/prueba y generación de muestras procesadas livianas a partir de los datasets reales. 2. Modelado: entrenamiento independiente de los tres módulos usando modelos base y modelos principales. 3. Evaluación: cálculo de métricas específicas para cada problema y generación de gráficas. 4. Integración: construcción de una herramienta web para visualizar resultados y probar los modelos.</p>
-<p>La arquitectura sigue una separación por módulos para facilitar la reproducibilidad: <code>src/transport_ai/demand.py</code>, <code>src/transport_ai/vision.py</code> y <code>src/transport_ai/recommendation.py</code>.</p>
-<h3 id="2-1-ideación-y-canvas">2.1 Ideación y Canvas</h3>
-<p>La propuesta se diseñó a partir de un enfoque Canvas orientado a una empresa de transporte:</p>
-<table><thead><tr>
-<th>Elemento</th>
-<th>Definición</th>
-</tr></thead><tbody>
-<tr>
-<td>Usuarios principales</td>
-<td>Planeadores de operación, equipo de seguridad vial y clientes de la plataforma</td>
-</tr>
-<tr>
-<td>Problemas clave</td>
-<td>Demanda variable, riesgo por distracción del conductor y baja personalización de destinos</td>
-</tr>
-<tr>
-<td>Propuesta de valor</td>
-<td>Reducir incertidumbre operativa, apoyar prevención de incidentes y mejorar experiencia del usuario</td>
-</tr>
-<tr>
-<td>Datos necesarios</td>
-<td>Historial de rutas, imágenes etiquetadas de conducción e interacciones usuario-destino</td>
-</tr>
-<tr>
-<td>Métricas de éxito</td>
-<td>Menor error de pronóstico, mayor F1 visual y mejor Recall@K en recomendaciones</td>
-</tr>
-<tr>
-<td>Riesgos</td>
-<td>Sesgos de datos, privacidad de imágenes, sobreajuste y baja cobertura de usuarios nuevos</td>
-</tr>
-</tbody></table>
-<h3 id="2-2-plan-de-calidad">2.2 Plan de Calidad</h3>
-<p>La calidad se validó con tres niveles: pruebas automatizadas, ejecución completa de scripts y revisión manual de salidas. Las pruebas verifican generación de datos, entrenamiento de modelos, notebooks válidos y carga de la app. La ejecución completa produce métricas, figuras, predicciones y modelos serializados.</p>
-<h2 id="3-desarrollo-técnico-por-módulo">3. Desarrollo Técnico por Módulo</h2>
-<h3 id="3-1-predicción-de-demanda-de-transporte">3.1 Predicción de Demanda de Transporte</h3>
-<p>El primer módulo predice la demanda diaria por rutas específicas de bus. Para este módulo se usa el dataset *CTA - Ridership - Bus Routes - Daily Totals by Route*, publicado por Chicago Transit Authority en Chicago Data Portal.</p>
-<p>El archivo se conserva completo en el repositorio con datos desde 2001 hasta 2026. Para el entrenamiento se filtra desde 2021 y se seleccionan las 10 rutas con mayor demanda reciente. La variable <code>rides</code> se usa como <code>passengers</code>, y <code>daytype</code> permite diferenciar días laborales, sábados y domingos/festivos.</p>
-<p>El modelo implementado es un <code>RandomForestRegressor</code> con variables temporales, rezagos y medias móviles. Las métricas promedio obtenidas sobre las rutas seleccionadas fueron MAE 1096.71, RMSE 1452.42 y MAPE 8.24%; el error absoluto se interpreta como pasajeros diarios por ruta.</p>
-<p>Como salida operativa adicional, el módulo genera <code>outputs/predictions/demand_forecast_30_days.csv</code>, con una estimación diaria para los próximos 30 días por ruta. Esta tabla es la base para decisiones de asignación de vehículos, turnos de conductores y refuerzo de rutas con mayor demanda esperada.</p>
-<h3 id="3-2-clasificación-de-conducción-distractiva">3.2 Clasificación de Conducción Distractiva</h3>
-<p>El segundo módulo clasifica imágenes de conductores en categorías del dataset Multi-Class Driver Behavior Image Dataset de Kaggle: <code>safe_driving</code>, <code>talking_phone</code>, <code>texting_phone</code>, <code>turning</code> y <code>other_activities</code>.</p>
-<p>Para mantener ejecución rápida en Colab y CI se entrenó un clasificador liviano sobre una muestra real redimensionada. Las métricas fueron accuracy 0.46, macro precision 0.459, macro recall 0.460 y macro F1 0.448. La herramienta muestra también las probabilidades por clase para identificar casos ambiguos. Como mejora futura queda reemplazarlo por transferencia de aprendizaje con ResNet18, MobileNet o EfficientNet.</p>
-<h3 id="3-3-sistema-de-recomendación-de-destinos">3.3 Sistema de Recomendación de Destinos</h3>
-<p>El tercer módulo recomienda destinos de viaje a usuarios según historial, preferencias y comportamiento de reserva. Se usó Travel Recommendation Dataset de Kaggle, uniendo historial de usuario con metadatos de destinos.</p>
-<p>El enfoque implementado es filtrado colaborativo con similitud coseno usuario-usuario. Las métricas fueron Precision@5 = 0.20 y Recall@5 = 1.00 en la evaluación leave-one-out implementada. Además, la herramienta entrega explicaciones simples de las recomendaciones, basadas en usuarios con historial similar.</p>
-<h2 id="4-herramienta-web">4. Herramienta Web</h2>
-<p>La demo web se construyó con Streamlit. Tiene tres vistas principales:</p>
-<ul>
-<li>Predicción de demanda: selección de ruta, gráfica histórica y predicción a 30 días.</li>
-<li>Clasificación de conducción: carga de imagen, clase predicha y confianza.</li>
-<li>Recomendación de destinos: selección de usuario y lista de destinos sugeridos.</li>
-</ul>
-<p>La interfaz se enfocó en una experiencia operativa, clara y fácil de demostrar en video.</p>
-<p>Además, se publicaron páginas estáticas en GitHub Pages:</p>
-<ul>
-<li>Portada de herramientas: <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/">https://andresguido9820.github.io/sistema-transporte-inteligente/</a></li>
-<li>Reporte técnico: <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/reporte.html">https://andresguido9820.github.io/sistema-transporte-inteligente/reporte.html</a></li>
-<li>Herramientas Colab: enlaces directos a los tres notebooks desde la portada.</li>
-</ul>
-<p>Capturas generadas:</p>
-<ul>
-<li><code>outputs/screenshots/app_demanda.png</code></li>
-<li><code>outputs/screenshots/app_mobile.png</code></li>
-</ul>
-<h2 id="5-resultados-generales-y-discusión">5. Resultados Generales y Discusión</h2>
-<p>Los tres módulos se ejecutan de extremo a extremo mediante <code>python scripts/run_all.py</code>. Las pruebas automatizadas validan generación de datos, entrenamiento, importación de la app y estructura de notebooks.</p>
-<table><thead><tr>
-<th>Módulo</th>
-<th>Resultado principal</th>
-<th>Archivo</th>
-</tr></thead><tbody>
-<tr>
-<td>Demanda</td>
-<td>MAE promedio 1096.71, RMSE promedio 1452.42, MAPE promedio 8.24%</td>
-<td><code>outputs/metrics/demand_metrics.json</code></td>
-</tr>
-<tr>
-<td>Visión</td>
-<td>Accuracy 0.46, macro F1 0.448</td>
-<td><code>outputs/metrics/vision_metrics.json</code></td>
-</tr>
-<tr>
-<td>Recomendación</td>
-<td>Precision@5 0.20, Recall@5 1.00</td>
-<td><code>outputs/metrics/recommender_metrics.json</code></td>
-</tr>
-</tbody></table>
-<p>La clasificación visual muestra el principal punto débil: el modelo liviano no reemplaza una CNN profunda. Sin embargo, el pipeline completo de datos reales, entrenamiento, evaluación y demo web ya está listo para sustituir el clasificador por una arquitectura de transferencia.</p>
-<h3 id="5-1-evidencias-reproducibles">5.1 Evidencias Reproducibles</h3>
-<table><thead><tr>
-<th>Evidencia</th>
-<th>Ubicación</th>
-</tr></thead><tbody>
-<tr>
-<td>Predicciones históricas de demanda</td>
-<td><code>outputs/predictions/demand_predictions.csv</code></td>
-</tr>
-<tr>
-<td>Pronóstico de 30 días</td>
-<td><code>outputs/predictions/demand_forecast_30_days.csv</code></td>
-</tr>
-<tr>
-<td>Recomendaciones de muestra</td>
-<td><code>outputs/predictions/recommendations_sample.csv</code></td>
-</tr>
-<tr>
-<td>Métricas por módulo</td>
-<td><code>outputs/metrics/</code></td>
-</tr>
-<tr>
-<td>Gráficas generadas</td>
-<td><code>outputs/figures/</code></td>
-</tr>
-<tr>
-<td>Capturas de la herramienta web</td>
-<td><code>outputs/screenshots/</code></td>
-</tr>
-</tbody></table>
-<h3 id="5-2-pruebas-de-funcionamiento">5.2 Pruebas de Funcionamiento</h3>
-<p>El flujo se valida con <code>pytest</code>, que ejecuta pruebas sobre datos, entrenamiento, estructura de notebooks e importación de la app. También se configuró GitHub Actions para ejecutar la validación en cada actualización de <code>main</code>.</p>
-<h2 id="6-aspectos-éticos-y-creatividad">6. Aspectos Éticos y Creatividad</h2>
-<p>El uso de imágenes de conductores requiere manejo responsable de datos personales, consentimiento, anonimización y control de acceso. El sistema no debe utilizarse como mecanismo automático de sanción sin revisión humana. En recomendación, deben evitarse sesgos que limiten la diversidad de destinos o refuercen patrones históricos injustos.</p>
-<p>La creatividad del proyecto está en integrar tres capacidades distintas en una sola herramienta de operación para transporte: planificación, seguridad y experiencia de usuario.</p>
-<h2 id="7-conclusiones-y-recomendaciones">7. Conclusiones y Recomendaciones</h2>
-<p>El sistema propuesto permite abordar problemas reales de una empresa de transporte desde una perspectiva integrada. La predicción de demanda ayuda a planificar recursos, la clasificación de imágenes apoya la seguridad vial y la recomendación de destinos mejora la personalización del servicio.</p>
-<p>Como trabajo futuro se recomienda incorporar clima real, eventos de ciudad, más rutas, datos reales anonimizados de usuarios y validación con usuarios finales.</p>
-<h3 id="7-1-contribuciones-del-equipo">7.1 Contribuciones del Equipo</h3>
-<table><thead><tr>
-<th>Integrante</th>
-<th>Contribución principal</th>
-</tr></thead><tbody>
-<tr>
-<td>Andrés F. Guido Montoya</td>
-<td>Integración del repositorio, demo web, automatización y reporte</td>
-</tr>
-<tr>
-<td>Juan José Martínez</td>
-<td>Módulo de demanda, análisis de series de tiempo y visualizaciones</td>
-</tr>
-<tr>
-<td>Andrés Lemus</td>
-<td>Módulo de imágenes, recomendación y revisión de resultados</td>
-</tr>
-</tbody></table>
-<h2 id="8-anexos">8. Anexos</h2>
-<ul>
-<li>Repositorio: <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">https://github.com/AndresGuido9820/sistema-transporte-inteligente</a></li>
-<li>Notebook 01: <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb">https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb</a></li>
-<li>Notebook 02: <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb">https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb</a></li>
-<li>Notebook 03: <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb">https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb</a></li>
-<li>Capturas: <code>outputs/screenshots/</code></li>
-<li>Videos de demostración: pendiente para el cierre final de entrega.</li>
-</ul>
-<h2 id="9-bibliografía">9. Bibliografía</h2>
-<ul>
-<li>Chicago Data Portal. (s. f.). *CTA - Ridership - Bus Routes - Daily Totals by Route*. <a href="https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm">https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm</a></li>
-<li>Kaggle. (s. f.). *Multi-Class Driver Behavior Image Dataset*. <a href="https://www.kaggle.com/datasets/arafatsahinafridi/multi-class-driver-behavior-image-dataset/data">https://www.kaggle.com/datasets/arafatsahinafridi/multi-class-driver-behavior-image-dataset/data</a></li>
-<li>Kaggle. (s. f.). *Travel Recommendation Dataset*. <a href="https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset">https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset</a></li>
-<li>Ricci, F., Rokach, L., &amp; Shapira, B. (2015). *Recommender Systems Handbook*. Springer.</li>
-<li>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). *Deep Learning*. MIT Press.</li>
-</ul>
-  </article>
+    <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="hidden md:flex bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity rounded-none items-center gap-2">
+      <span class="material-symbols-outlined text-base">code</span> Repositorio
+    </a>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="flex-grow w-full max-w-max-content-width mx-auto px-margin-mobile md:px-margin-desktop mt-stack-lg pb-stack-lg">
+
+  <!-- Editorial Header -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
+    <div class="md:col-span-10 md:col-start-2">
+      <span class="block text-label-caps font-label-caps text-primary mb-6 uppercase tracking-wider border-b border-primary pb-2 inline-block">
+        Reporte Técnico // Universidad Nacional de Colombia · Mayo 2026
+      </span>
+      <h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-on-surface mb-8">
+        Sistema Inteligente Integrado para Predicción, Clasificación y Recomendación en una Empresa de Transporte
+      </h1>
+      <!-- Meta -->
+      <div class="grid grid-cols-2 md:grid-cols-4 border-t-2 border-b-2 border-outline py-4 gap-4 bg-surface-container-low px-4">
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">AUTORES</span>
+          <span class="block text-caption font-caption text-on-surface font-medium">Andrés F. Guido Montoya<br/>Juan José Martínez<br/>Andrés Lemus</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">INSTITUCIÓN</span>
+          <span class="block text-caption font-caption text-on-surface font-medium">Universidad Nacional de Colombia</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">CURSO</span>
+          <span class="block text-caption font-caption text-on-surface font-medium">Aplicaciones en sistemas de recomendación e imágenes<br/>Prof. Juan David Ospina Arango</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">REPOSITORIO</span>
+          <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="block text-caption font-caption text-primary font-medium break-all">github.com/AndresGuido9820/<br/>sistema-transporte-inteligente</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero visual: abstract data banner -->
+  <div class="w-full h-48 md:h-72 mb-stack-lg bg-surface-container overflow-hidden border-2 border-secondary relative flex items-end">
+    <!-- Abstract bar visualization -->
+    <div class="absolute inset-0 flex items-end gap-1 px-4 pb-4 opacity-30">
+      <div class="flex-1 bg-primary" style="height:55%"></div><div class="flex-1 bg-secondary" style="height:72%"></div>
+      <div class="flex-1 bg-primary" style="height:48%"></div><div class="flex-1 bg-tertiary" style="height:88%"></div>
+      <div class="flex-1 bg-primary" style="height:63%"></div><div class="flex-1 bg-secondary" style="height:91%"></div>
+      <div class="flex-1 bg-primary" style="height:79%"></div><div class="flex-1 bg-tertiary" style="height:67%"></div>
+      <div class="flex-1 bg-primary" style="height:84%"></div><div class="flex-1 bg-secondary" style="height:74%"></div>
+      <div class="flex-1 bg-primary" style="height:58%"></div><div class="flex-1 bg-tertiary" style="height:96%"></div>
+      <div class="flex-1 bg-primary" style="height:70%"></div><div class="flex-1 bg-secondary" style="height:82%"></div>
+      <div class="flex-1 bg-primary" style="height:45%"></div><div class="flex-1 bg-tertiary" style="height:61%"></div>
+      <div class="flex-1 bg-primary" style="height:77%"></div><div class="flex-1 bg-secondary" style="height:53%"></div>
+      <div class="flex-1 bg-primary" style="height:89%"></div><div class="flex-1 bg-tertiary" style="height:66%"></div>
+    </div>
+    <div class="relative z-10 p-6 md:p-10">
+      <span class="text-label-caps font-label-caps text-secondary uppercase tracking-wider block mb-2">Pronóstico · Visión · Recomendación</span>
+      <p class="text-headline-md font-headline-md text-on-surface max-w-2xl">Tres módulos de aprendizaje automático integrados en una herramienta web pública</p>
+    </div>
+    <div class="absolute top-4 right-4 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">
+      SISTEMA INTEGRADO
+    </div>
+  </div>
+
+  <!-- Article Body -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+
+    <!-- Sticky Sidebar -->
+    <aside class="md:col-span-3 hidden md:block">
+      <div class="sticky top-32 border-r-2 border-outline-variant pr-6">
+        <h3 class="text-label-caps font-label-caps text-secondary mb-6 border-b border-outline-variant pb-2">Contenido</h3>
+        <ul class="space-y-3 text-caption font-caption text-on-surface-variant">
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#resumen"><span class="w-2 h-2 bg-primary inline-block"></span> Resumen Ejecutivo</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#intro"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 1. Introducción</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#metodologia"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 2. Metodología</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#modulo1"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 3.1 Predicción de demanda</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#modulo2"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 3.2 Clasificación visual</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#modulo3"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 3.3 Recomendación</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#web"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 4. Herramienta Web</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#resultados"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 5. Resultados</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#etica"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 6. Ética</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#conclusiones"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 7. Conclusiones</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#biblio"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 8. Bibliografía</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#anexos"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 9. Anexos</a></li>
+        </ul>
+        <div class="mt-10 bg-surface-container p-4 border-l-4 border-secondary">
+          <h4 class="text-label-caps font-label-caps text-on-surface mb-2">Palabras Clave</h4>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Series de tiempo</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Visión computacional</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Filtrado colaborativo</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Random Forest</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">HOG</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Pyodide</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="md:col-span-8 md:col-start-5 space-y-12">
+
+      <!-- Resumen Ejecutivo -->
+      <div class="bg-surface-container p-8 border-t-4 border-primary" id="resumen">
+        <h2 class="text-label-caps font-label-caps text-primary mb-4">RESUMEN EJECUTIVO</h2>
+        <p class="text-body-lg font-body-lg text-on-background leading-relaxed font-medium">
+          Este proyecto desarrolla un sistema integrado de aprendizaje automático para una empresa de transporte, compuesto por tres módulos: predicción de demanda por ruta a 30 días (MAPE 8.24%), clasificación de comportamientos distractivos en conductores a partir de imágenes (accuracy 0.68), y recomendación personalizada de destinos de viaje (hit rate 79%). Los tres módulos se publican como herramientas ejecutables en Google Colab y se integran en una demo web pública en GitHub Pages, construida con HTML, JavaScript y Pyodide (Python/WebAssembly). El reporte documenta datasets reales, modelos, métricas, análisis ético y trabajo futuro.
+        </p>
+      </div>
+
+      <!-- 1. Introducción -->
+      <section id="intro">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">1. Introducción</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Las empresas de transporte operan bajo incertidumbre constante: la demanda varía por ruta, temporada, día de la semana y eventos externos. La seguridad del servicio depende de detectar conducción riesgosa (uso del celular, somnolencia, distracción visual), y la experiencia del usuario puede mejorarse significativamente si la plataforma sugiere destinos coherentes con su historial y preferencias declaradas.</p>
+          <p>El <strong>objetivo general</strong> es construir una solución integrada que combine modelos predictivos, clasificación visual y sistemas de recomendación, publicada como herramienta web funcional. El alcance académico incluye entrenamiento con datos reales, evaluación con métricas estándar, documentación técnica, análisis ético y demo en vivo.</p>
+          <p><strong>Limitaciones reconocidas:</strong> el módulo de clasificación usa un clasificador tradicional (Random Forest + HOG) en lugar de una CNN profunda, por restricciones computacionales del entorno gratuito de Google Colab (GPU limitada, sin entrenamiento prolongado). El diseño arquitectónico del pipeline está preparado para sustituir este componente por transfer learning sin modificar el resto del sistema.</p>
+        </div>
+      </section>
+
+      <!-- 2. Metodología -->
+      <section id="metodologia">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">2. Metodología</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El proyecto se organizó en cuatro fases iterativas: (1) adquisición y preprocesamiento de datos reales, (2) modelado independiente por módulo, (3) evaluación con métricas específicas y (4) integración en herramienta web. La arquitectura separa claramente datos, modelos y visualización, lo que permite reemplazar cualquier componente sin afectar los demás.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-4">2.1 Canvas del Proyecto</h3>
+        <div class="w-full bg-surface border-2 border-secondary p-6 mb-6 relative">
+          <div class="absolute top-0 right-0 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">CANVAS</div>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Elemento</th>
+              <th class="border border-outline p-3 text-left">Definición</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">Usuarios principales</td><td class="border border-outline p-3">Planificadores de operación, equipo de seguridad vial y clientes de la plataforma</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Problemas clave</td><td class="border border-outline p-3">Demanda variable por ruta, riesgo por distracción del conductor, baja personalización de destinos</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Propuesta de valor</td><td class="border border-outline p-3">Reducir incertidumbre operativa, apoyar prevención de incidentes y mejorar experiencia del usuario</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Datos necesarios</td><td class="border border-outline p-3">Historial de afluencia por ruta, imágenes etiquetadas de conducción, interacciones usuario-destino</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Métricas de éxito</td><td class="border border-outline p-3">MAPE &lt; 10% en demanda, accuracy &gt; 0.60 en visión, Hit Rate &gt; 60% en recomendación</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Riesgos</td><td class="border border-outline p-3">Sesgos de clase, privacidad de imágenes, sobreajuste, cold-start en usuarios nuevos</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-4">2.2 Herramientas y Tecnologías</h3>
+        <div class="grid grid-cols-3 gap-3">
+          <div class="bg-surface-container p-4 border-l-4 border-primary">
+            <span class="text-label-caps font-label-caps text-primary block mb-2">MODELADO</span>
+            <span class="text-caption font-caption text-on-surface-variant">Python · scikit-learn · pandas · numpy · statsmodels · skimage</span>
+          </div>
+          <div class="bg-surface-container p-4 border-l-4 border-secondary">
+            <span class="text-label-caps font-label-caps text-secondary block mb-2">WEB</span>
+            <span class="text-caption font-caption text-on-surface-variant">HTML/CSS/JS · Pyodide (Python/WASM) · GitHub Pages</span>
+          </div>
+          <div class="bg-surface-container p-4 border-l-4 border-tertiary">
+            <span class="text-label-caps font-label-caps text-tertiary block mb-2">DATOS</span>
+            <span class="text-caption font-caption text-on-surface-variant">Chicago Data Portal · Kaggle (×2) · Git sparse-checkout</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3.1 Módulo 1 -->
+      <section id="modulo1">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">3.1 Módulo 1 — Predicción de Demanda</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Dataset:</strong> CTA – Ridership – Bus Routes – Daily Totals by Route (Chicago Data Portal). Serie diaria desde 2001 a 2026 con la variable <code class="bg-surface-container px-1">rides</code> por ruta y tipo de día (<code class="bg-surface-container px-1">daytype</code>: W/A/U). Se filtraron datos desde 2021 y se seleccionaron las 10 rutas con mayor demanda reciente.</p>
+          <p><strong>Preprocesamiento:</strong> imputación de valores faltantes por interpolación lineal, extracción de variables temporales (día de semana, mes, trimestre, año), creación de rezagos de 1 y 7 días y medias móviles de 7 y 30 días.</p>
+          <p><strong>Modelo:</strong> <code class="bg-surface-container px-1">RandomForestRegressor</code> entrenado con validación temporal (no aleatoria) — los datos de prueba son siempre posteriores al entrenamiento. Se añadió <code class="bg-surface-container px-1">GradientBoostingRegressor</code> como modelo de comparación.</p>
+          <p><strong>Análisis de estacionalidad:</strong> descomposición STL con <code class="bg-surface-container px-1">seasonal_decompose</code>, identificando tendencia semanal (lunes–viernes pico, fin de semana caída) y tendencia anual (caída post-COVID, recuperación 2023–2025).</p>
+        </div>
+        <!-- Metrics box -->
+        <div class="w-full bg-surface border-2 border-secondary p-6 mt-6 relative">
+          <div class="absolute top-0 right-0 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">FIGURA 1 — MÉTRICAS</div>
+          <p class="text-caption font-caption text-on-surface-variant mb-4 pb-2 border-b border-outline-variant">Promedio sobre las 10 rutas seleccionadas. Validación temporal: train hasta 2024-10, test 2024-11 a 2025-01.</p>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Métrica</th>
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Valor</th>
+              <th class="border border-outline p-3 text-left">Interpretación</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">MAE</td><td class="border border-outline p-3 text-primary font-bold">1 096.71</td><td class="border border-outline p-3">Pasajeros de error promedio por ruta/día</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">RMSE</td><td class="border border-outline p-3 text-primary font-bold">1 452.42</td><td class="border border-outline p-3">Penaliza más los errores grandes</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">MAPE</td><td class="border border-outline p-3 text-primary font-bold">8.24%</td><td class="border border-outline p-3">Error porcentual — excelente para planificación (&lt;10%)</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3.2 Módulo 2 -->
+      <section id="modulo2">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">3.2 Módulo 2 — Clasificación de Conducción Distractiva</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Dataset:</strong> Multi-Class Driver Behavior Image Dataset (Kaggle, arafatsahinafridi, 2024). 7 286 imágenes reales de conductores en Bangladesh, cinco clases: <em>safe_driving</em> (1 679), <em>texting_phone</em> (1 561), <em>talking_phone</em> (1 513), <em>turning</em> (1 339), <em>other_activities</em> (1 184). Ausencia nota­ble: somnolencia no está representada.</p>
+          <p><strong>Preprocesamiento:</strong> redimensionamiento a 96×96 px JPEG para viabilidad en GitHub (33 MB total). En Colab, descarga vía <code class="bg-surface-container px-1">git sparse-checkout</code> desde el repositorio.</p>
+          <p><strong>Extracción de características:</strong> Histogram of Oriented Gradients (HOG) con ventana 16×16, 8 orientaciones, + estadísticas de color RGB (media, desviación, umbral de brillo). Total: 136 características por imagen.</p>
+          <p><strong>Modelo:</strong> <code class="bg-surface-container px-1">GradientBoostingClassifier</code> entrenado sobre 80% de las imágenes, evaluado en 20% (hold-out estratificado).</p>
+        </div>
+
+        <!-- Por qué no CNN -->
+        <blockquote class="my-8 pl-6 border-l-4 border-primary italic text-body-md text-on-surface-variant bg-surface-container-low py-4 pr-4">
+          <strong class="not-italic text-label-caps font-label-caps text-primary block mb-2">¿POR QUÉ RF/GB Y NO UNA CNN?</strong>
+          El objetivo general menciona <em>"aprendizaje profundo"</em>, y la alternativa natural sería transfer learning con MobileNetV3 o EfficientNet-B0. No se implementó por tres razones concretas: (1) el entorno gratuito de Google Colab limita GPU a ~4 horas/sesión y RAM a ~12 GB — fine-tuning de una red preentrenada sobre 7 000 imágenes es viable pero requiere gestión de checkpoints que excede el alcance del notebook; (2) las imágenes procesadas a 96×96 para caber en GitHub pierden resolución para los últimos bloques convolucionales de ResNet; (3) el pipeline de extracción HOG + clasificador es completamente reproducible sin GPU y sirve como baseline interpretable. El arquitectura modular permite sustituir el clasificador por un modelo CNN sin modificar el resto del sistema.
+        </blockquote>
+
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Resultados:</strong> el modelo alcanzó accuracy 0.68 en el conjunto de prueba. Las clases <em>safe_driving</em> y <em>talking_phone</em> tienen mejor F1 por mayor representación en el dataset. <em>other_activities</em> y <em>turning</em> tienen peor rendimiento por menor cantidad de datos y mayor variabilidad visual intraclase.</p>
+          <p><strong>Ejemplos clasificados:</strong> el notebook muestra imágenes representativas de aciertos y errores por clase, con la probabilidad predicha para cada categoría (sección 8 del notebook02).</p>
+        </div>
+        <div class="w-full bg-surface border-2 border-secondary p-6 mt-6 relative">
+          <div class="absolute top-0 right-0 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">FIGURA 2 — MÉTRICAS</div>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Clase</th>
+              <th class="border border-outline p-3 text-left">Imágenes</th>
+              <th class="border border-outline p-3 text-left">Precision</th>
+              <th class="border border-outline p-3 text-left">Recall</th>
+              <th class="border border-outline p-3 text-left">F1</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3">safe_driving</td><td class="border border-outline p-3">1 679</td><td class="border border-outline p-3">0.72</td><td class="border border-outline p-3">0.78</td><td class="border border-outline p-3 font-bold text-primary">0.75</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3">texting_phone</td><td class="border border-outline p-3">1 561</td><td class="border border-outline p-3">0.68</td><td class="border border-outline p-3">0.65</td><td class="border border-outline p-3 font-bold">0.66</td></tr>
+              <tr><td class="border border-outline p-3">talking_phone</td><td class="border border-outline p-3">1 513</td><td class="border border-outline p-3">0.70</td><td class="border border-outline p-3">0.72</td><td class="border border-outline p-3 font-bold">0.71</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3">turning</td><td class="border border-outline p-3">1 339</td><td class="border border-outline p-3">0.63</td><td class="border border-outline p-3">0.61</td><td class="border border-outline p-3 font-bold">0.62</td></tr>
+              <tr><td class="border border-outline p-3">other_activities</td><td class="border border-outline p-3">1 184</td><td class="border border-outline p-3">0.59</td><td class="border border-outline p-3">0.57</td><td class="border border-outline p-3 font-bold">0.58</td></tr>
+              <tr class="bg-surface-container-high"><td class="border border-outline p-3 font-bold">Macro promedio</td><td class="border border-outline p-3 font-bold">7 276</td><td class="border border-outline p-3 font-bold">0.66</td><td class="border border-outline p-3 font-bold">0.67</td><td class="border border-outline p-3 font-bold text-primary">0.68 acc.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3.3 Módulo 3 -->
+      <section id="modulo3">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">3.3 Módulo 3 — Recomendación de Destinos</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Dataset:</strong> Travel Recommendation Dataset (Kaggle, amanmehra23, 2024, licencia MIT). Cuatro tablas: <em>destinations</em> (1 000 destinos con tipo y popularidad), <em>users</em> (999 usuarios con preferencias declaradas), <em>reviews</em> (999 calificaciones 1–5) e <em>user_history</em> (999 visitas con ExperienceRating). Se combinaron reviews e historial en 1 998 interacciones únicas sobre 858 usuarios y 866 destinos.</p>
+          <p><strong>Sistema híbrido:</strong> combina dos señales complementarias. El <em>filtrado colaborativo</em> (CF) construye una matriz usuario × destino (858×866), calcula similitud coseno entre usuarios (diagonal en cero para evitar auto-similitud) y genera scores como suma ponderada de ratings de vecinos. El <em>filtrado por contenido</em> (CB) mapea las preferencias declaradas al tipo de destino y añade un bonus de popularidad normalizada. El score final es <code class="bg-surface-container px-1">0.7 × CF + 0.3 × CB</code>.</p>
+          <p><strong>Evaluación Leave-One-Out:</strong> por cada usuario con ≥ 2 destinos calificados ≥ 4, se oculta uno al azar y se verifica si aparece en el Top-K recomendado.</p>
+        </div>
+        <div class="w-full bg-surface border-2 border-secondary p-6 mt-6 relative">
+          <div class="absolute top-0 right-0 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">FIGURA 3 — MÉTRICAS</div>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Modo</th>
+              <th class="border border-outline p-3">Precision@5</th>
+              <th class="border border-outline p-3">Recall@5</th>
+              <th class="border border-outline p-3">NDCG@5</th>
+              <th class="border border-outline p-3">Hit Rate</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">Colaborativo (CF)</td><td class="border border-outline p-3 font-bold text-primary">0.158</td><td class="border border-outline p-3 font-bold text-primary">0.790</td><td class="border border-outline p-3 font-bold">0.699</td><td class="border border-outline p-3 font-bold text-primary">79.0%</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Híbrido (recomendado)</td><td class="border border-outline p-3">0.141</td><td class="border border-outline p-3">0.707</td><td class="border border-outline p-3">0.626</td><td class="border border-outline p-3">70.7%</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Contenido (CB)</td><td class="border border-outline p-3 text-on-surface-variant">0.001</td><td class="border border-outline p-3 text-on-surface-variant">0.006</td><td class="border border-outline p-3 text-on-surface-variant">0.004</td><td class="border border-outline p-3 text-on-surface-variant">0.6%</td></tr>
+            </tbody>
+          </table>
+          <p class="text-caption font-caption text-on-surface-variant mt-3">N evaluados: 181 usuarios · K=5 · Seed=42</p>
+        </div>
+        <div class="space-y-4 text-body-md font-body-md text-on-background mt-6">
+          <p><strong>Efectividad:</strong> el 85% de las recomendaciones Top-5 coinciden con el tipo de preferencia declarada por el usuario. La cobertura del catálogo es del 72% (624 de 866 destinos). Los 10 destinos más recomendados (Taj Mahal, Kerala Backwaters, Goa Beaches…) representan la demanda proyectada que el sistema generaría en rutas de alta visibilidad.</p>
+        </div>
+      </section>
+
+      <!-- 4. Herramienta Web -->
+      <section id="web">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">4. Herramienta Web</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>La herramienta web se construyó en <strong>HTML, CSS y JavaScript puros</strong>, publicada en <strong>GitHub Pages</strong> (rama <code class="bg-surface-container px-1">gh-pages</code>). No requiere servidor: toda la lógica de ejecución de Python corre en el navegador mediante <strong>Pyodide</strong> (Python/WebAssembly). Esto permite ejecutar el mismo código del notebook directamente desde el browser, sin instalar nada.</p>
+        </div>
+        <div class="grid grid-cols-1 gap-4 mt-6">
+          <div class="bg-surface-container p-5 border-l-4 border-primary">
+            <span class="text-label-caps font-label-caps text-primary block mb-2">MÓDULO 01 — PREDICCIÓN DE DEMANDA</span>
+            <p class="text-caption font-caption text-on-surface-variant">Carga datos CTA vía fetch, ejecuta preprocesamiento y modelo RF en Pyodide, renderiza gráficas de pronóstico a 30 días y análisis de estacionalidad con matplotlib.</p>
+            <a href="notebook01.html" class="text-primary text-caption font-caption mt-2 block hover:underline">→ notebook01.html</a>
+          </div>
+          <div class="bg-surface-container p-5 border-l-4 border-secondary">
+            <span class="text-label-caps font-label-caps text-secondary block mb-2">MÓDULO 02 — CLASIFICACIÓN VISUAL</span>
+            <p class="text-caption font-caption text-on-surface-variant">Carga modelo pre-entrenado (<code>modelo_conduccion.pkl</code>, 31 MB) vía fetch + pickle en Pyodide. El usuario sube una imagen y el sistema extrae HOG+color y ejecuta predict() mostrando probabilidades por clase en tiempo real.</p>
+            <a href="notebook02.html" class="text-secondary text-caption font-caption mt-2 block hover:underline">→ notebook02.html</a>
+          </div>
+          <div class="bg-surface-container p-5 border-l-4 border-tertiary">
+            <span class="text-label-caps font-label-caps text-tertiary block mb-2">MÓDULO 03 — RECOMENDACIÓN</span>
+            <p class="text-caption font-caption text-on-surface-variant">Carga recomendaciones pre-computadas (<code>recommendations.json</code>, 858 usuarios) y las 4 tablas del dataset. Búsqueda instantánea por usuario, preferencias, tipo de destino. Gráficas de demanda proyectada y cobertura.</p>
+            <a href="notebook03.html" class="text-tertiary text-caption font-caption mt-2 block hover:underline">→ notebook03.html</a>
+          </div>
+        </div>
+        <p class="text-caption font-caption text-on-surface-variant mt-4">URL pública: <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/" class="text-primary hover:underline">andresguido9820.github.io/sistema-transporte-inteligente/</a></p>
+      </section>
+
+      <!-- 5. Resultados -->
+      <section id="resultados">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">5. Resultados Generales y Discusión</h2>
+        <div class="w-full bg-surface border-2 border-secondary p-6 relative">
+          <div class="absolute top-0 right-0 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">TABLA RESUMEN</div>
+          <table class="w-full text-caption font-caption border-collapse mt-2">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Módulo</th>
+              <th class="border border-outline p-3 text-left">Dataset</th>
+              <th class="border border-outline p-3 text-left">Modelo</th>
+              <th class="border border-outline p-3 text-left">Resultado principal</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">Predicción demanda</td><td class="border border-outline p-3">CTA Chicago (2001–2026)</td><td class="border border-outline p-3">Random Forest</td><td class="border border-outline p-3 font-bold text-primary">MAPE 8.24% · MAE 1097</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Clasificación visual</td><td class="border border-outline p-3">Driver Behavior · 7 276 imgs</td><td class="border border-outline p-3">GB + HOG</td><td class="border border-outline p-3 font-bold text-primary">Accuracy 0.68</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Recomendación</td><td class="border border-outline p-3">Travel Rec. Kaggle · 858 users</td><td class="border border-outline p-3">CF + CB Híbrido</td><td class="border border-outline p-3 font-bold text-primary">Hit Rate 79% (CF)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="space-y-4 text-body-md font-body-md text-on-background mt-6">
+          <p>El módulo de predicción logra MAPE &lt; 10%, considerado excelente para planificación operativa: permite dimensionar flota y personal con margen de error de ~87 pasajeros por cada 1 000 en rutas de alta demanda. El módulo de clasificación con accuracy 0.68 sobre cinco clases superancial el baseline de azar (0.20), validando que HOG captura patrones de postura y contexto visual relevantes. El módulo de recomendación con Hit Rate 79% (CF) indica que el sistema recupera el destino oculto en 4 de cada 5 usuarios evaluados, resultado competitivo para un dataset de densidad moderada (2 interacciones/usuario promedio).</p>
+          <p>El componente de contenido tiene baja recall individual (0.6%) porque cada tipo de destino abarca cientos de opciones; sin embargo, aporta como señal secundaria en el híbrido para usuarios con pocos datos históricos (cold-start parcial).</p>
+        </div>
+      </section>
+
+      <!-- 6. Ética -->
+      <section id="etica">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">6. Aspectos Éticos y Creatividad</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mb-3">6.1 Privacidad y Consentimiento — Módulo 2</h3>
+        <div class="space-y-3 text-body-md font-body-md text-on-background mb-6">
+          <p>Las imágenes de conducción son datos biométricos sensibles. El dataset utilizado (Bangladesh, 2024) fue recolectado en un contexto académico pero no especifica si los conductores otorgaron consentimiento explícito. En un entorno de producción, cualquier sistema de monitoreo visual de conductores requiere: (1) consentimiento informado documentado, (2) almacenamiento cifrado con acceso restringido, (3) política de retención y borrado, y (4) cumplimiento de normativas locales de privacidad (ej. GDPR en Europa, Ley 1581 en Colombia).</p>
+          <p><strong>Uso del sistema:</strong> el modelo no debe utilizarse como mecanismo automático de sanción. Cualquier alerta debe revisarla un supervisor humano antes de generar consecuencias laborales. El riesgo de falsos positivos (0.32 de error) implica que un uso irresponsable puede perjudicar a conductores sin causa justificada.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mb-3">6.2 Sesgos de Datos</h3>
+        <div class="space-y-3 text-body-md font-body-md text-on-background mb-6">
+          <p><strong>Módulo 2 — sesgo de clase:</strong> <em>other_activities</em> tiene 1 184 imágenes vs. 1 679 de <em>safe_driving</em>, lo que genera recall inferior para la clase con menos datos. Un sistema de producción debería balancear mediante oversampling (SMOTE en espacio de características) o ajuste de pesos de clase.</p>
+          <p><strong>Módulo 2 — sesgo geográfico:</strong> el dataset fue grabado en Bangladesh con condiciones de iluminación, tipos de vehículo y comportamiento cultural específicos. Su generalización a entornos colombianos o latinoamericanos no está validada. Se requeriría recolección local o adaptación de dominio.</p>
+          <p><strong>Módulo 2 — somnolencia ausente:</strong> el dataset no contiene imágenes de conducción somnolienta, que es una de las principales causas de accidentes. Esta limitación reduce el alcance del sistema para seguridad vial integral.</p>
+          <p><strong>Módulo 3 — sesgo geográfico:</strong> todos los destinos son de India. El sistema no puede recomendarse directamente para una empresa colombiana sin reemplazar el dataset por destinos locales relevantes.</p>
+          <p><strong>Módulo 3 — cold-start:</strong> el 28% del catálogo nunca se recomienda, afectando desproporcionadamente destinos nuevos o de nicho. Los usuarios nuevos sin historial reciben recomendaciones basadas únicamente en contenido (preferencias declaradas), que tienen recall muy baja.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mb-3">6.3 Creatividad de la Solución</h3>
+        <div class="space-y-3 text-body-md font-body-md text-on-background">
+          <p>La herramienta web ejecuta Python directamente en el navegador mediante Pyodide, sin servidor ni backend. Esto elimina costos de infraestructura, garantiza privacidad del usuario (los datos no salen del dispositivo) y permite que cualquier persona con un browser reproduzca los modelos. La arquitectura de tres páginas independientes refleja la separación de módulos del proyecto y facilita la evaluación por piezas.</p>
+        </div>
+      </section>
+
+      <!-- 7. Conclusiones -->
+      <section id="conclusiones">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">7. Conclusiones y Recomendaciones</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El sistema logra los tres objetivos específicos del enunciado con datos reales, evaluación correcta y herramienta web funcional. El módulo de predicción alcanza MAPE 8.24%, suficiente para planificación operativa de flota y turnos. El módulo de clasificación demuestra que HOG+GB es un baseline válido para detección de distracciones, con accuracy 0.68, aunque su reemplazo por transfer learning (MobileNetV3, EfficientNet-B0) es el camino directo para superar 0.90. El módulo de recomendación con Hit Rate 79% valida el enfoque colaborativo y establece la base para un sistema de sugerencias personalizadas.</p>
+          <p><strong>Trabajo futuro:</strong></p>
+          <ul class="list-disc pl-6 space-y-2 text-body-md font-body-md">
+            <li>Reemplazar RF/GB en clasificación por fine-tuning de EfficientNet-B0 con dataset local de conductores colombianos (meta: accuracy &gt; 0.90, incluir clase somnolencia).</li>
+            <li>Incorporar LSTM o Transformer temporal para predicción de demanda, aprovechando dependencias de largo plazo.</li>
+            <li>Escalar el sistema de recomendación con ALS (Alternating Least Squares) o Neural CF para datasets más grandes.</li>
+            <li>Añadir variables exógenas: clima, eventos de ciudad, festivos locales al modelo de demanda.</li>
+            <li>Validar el sistema de recomendación con destinos reales colombianos y usuarios reales de la empresa.</li>
+          </ul>
+        </div>
+
+        <div class="mt-8 bg-surface-container p-6 border-l-4 border-primary">
+          <h3 class="text-label-caps font-label-caps text-primary mb-4">CONTRIBUCIONES DEL EQUIPO</h3>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left">Integrante</th>
+              <th class="border border-outline p-3 text-left">Contribución</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">Andrés F. Guido Montoya</td><td class="border border-outline p-3">Repositorio, herramienta web (GitHub Pages + Pyodide), módulo 03, reporte técnico</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Juan José Martínez</td><td class="border border-outline p-3">Módulo 01 — predicción de demanda, análisis de series de tiempo, visualizaciones</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Andrés Lemus</td><td class="border border-outline p-3">Módulo 02 — clasificación de conducción, HOG, evaluación y análisis de errores</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 8. Bibliografía -->
+      <section id="biblio">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">8. Bibliografía</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Chicago Transit Authority. (2024). <em>CTA – Ridership – Bus Routes – Daily Totals by Route</em> [Dataset]. Chicago Data Portal. <a href="https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm" class="text-primary hover:underline">https://data.cityofchicago.org/...</a></p>
+          <p>Afridi, A. S. (2024). <em>Multi-Class Driver Behavior Image Dataset</em> [Dataset]. Kaggle. <a href="https://www.kaggle.com/datasets/arafatsahinafridi/multi-class-driver-behavior-image-dataset" class="text-primary hover:underline">https://www.kaggle.com/datasets/arafatsahinafridi/...</a></p>
+          <p>Mehra, A. (2024). <em>Travel Recommendation Dataset</em> [Dataset]. Kaggle. <a href="https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset" class="text-primary hover:underline">https://www.kaggle.com/datasets/amanmehra23/...</a></p>
+          <p>Dalal, N., &amp; Triggs, B. (2005). Histograms of oriented gradients for human detection. <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)</em>, 886–893. <a href="https://doi.org/10.1109/CVPR.2005.177" class="text-primary hover:underline">https://doi.org/10.1109/CVPR.2005.177</a></p>
+          <p>Ricci, F., Rokach, L., &amp; Shapira, B. (Eds.). (2015). <em>Recommender systems handbook</em> (2nd ed.). Springer.</p>
+          <p>Breiman, L. (2001). Random forests. <em>Machine Learning</em>, <em>45</em>(1), 5–32. <a href="https://doi.org/10.1023/A:1010933404324" class="text-primary hover:underline">https://doi.org/10.1023/A:1010933404324</a></p>
+          <p>Pyodide Development Team. (2024). <em>Pyodide: Python for the browser</em> [Software]. <a href="https://pyodide.org" class="text-primary hover:underline">https://pyodide.org</a></p>
+          <p>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <em>Deep learning</em>. MIT Press.</p>
+        </div>
+      </section>
+
+      <!-- 9. Anexos -->
+      <section id="anexos">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">9. Anexos</h2>
+        <div class="grid grid-cols-1 gap-3 text-caption font-caption">
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-primary">open_in_new</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-primary block mb-1">HERRAMIENTA WEB EN VIVO</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/" class="text-primary hover:underline">andresguido9820.github.io/sistema-transporte-inteligente/</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-secondary">bar_chart</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-secondary block mb-1">MÓDULO 01 — PREDICCIÓN (EN VIVO)</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/notebook01.html" class="text-primary hover:underline">…/notebook01.html</a>
+              &nbsp;·&nbsp;
+              <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb" class="text-primary hover:underline">Colab</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-secondary">camera</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-secondary block mb-1">MÓDULO 02 — CLASIFICACIÓN (EN VIVO)</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/notebook02.html" class="text-primary hover:underline">…/notebook02.html</a>
+              &nbsp;·&nbsp;
+              <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb" class="text-primary hover:underline">Colab</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-secondary">recommend</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-secondary block mb-1">MÓDULO 03 — RECOMENDACIÓN (EN VIVO)</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/notebook03.html" class="text-primary hover:underline">…/notebook03.html</a>
+              &nbsp;·&nbsp;
+              <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb" class="text-primary hover:underline">Colab</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-tertiary">folder_open</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-tertiary block mb-1">REPOSITORIO</span>
+              <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="text-primary hover:underline">github.com/AndresGuido9820/sistema-transporte-inteligente</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-tertiary">videocam</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-tertiary block mb-1">VIDEOS DE DEMOSTRACIÓN</span>
+              <span class="text-on-surface-variant">Pendiente de publicación — se actualizará antes del cierre de entrega.</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Article footer -->
+        <div class="mt-12 pt-6 border-t-2 border-primary border-dashed flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="text-caption font-caption text-on-surface-variant">
+            <strong>Curso:</strong> Trabajo 3 · Aplicaciones en sistemas de recomendación e imágenes · Universidad Nacional de Colombia · 2026
+          </div>
+          <a href="index.html" class="border-2 border-secondary bg-transparent text-secondary hover:bg-secondary hover:text-on-secondary px-6 py-2 text-label-caps font-label-caps transition-colors rounded-none flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">arrow_back</span> Volver a herramientas
+          </a>
+        </div>
+      </section>
+
+    </div><!-- /main content -->
+  </div><!-- /grid -->
 </main>
+
+<!-- Footer -->
+<footer class="bg-inverse-surface mt-stack-lg w-full border-t-4 border-primary">
+  <div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-lg max-w-max-content-width mx-auto gap-8 md:gap-0">
+    <div class="flex flex-col items-center md:items-start">
+      <span class="text-headline-md font-headline-md text-inverse-on-surface mb-2 font-bold tracking-wider text-sm">SISTEMA INTELIGENTE DE TRANSPORTE</span>
+      <span class="text-caption font-caption text-surface-variant text-center md:text-left">
+        Universidad Nacional de Colombia · Trabajo 3 · Mayo 2026
+      </span>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6">
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="index.html">Herramientas</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="notebook01.html">Módulo 01</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="notebook02.html">Módulo 02</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="notebook03.html">Módulo 03</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">GitHub</a>
+    </div>
+  </div>
+</footer>
+
 </body>
 </html>
