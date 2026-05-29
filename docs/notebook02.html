@@ -5,7 +5,6 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Módulo 02 — Clasificación de Conducción | Sistema Inteligente de Transporte</title>
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/dist/tf-tflite.min.js"></script>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -47,32 +46,26 @@ tailwind.config = {
 <style>
 :root {
   --primary:#8f361d; --secondary:#4d6356; --bg:#fbf9f4; --ink:#1b1c19;
-  --muted:#56423d; --line:#ddc0b9; --blue:#1f5eff; --green:#4d6356;
-  --amber:#b07d00; --red:#ba1a1a;
+  --muted:#56423d; --line:#ddc0b9; --green:#4d6356; --amber:#b07d00; --red:#ba1a1a;
 }
 .note { color:var(--muted); font-size:14px; margin:0 0 12px; font-family:'Hanken Grotesk',sans-serif; }
 .step-label { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--primary); color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; margin-right:10px; vertical-align:middle; }
-/* Progress */
 .progress { height:4px; background:#e4e2dd; overflow:hidden; margin-top:14px; }
 .progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--secondary)); width:0%; transition:width .5s ease; }
-/* Status dot */
 .status-dot { width:10px; height:10px; border-radius:50%; background:#e4e2dd; flex-shrink:0; transition:background .3s; }
 .status-dot.loading { background:var(--amber); animation:pulse 1s infinite; }
 .status-dot.ready { background:var(--secondary); }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-/* Metrics */
 .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
 .kpi { background:#fff; border:1px solid var(--line); padding:14px; text-align:center; }
 .kpi strong { display:block; font-size:22px; color:var(--primary); font-family:'Libre Caslon Text',serif; }
 .kpi span { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; }
-/* Tables */
 table.report { width:100%; border-collapse:collapse; font-size:13px; }
 table.report th, table.report td { border:1px solid var(--line); padding:7px 10px; text-align:left; }
 table.report th { background:#f0eee9; font-weight:600; font-family:'JetBrains Mono',monospace; font-size:11px; }
 table.report tr:hover td { background:#f5f3ee; }
 .best { color:var(--secondary); font-weight:700; }
 .worst { color:var(--red); }
-/* Confusion matrix */
 .cm-wrap { overflow-x:auto; }
 table.cm { border-collapse:collapse; font-size:11px; }
 table.cm th, table.cm td { border:1px solid var(--line); padding:6px 8px; text-align:center; white-space:nowrap; }
@@ -80,17 +73,14 @@ table.cm th { background:#f0eee9; font-family:'JetBrains Mono',monospace; font-s
 table.cm .diag { background:#d0e8d7; font-weight:700; color:var(--secondary); }
 table.cm .err { background:#fde8e8; color:var(--red); }
 table.cm .zero { color:#bbb; }
-/* Class cards */
 .class-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:12px; }
 .class-card { background:#f5f3ee; border:1px solid var(--line); padding:12px; text-align:center; }
 .class-card strong { display:block; font-size:18px; color:var(--primary); font-family:'Libre Caslon Text',serif; }
 .class-card span { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
-/* Upload zone */
 .upload-zone { display:block; border:2px dashed var(--line); padding:32px; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; background:#fff; }
 .upload-zone:hover, .upload-zone.drag-over { border-color:var(--primary); background:#fdf5f3; }
 .upload-zone input { display:none; }
 .upload-zone p { margin:8px 0 0; color:var(--muted); font-size:14px; }
-/* Result */
 .result-box { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; margin-top:16px; }
 .result-img img { max-width:180px; border:1px solid var(--line); }
 .pred-label { font-size:26px; font-weight:700; margin:0 0 4px; color:var(--primary); font-family:'Libre Caslon Text',serif; }
@@ -100,7 +90,6 @@ table.cm .zero { color:#bbb; }
 .prob-track { flex:1; height:8px; background:#e4e2dd; overflow:hidden; }
 .prob-fill { height:100%; transition:width .4s; }
 .prob-pct { width:42px; text-align:right; font-weight:600; font-family:'JetBrains Mono',monospace; font-size:11px; }
-/* Metrics layout */
 .metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
 @media(max-width:700px){.metrics-grid,.class-grid{grid-template-columns:1fr}.result-box{grid-template-columns:1fr}.kpi-row{grid-template-columns:1fr 1fr}}
 </style>
@@ -136,7 +125,7 @@ table.cm .zero { color:#bbb; }
       <div class="flex-1 bg-secondary" style="height:60%"></div><div class="flex-1 bg-primary" style="height:85%"></div>
     </div>
     <div class="relative z-10 p-6 md:p-8">
-      <span class="text-label-caps font-label-caps text-secondary uppercase tracking-wider block mb-1">Módulo 02 · MobileNetV2 · TFLite en navegador</span>
+      <span class="text-label-caps font-label-caps text-secondary uppercase tracking-wider block mb-1">Módulo 02 · MobileNetV2 · TF.js en navegador</span>
       <h1 class="font-display-lg text-on-surface" style="font-size:clamp(22px,3.5vw,40px);line-height:1.15;font-family:'Libre Caslon Text',serif;font-weight:700;">Clasificación de conducción distractiva</h1>
     </div>
     <div class="absolute top-4 right-4 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">VISIÓN COMPUTACIONAL</div>
@@ -146,7 +135,7 @@ table.cm .zero { color:#bbb; }
   <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
     <div class="md:col-span-8 md:col-start-3">
       <p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed">
-        Modelo <strong class="text-on-surface">MobileNetV2</strong> entrenado con 7 276 imágenes reales del dataset Bangladesh 2024. Inferencia directa en el navegador con <strong class="text-on-surface">TensorFlow.js + TFLite</strong> — sin servidor, sin Python.
+        Modelo <strong class="text-on-surface">MobileNetV2</strong> entrenado con 7 276 imágenes reales del dataset Bangladesh 2024. Inferencia directa en el navegador con <strong class="text-on-surface">TensorFlow.js LayersModel</strong> — sin servidor, sin plugins experimentales.
       </p>
     </div>
   </div>
@@ -160,7 +149,7 @@ table.cm .zero { color:#bbb; }
       <p class="note">
         <strong>Fuente:</strong>
         <a href="https://zenodo.org/records/14908802" target="_blank" class="text-primary">Multi-Class Driver Behavior Image Dataset</a>
-        — Zenodo, Bangladesh octubre 2024. Artículo: <em>A multi-class driver behavior dataset for real-time detection and road safety enhancement</em> (PMC 2025).
+        — Zenodo, Bangladesh octubre 2024.
       </p>
       <div class="class-grid">
         <div class="class-card"><strong>1 679</strong><span>safe_driving</span></div>
@@ -175,17 +164,17 @@ table.cm .zero { color:#bbb; }
   <!-- 2. Modelo -->
   <section class="mb-stack-md">
     <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
-      <span class="step-label">2</span>Modelo — MobileNetV2 fine-tuned + TFLite
+      <span class="step-label">2</span>Modelo — MobileNetV2 fine-tuned
     </h2>
     <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <div class="flex items-center gap-4 flex-wrap mb-3">
         <div class="status-dot loading" id="status-dot"></div>
-        <span class="text-caption font-caption text-on-surface-variant" id="status-text">Cargando modelo TFLite desde GitHub…</span>
+        <span class="text-caption font-caption text-on-surface-variant" id="status-text">Cargando modelo desde GitHub (~10 MB)…</span>
       </div>
       <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
       <div class="mt-4 bg-surface-container p-4 border-l-4 border-secondary">
         <p class="text-label-caps font-label-caps text-on-surface-variant mb-2">ARQUITECTURA</p>
-        <p class="text-caption font-caption text-on-surface-variant">MobileNetV2 (ImageNet) → GlobalAvgPooling → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax). Dos fases: base congelada (lr=1e-3) → fine-tune últimas 30 capas (lr=1e-4). Exportado a TFLite float32 (sin cuantización, compatible con runtime web).</p>
+        <p class="text-caption font-caption text-on-surface-variant">MobileNetV2 (ImageNet, 96×96) → GlobalAvgPooling → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax). Fase 1: base congelada, Adam lr=1e-3. Fase 2: fine-tune últimas 30 capas, Adam lr=1e-4. Convertido a TF.js LayersModel.</p>
       </div>
     </div>
   </section>
@@ -216,12 +205,10 @@ table.cm .zero { color:#bbb; }
           </table>
         </div>
         <div>
-          <p class="note" style="margin-top:0">Matriz de confusión (clases abreviadas)</p>
+          <p class="note" style="margin-top:0">Matriz de confusión</p>
           <div class="cm-wrap">
             <table class="cm">
-              <thead>
-                <tr><th>Real \ Pred</th><th>other</th><th>safe</th><th>talking</th><th>texting</th><th>turning</th></tr>
-              </thead>
+              <thead><tr><th>Real \ Pred</th><th>other</th><th>safe</th><th>talking</th><th>texting</th><th>turning</th></tr></thead>
               <tbody>
                 <tr><th>other_activities</th><td class="diag">178</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
                 <tr><th>safe_driving</th><td class="zero">0</td><td class="diag">126</td><td class="err">48</td><td class="zero">0</td><td class="err">78</td></tr>
@@ -236,7 +223,7 @@ table.cm .zero { color:#bbb; }
     </div>
   </section>
 
-  <!-- 4. Clasificar imagen -->
+  <!-- 4. Clasificar -->
   <section class="mb-stack-md">
     <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
       <span class="step-label">4</span>Clasificar una imagen nueva
@@ -246,14 +233,13 @@ table.cm .zero { color:#bbb; }
       <label class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
         <input type="file" id="file-input" accept="image/*">
         <span class="material-symbols-outlined text-4xl text-on-surface-variant block mb-2">photo_camera</span>
-        <strong class="text-on-surface font-body-md font-body-md">Haz clic o arrastra una imagen aquí</strong>
-        <p>JPG, PNG, WEBP — inferencia local con TFLite, sin servidor</p>
+        <strong class="text-on-surface font-body-md">Haz clic o arrastra una imagen aquí</strong>
+        <p>JPG, PNG, WEBP — inferencia local con TF.js, sin servidor</p>
       </label>
       <div id="out-clasificacion" style="margin-top:16px"></div>
     </div>
   </section>
 
-  <!-- Links -->
   <div class="flex gap-3 flex-wrap mt-stack-lg">
     <a href="reporte.html" class="flex items-center gap-2 bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity">Ver reporte técnico</a>
     <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb" class="flex items-center gap-2 bg-surface text-primary border-2 border-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors">Abrir en Colab</a>
@@ -262,10 +248,11 @@ table.cm .zero { color:#bbb; }
 </main>
 
 <script>
-let tfliteModel = null;
+let model = null;
 let modeloListo = false;
 
-const MODEL_URL = 'https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main/data/processed/modelo_conduccion_f32.tflite';
+// GitHub Pages serves from docs/ — model/ is relative to this page
+const MODEL_URL = 'model/model.json';
 const CLASSES = ['other_activities', 'safe_driving', 'talking_phone', 'texting_phone', 'turning'];
 const LABELS = {
   safe_driving:     'Conducción segura',
@@ -274,6 +261,7 @@ const LABELS = {
   turning:          'Girando',
   other_activities: 'Otras actividades',
 };
+const INPUT_SIZE = 96; // MobileNetV2 trained at 96×96
 
 function setProgress(pct, msg, state) {
   document.getElementById('progress-fill').style.width = pct + '%';
@@ -294,42 +282,34 @@ async function handleFile(file) {
     return;
   }
   const previewSrc = URL.createObjectURL(file);
-  inject('out-clasificacion', '<div style="height:100px;background:linear-gradient(90deg,#eae8e3 25%,#f5f3ee 50%,#eae8e3 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;"></div>');
+  inject('out-clasificacion', '<div style="height:80px;background:linear-gradient(90deg,#eae8e3 25%,#f5f3ee 50%,#eae8e3 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;"></div>');
 
   const img = new Image();
   img.src = previewSrc;
   await new Promise(res => { img.onload = res; });
 
-  // Preprocess: resize to 224×224, normalize to [-1, 1] (MobileNetV2 preprocess_input)
+  // Resize to 96×96, normalize to [-1, 1] (MobileNetV2 preprocess_input)
   const canvas = document.createElement('canvas');
-  canvas.width = 224; canvas.height = 224;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(img, 0, 0, 224, 224);
-  const imageData = ctx.getImageData(0, 0, 224, 224);
-  const data = imageData.data;
+  canvas.width = INPUT_SIZE; canvas.height = INPUT_SIZE;
+  canvas.getContext('2d').drawImage(img, 0, 0, INPUT_SIZE, INPUT_SIZE);
 
-  // RGB float32 normalized to [-1, 1]
-  const float32 = new Float32Array(224 * 224 * 3);
-  for (let i = 0, j = 0; i < data.length; i += 4) {
-    float32[j++] = (data[i]     / 127.5) - 1.0;  // R
-    float32[j++] = (data[i + 1] / 127.5) - 1.0;  // G
-    float32[j++] = (data[i + 2] / 127.5) - 1.0;  // B
-  }
+  const inputTensor = tf.tidy(() => {
+    return tf.browser.fromPixels(canvas)
+      .toFloat()
+      .div(127.5)
+      .sub(1.0)
+      .expandDims(0);
+  });
 
-  const inputTensor = tf.tensor4d(float32, [1, 224, 224, 3]);
-  let outputData;
-  try {
-    const output = tfliteModel.predict(inputTensor);
-    outputData = await output.data();
-    output.dispose();
-  } finally {
-    inputTensor.dispose();
-  }
+  const outputTensor = model.predict(inputTensor);
+  const probs = await outputTensor.data();
+  inputTensor.dispose();
+  outputTensor.dispose();
 
-  const probs = {};
-  CLASSES.forEach((cls, i) => { probs[cls] = outputData[i]; });
-  const clase = CLASSES[outputData.indexOf(Math.max(...outputData))];
-  renderResultado(previewSrc, clase, probs);
+  const probMap = {};
+  CLASSES.forEach((cls, i) => { probMap[cls] = probs[i]; });
+  const clase = CLASSES[Array.from(probs).indexOf(Math.max(...probs))];
+  renderResultado(previewSrc, clase, probMap);
 }
 
 function renderResultado(imgSrc, clase, probas) {
@@ -364,11 +344,9 @@ async function cargarModelo() {
     setProgress(10, 'Inicializando TensorFlow.js…');
     await tf.ready();
 
-    
-
-
-    setProgress(40, 'Descargando modelo CNN float32 (9.9 MB)…');
-    tfliteModel = await tflite.loadTFLiteModel(MODEL_URL);
+    setProgress(40, 'Descargando modelo MobileNetV2 (~10 MB)…');
+    model = await tf.loadLayersModel(MODEL_URL);
+    model.predict(tf.zeros([1, INPUT_SIZE, INPUT_SIZE, 3])).dispose(); // warm-up
 
     setProgress(100, 'Modelo listo — sube una imagen para clasificar.', 'ready');
     document.getElementById('upload-note').textContent = 'Sube cualquier imagen de un conductor para clasificarla al instante.';
@@ -377,7 +355,7 @@ async function cargarModelo() {
   } catch(err) {
     setProgress(0, 'Error: ' + err.message, '');
     document.getElementById('status-dot').style.background = 'var(--red)';
-    console.error('Error cargando modelo TFLite:', err);
+    console.error('Error cargando modelo:', err);
   }
 }
 
