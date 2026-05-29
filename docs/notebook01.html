@@ -1,144 +1,208 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Notebook 01 — Predicción de demanda | Sistema Inteligente de Transporte</title>
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
-  <style>
-    :root { color-scheme: light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --bg:#f5f7fa; }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
-    a { color: var(--blue); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 64px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 34px; }
-    .brand { font-weight: 800; letter-spacing: .2px; }
-    .nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
-    .hero { padding: 42px 0 34px; border-bottom: 1px solid var(--line); }
-    .hero h1 { margin: 0; font-size: clamp(28px, 4vw, 50px); line-height: 1.08; }
-    .hero p { margin: 14px 0 0; color: var(--muted); font-size: 17px; max-width: 720px; }
-    .badge { display: inline-flex; margin-bottom: 14px; color: var(--green); font-weight: 700; font-size: 14px; }
-    .section { margin-top: 36px; }
-    .section > h2 { margin: 0 0 12px; font-size: 20px; }
-    .panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
-    /* run bar */
-    .run-bar { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
-    .button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 20px; border-radius: 6px; background: var(--blue); color: white; font-weight: 700; border: none; cursor: pointer; font-size: 15px; transition: background .15s; }
-    .button:hover:not(:disabled) { background: #174bd0; }
-    .button:disabled { opacity: .45; cursor: not-allowed; }
-    .status-text { color: var(--muted); font-size: 14px; }
-    .progress { height: 6px; background: #e8edf3; border-radius: 999px; overflow: hidden; margin-top: 14px; }
-    .progress-fill { height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); border-radius: 999px; width: 0%; transition: width .5s ease; }
-    /* log */
-    .log-box { font-family: ui-monospace, "Cascadia Code", monospace; font-size: 12.5px; background: #f0f2f5; border-radius: 6px; padding: 10px 14px; max-height: 130px; overflow-y: auto; color: var(--muted); margin-top: 12px; white-space: pre-wrap; border: 1px solid var(--line); }
-    /* skeleton */
-    .skeleton { background: linear-gradient(90deg, #eef0f3 25%, #f5f7fa 50%, #eef0f3 75%); background-size: 200% 100%; animation: shimmer 1.6s infinite; border-radius: 6px; }
-    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-    .placeholder { height: 180px; }
-    .placeholder-sm { height: 90px; }
-    /* output tables */
-    .output-table { width: 100%; border-collapse: collapse; font-size: 13.5px; overflow-x: auto; display: block; }
-    .output-table th, .output-table td { border: 1px solid var(--line); padding: 7px 10px; text-align: left; white-space: nowrap; }
-    .output-table th { background: #eef3f8; font-weight: 600; }
-    .output-table tr:hover td { background: #f7f9fc; }
-    /* charts */
-    .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    .chart-box { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
-    .chart-box img { max-width: 100%; border-radius: 4px; display: block; }
-    /* misc */
-    .note { color: var(--muted); font-size: 14px; margin: 0 0 12px; }
-    .step-label { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 50%; background: #edf3ff; color: var(--blue); font-weight: 800; font-size: 13px; margin-right: 8px; vertical-align: middle; }
-    @media (max-width: 700px) { .charts-grid { grid-template-columns: 1fr; } .topbar { flex-direction: column; align-items: flex-start; } }
-  </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Módulo 01 — Predicción de Demanda | Sistema Inteligente de Transporte</title>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "background":"#fbf9f4","surface":"#fbf9f4","surface-container":"#f0eee9",
+      "surface-container-low":"#f5f3ee","surface-container-high":"#eae8e3",
+      "surface-container-lowest":"#ffffff","surface-dim":"#dbdad5",
+      "surface-variant":"#e4e2dd","on-background":"#1b1c19","on-surface":"#1b1c19",
+      "on-surface-variant":"#56423d","outline":"#89726c","outline-variant":"#ddc0b9",
+      "primary":"#8f361d","on-primary":"#ffffff","secondary":"#4d6356","on-secondary":"#ffffff",
+      "tertiary":"#5f5136","on-tertiary":"#ffffff","error":"#ba1a1a","on-error":"#ffffff"
+    },
+    spacing:{
+      "stack-lg":"48px","stack-md":"24px","gutter":"24px",
+      "margin-desktop":"64px","margin-mobile":"16px","max-content-width":"1280px"
+    },
+    fontFamily:{
+      "body-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],
+      "headline-md":["Libre Caslon Text"],"display-lg":["Libre Caslon Text"],
+      "display-lg-mobile":["Libre Caslon Text"],"label-caps":["JetBrains Mono"],"caption":["Hanken Grotesk"]
+    },
+    fontSize:{
+      "body-lg":["18px",{"lineHeight":"1.7"}],"body-md":["16px",{"lineHeight":"1.5"}],
+      "headline-md":["22px",{"lineHeight":"1.3","fontWeight":"600"}],
+      "display-lg":["60px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"700"}],
+      "display-lg-mobile":["38px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "label-caps":["11px",{"lineHeight":"1.0","letterSpacing":"0.1em","fontWeight":"500"}],
+      "caption":["14px",{"lineHeight":"1.4"}]
+    }
+  }}
+}
+</script>
+<style>
+/* Interactive component styles — preserved functional CSS with updated palette */
+:root {
+  --primary:#8f361d; --secondary:#4d6356; --bg:#fbf9f4; --ink:#1b1c19;
+  --muted:#56423d; --line:#ddc0b9; --blue:#1f5eff; --green:#4d6356;
+  --amber:#b07d00; --red:#ba1a1a;
+}
+/* Run button */
+.btn-run { display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:10px 24px; background:var(--primary); color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; font-weight:500; border:none; cursor:pointer; transition:opacity .15s; }
+.btn-run:hover:not(:disabled) { opacity:.9; }
+.btn-run:disabled { opacity:.45; cursor:not-allowed; }
+/* Progress */
+.progress { height:4px; background:#e4e2dd; overflow:hidden; margin-top:14px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--secondary)); width:0%; transition:width .5s ease; }
+/* Log */
+.log-box { font-family:'JetBrains Mono',monospace; font-size:12px; background:#f0eee9; border:1px solid var(--line); padding:10px 14px; max-height:120px; overflow-y:auto; color:var(--muted); margin-top:12px; white-space:pre-wrap; }
+/* Skeleton */
+.skeleton { background:linear-gradient(90deg,#eae8e3 25%,#f5f3ee 50%,#eae8e3 75%); background-size:200% 100%; animation:shimmer 1.6s infinite; }
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.placeholder { height:180px; }
+.placeholder-sm { height:90px; }
+/* Output tables */
+.output-table { width:100%; border-collapse:collapse; font-size:13px; overflow-x:auto; display:block; }
+.output-table th, .output-table td { border:1px solid var(--line); padding:7px 10px; text-align:left; white-space:nowrap; }
+.output-table th { background:#f0eee9; font-weight:600; font-family:'JetBrains Mono',monospace; font-size:11px; }
+.output-table tr:hover td { background:#f5f3ee; }
+/* Charts */
+.charts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+.chart-box { background:#fff; border:1px solid var(--line); padding:14px; }
+.chart-box img { max-width:100%; display:block; }
+/* Notes */
+.note { color:var(--muted); font-size:14px; margin:0 0 12px; font-family:'Hanken Grotesk',sans-serif; }
+/* Step label */
+.step-label { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--primary); color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; margin-right:10px; vertical-align:middle; }
+@media(max-width:700px){.charts-grid{grid-template-columns:1fr}}
+</style>
 </head>
-<body>
-<main class="wrap">
+<body class="bg-background text-on-background antialiased flex flex-col min-h-screen">
 
-  <header class="topbar">
-    <div class="brand">Sistema Inteligente de Transporte</div>
-    <nav class="nav">
-      <a href="index.html">Inicio</a>
-      <a href="reporte.html">Reporte técnico</a>
-      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+<header class="bg-surface border-b-4 border-primary sticky top-0 z-50 w-full">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-max-content-width mx-auto py-stack-md">
+    <div class="text-headline-md font-headline-md text-primary uppercase tracking-wider text-sm md:text-base">Sistemas Inteligentes</div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="index.html">Herramientas</a>
+      <a class="text-primary border-b-2 border-primary text-label-caps font-label-caps uppercase pb-1" href="notebook01.html">Módulo 01</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook02.html">Módulo 02</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook03.html">Módulo 03</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="reporte.html">Reporte</a>
     </nav>
-  </header>
+    <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="hidden md:flex bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity items-center gap-2">
+      <span class="material-symbols-outlined text-base">code</span> Repositorio
+    </a>
+  </div>
+</header>
 
-  <section class="hero">
-    <span class="badge">Notebook 01 — ejecutado en el navegador</span>
-    <h1>Predicción de demanda de transporte</h1>
-    <p>
-      Este módulo corre el mismo código del notebook directamente en tu navegador usando
-      <strong>Pyodide</strong> (Python/WebAssembly). Sin servidor: carga los datos reales del CTA,
-      entrena Random Forest y Gradient Boosting, y genera el pronóstico de 30 días a partir del
-      <strong>último registro disponible en el dataset</strong> — no desde la fecha de hoy.
-    </p>
-  </section>
+<main class="flex-grow w-full max-w-max-content-width mx-auto px-margin-mobile md:px-margin-desktop mt-stack-lg pb-stack-lg">
 
-  <!-- ── Control de ejecución ── -->
-  <section class="section">
-    <div class="panel">
-      <div class="run-bar">
-        <button class="button" id="btn-run" onclick="iniciarEjecucion()">Ejecutar notebook</button>
-        <span class="status-text" id="status-text">Presiona el botón para cargar Python y correr el notebook.</span>
+  <!-- Hero banner -->
+  <div class="w-full h-32 md:h-48 mb-stack-lg bg-surface-container overflow-hidden border-2 border-primary relative flex items-end">
+    <div class="absolute inset-0 flex items-end gap-1 px-4 pb-4 opacity-20">
+      <div class="flex-1 bg-primary" style="height:46%"></div><div class="flex-1 bg-secondary" style="height:63%"></div>
+      <div class="flex-1 bg-primary" style="height:58%"></div><div class="flex-1 bg-primary" style="height:81%"></div>
+      <div class="flex-1 bg-secondary" style="height:69%"></div><div class="flex-1 bg-primary" style="height:92%"></div>
+      <div class="flex-1 bg-primary" style="height:77%"></div><div class="flex-1 bg-secondary" style="height:88%"></div>
+      <div class="flex-1 bg-primary" style="height:74%"></div><div class="flex-1 bg-primary" style="height:96%"></div>
+      <div class="flex-1 bg-secondary" style="height:84%"></div><div class="flex-1 bg-primary" style="height:90%"></div>
+    </div>
+    <div class="relative z-10 p-6 md:p-8">
+      <span class="text-label-caps font-label-caps text-primary uppercase tracking-wider block mb-1">Módulo 01 · ejecutado en el navegador con Pyodide</span>
+      <h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-on-surface" style="font-size:clamp(22px,3.5vw,40px)">Predicción de demanda de transporte</h1>
+    </div>
+    <div class="absolute top-4 right-4 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">SERIE DE TIEMPO</div>
+  </div>
+
+  <!-- Intro text -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
+    <div class="md:col-span-8 md:col-start-3">
+      <p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed">
+        Este módulo corre el mismo código del notebook directamente en tu navegador usando <strong class="text-on-surface">Pyodide</strong> (Python/WebAssembly). Sin servidor: carga los datos reales del CTA, entrena Random Forest y Gradient Boosting, y genera el pronóstico de 30 días a partir del <strong class="text-on-surface">último registro disponible en el dataset</strong> — no desde la fecha de hoy.
+      </p>
+    </div>
+  </div>
+
+  <!-- Run control -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">Control de ejecución</h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
+      <div class="flex items-center gap-4 flex-wrap">
+        <button class="btn-run" id="btn-run" onclick="iniciarEjecucion()">
+          <span class="material-symbols-outlined text-base">play_arrow</span> Ejecutar notebook
+        </button>
+        <span class="text-caption font-caption text-on-surface-variant" id="status-text">Presiona el botón para cargar Python y correr el notebook.</span>
       </div>
-      <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
-      <div class="log-box" id="log-box">Los pasos de ejecución aparecerán aquí...</div>
+      <div class="progress mt-4"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="log-box mt-3" id="log-box">Los pasos de ejecución aparecerán aquí…</div>
     </div>
   </section>
 
-  <!-- ── 1. Dataset ── -->
-  <section class="section">
-    <h2><span class="step-label">1</span>Dataset — CTA Bus Ridership</h2>
-    <div class="panel">
+  <!-- 1. Dataset -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">1</span>Dataset — CTA Bus Ridership
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <p class="note" id="note-datos">Datos del Chicago Transit Authority (2001–2026). Se filtra desde 2021 y se toman las 10 rutas de mayor demanda.</p>
       <div id="out-datos"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
 
-  <!-- ── 2. Exploración ── -->
-  <section class="section">
-    <h2><span class="step-label">2</span>Exploración — Media móvil 7 días por ruta</h2>
-    <div class="panel">
+  <!-- 2. Exploración -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">2</span>Exploración — Media móvil 7 días por ruta
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <div id="out-exploracion"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
 
-  <!-- ── 3. Estacionalidad ── -->
-  <section class="section">
-    <h2><span class="step-label">3</span>Estacionalidad y tendencias</h2>
-    <div class="panel">
+  <!-- 3. Estacionalidad -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">3</span>Estacionalidad y tendencias
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <p class="note">Descomposición aditiva de la serie (tendencia + estacionalidad semanal + residuo), patrón promedio por día de semana y evolución anual por ruta.</p>
       <div id="out-estacionalidad"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
 
-  <!-- ── 4. Ingeniería de variables ── -->
-  <section class="section">
-    <h2><span class="step-label">4</span>Ingeniería de variables</h2>
-    <div class="panel">
+  <!-- 4. Variables -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">4</span>Ingeniería de variables
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <p class="note">
-        Se añaden <strong>rezagos</strong> (lag_1 = pasajeros de ayer, lag_7 = mismo día semana anterior),
-        <strong>media móvil de 7 días</strong> (rolling_7) y <strong>variables de calendario</strong>
-        (día de semana, mes, fin de semana, festivo). Estas variables convierten la serie de tiempo
-        en un problema supervisado de regresión tabular.
+        Se añaden <strong>rezagos</strong> (lag_1, lag_7), <strong>media móvil de 7 días</strong> (rolling_7) y <strong>variables de calendario</strong> (día de semana, mes, fin de semana, festivo). Estas variables convierten la serie en un problema supervisado de regresión tabular.
       </p>
       <div id="out-variables"><div class="skeleton placeholder-sm"></div></div>
     </div>
   </section>
 
-  <!-- ── 5. Resultados del modelo ── -->
-  <section class="section">
-    <h2><span class="step-label">5</span>Resultados del modelo por ruta</h2>
-    <div class="panel">
+  <!-- 5. Resultados -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">5</span>Resultados del modelo por ruta
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <p class="note">Partición temporal 80/20 — el 20% más reciente se usa como set de prueba. El modelo ganador por ruta se selecciona por menor RMSE.</p>
       <div id="out-metricas"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
 
-  <!-- ── 6. Validación gráfica ── -->
-  <section class="section">
-    <h2><span class="step-label">6</span>Validación — Real vs. Predicción (4 rutas)</h2>
+  <!-- 6. Validación -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">6</span>Validación — Real vs. Predicción (4 rutas)
+    </h2>
     <div class="charts-grid" id="out-graficas">
       <div class="chart-box"><div class="skeleton placeholder"></div></div>
       <div class="chart-box"><div class="skeleton placeholder"></div></div>
@@ -147,13 +211,21 @@
     </div>
   </section>
 
-  <!-- ── 7. Pronóstico 30 días ── -->
-  <section class="section">
-    <h2><span class="step-label">7</span>Pronóstico operativo — 30 días</h2>
-    <div class="panel">
+  <!-- 7. Pronóstico -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">7</span>Pronóstico operativo — 30 días
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <div id="out-pronostico"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
+
+  <!-- Links -->
+  <div class="flex gap-3 flex-wrap mt-stack-lg">
+    <a href="reporte.html" class="flex items-center gap-2 bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity">Ver reporte técnico</a>
+    <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb" class="flex items-center gap-2 bg-surface text-primary border-2 border-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors">Abrir en Colab</a>
+  </div>
 
 </main>
 
@@ -184,7 +256,6 @@ async function iniciarEjecucion() {
 
   try {
 
-    // ── Cargar Pyodide ──────────────────────────────────────────────
     if (!pyodide) {
       setProgress(5, 'Cargando entorno Python (Pyodide)...');
       pyodide = await loadPyodide();
@@ -193,7 +264,6 @@ async function iniciarEjecucion() {
       setProgress(32, 'Paquetes instalados.');
     }
 
-    // ── Setup global ───────────────────────────────────────────────
     await pyodide.runPythonAsync(`
 import warnings
 warnings.filterwarnings('ignore')
@@ -215,10 +285,9 @@ def fig_to_img():
     buf.seek(0)
     b64 = base64.b64encode(buf.read()).decode()
     plt.close('all')
-    return f'<img src="data:image/png;base64,{b64}" style="max-width:100%;border-radius:4px;">'
+    return f'<img src="data:image/png;base64,{b64}" style="max-width:100%;display:block;">'
 `);
 
-    // ── 1. Cargar datos ────────────────────────────────────────────
     setProgress(38, 'Cargando datos del CTA desde GitHub...');
     const datosHTML = await pyodide.runPythonAsync(`
 from pyodide.http import open_url
@@ -250,7 +319,6 @@ info + resumen.to_html(index=False, classes='output-table', border=0)
     inject('out-datos', datosHTML);
     setProgress(50, 'Datos cargados. Generando gráfica exploratoria...');
 
-    // ── 2. Exploración ─────────────────────────────────────────────
     const exploHTML = await pyodide.runPythonAsync(`
 plt.figure(figsize=(12, 4))
 for ruta, datos in demanda.groupby('route'):
@@ -267,7 +335,6 @@ fig_to_img()
     inject('out-exploracion', exploHTML);
     setProgress(55, 'Gráfica lista. Cargando statsmodels...');
 
-    // ── 3. Estacionalidad ──────────────────────────────────────────
     await pyodide.loadPackage(['statsmodels']);
     setProgress(60, 'Analizando estacionalidad y tendencias...');
     const estacHTML = await pyodide.runPythonAsync(`
@@ -284,10 +351,10 @@ serie_ref = (
 
 decomp = seasonal_decompose(serie_ref, model='additive', period=7)
 fig, axes = plt.subplots(4, 1, figsize=(12, 9), sharex=True)
-serie_ref.plot(ax=axes[0], lw=1, color='#1f5eff', title='Original')
-decomp.trend.plot(ax=axes[1], lw=1.5, color='#a86200', title='Tendencia')
-decomp.seasonal.plot(ax=axes[2], lw=1, color='#0a7a5f', title='Estacionalidad semanal')
-decomp.resid.plot(ax=axes[3], lw=1, color='#c0392b', title='Residuo')
+serie_ref.plot(ax=axes[0], lw=1, color='#8f361d', title='Original')
+decomp.trend.plot(ax=axes[1], lw=1.5, color='#5f5136', title='Tendencia')
+decomp.seasonal.plot(ax=axes[2], lw=1, color='#4d6356', title='Estacionalidad semanal')
+decomp.resid.plot(ax=axes[3], lw=1, color='#ba1a1a', title='Residuo')
 for ax in axes:
     ax.grid(alpha=0.25)
     ax.set_xlabel('')
@@ -300,7 +367,7 @@ tmp2['dayofweek'] = tmp2['date'].dt.dayofweek
 patron = tmp2.groupby('dayofweek')['passengers'].mean()
 dias = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom']
 plt.figure(figsize=(8, 3.2))
-colores = ['#1f5eff' if i < 5 else '#f6a531' for i in range(7)]
+colores = ['#8f361d' if i < 5 else '#4d6356' for i in range(7)]
 plt.bar(dias, patron.values, color=colores)
 plt.title('Demanda promedio por día de semana')
 plt.ylabel('Pasajeros promedio')
@@ -327,7 +394,6 @@ decomp_img + '<br><br>' + week_img + '<br><br>' + annual_img
     inject('out-estacionalidad', estacHTML);
     setProgress(66, 'Análisis listo. Creando variables de ingeniería...');
 
-    // ── 4. Feature engineering ─────────────────────────────────────
     const varHTML = await pyodide.runPythonAsync(`
 def crear_variables(df):
     data = df.copy()
@@ -356,7 +422,6 @@ sample.to_html(index=False, classes='output-table', border=0)
     inject('out-variables', varHTML);
     setProgress(72, 'Variables listas. Entrenando modelos (puede tardar ~40 s)...');
 
-    // ── 4. Entrenar modelos + métricas ─────────────────────────────
     const metHTML = await pyodide.runPythonAsync(`
 from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
@@ -398,7 +463,6 @@ metricas.to_html(index=False, classes='output-table', border=0)
     inject('out-metricas', metHTML);
     setProgress(86, 'Modelos entrenados. Generando gráficas de validación...');
 
-    // ── 5. Gráficas validación ─────────────────────────────────────
     const chartsHTML = await pyodide.runPythonAsync(`
 pred_df   = pd.concat(predicciones, ignore_index=True)
 rutas_sel = pred_df['route'].unique()[:4]
@@ -407,8 +471,8 @@ imgs      = []
 for ruta in rutas_sel:
     graf = pred_df[pred_df['route'] == ruta].sort_values('date')
     plt.figure(figsize=(9, 3.5))
-    plt.plot(graf['date'], graf['passengers'],  marker='o', ms=3, lw=1.5, label='Real')
-    plt.plot(graf['date'], graf['prediction'],  marker='o', ms=3, lw=1.5, ls='--', label='Predicción')
+    plt.plot(graf['date'], graf['passengers'],  marker='o', ms=3, lw=1.5, label='Real', color='#8f361d')
+    plt.plot(graf['date'], graf['prediction'],  marker='o', ms=3, lw=1.5, ls='--', label='Predicción', color='#4d6356')
     plt.title(f'Ruta {ruta} — Real vs. Predicción', fontsize=12)
     plt.ylabel('Pasajeros')
     plt.xticks(rotation=30, ha='right', fontsize=8)
@@ -422,7 +486,6 @@ for ruta in rutas_sel:
     inject('out-graficas', chartsHTML);
     setProgress(94, 'Gráficas listas. Generando pronóstico 30 días...');
 
-    // ── 6. Pronóstico ──────────────────────────────────────────────
     const forecastHTML = await pyodide.runPythonAsync(`
 def pronosticar_ruta(df, ruta, modelo, dias=30):
     hist   = df[df['route'] == ruta].sort_values('date')[['date', 'passengers']].copy()
@@ -450,9 +513,9 @@ pronostico = pronosticar_ruta(demanda, ruta_sel, mejores_modelos[ruta_sel], 30)
 
 plt.figure(figsize=(11, 3.8))
 plt.plot(range(len(pronostico)), pronostico['Pasajeros estimados'],
-         marker='o', ms=4, lw=1.7, color='#1f5eff')
+         marker='o', ms=4, lw=1.7, color='#8f361d')
 plt.fill_between(range(len(pronostico)), pronostico['Pasajeros estimados'],
-                 alpha=0.12, color='#1f5eff')
+                 alpha=0.12, color='#8f361d')
 plt.xticks(range(len(pronostico)), pronostico['Fecha'], rotation=45, ha='right', fontsize=8)
 plt.title(f'Pronóstico 30 días — Ruta {ruta_sel}', fontsize=12)
 plt.ylabel('Pasajeros estimados')
@@ -469,11 +532,11 @@ table_html = pronostico.head(10).to_html(index=False, classes='output-table', bo
 )
 `);
     inject('out-pronostico', forecastHTML);
-    setProgress(100, 'Ejecucion completa.');
+    setProgress(100, 'Ejecución completa.');
 
   } catch (err) {
     log('ERROR: ' + err.message);
-    document.getElementById('status-text').textContent = 'Error en la ejecucion. Revisa la consola del navegador (F12).';
+    document.getElementById('status-text').textContent = 'Error en la ejecución. Revisa la consola del navegador (F12).';
     console.error(err);
   } finally {
     btn.disabled = false;

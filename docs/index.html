@@ -1,174 +1,299 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Herramientas - Sistema Inteligente de Transporte</title>
-  <style>
-:root { color-scheme: light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --bg:#f5f7fa; }
-* { box-sizing: border-box; }
-body { margin: 0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: var(--ink); background: var(--bg); line-height: 1.55; }
-a { color: var(--blue); text-decoration: none; }
-a:hover { text-decoration: underline; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 20px 56px; }
-.topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 34px; }
-.brand { font-weight: 800; letter-spacing: .2px; }
-.nav { display: flex; flex-wrap: wrap; gap: 12px; font-size: 14px; }
-.hero { display: grid; grid-template-columns: 1.05fr .95fr; gap: 28px; align-items: center; padding: 42px 0 34px; border-bottom: 1px solid var(--line); }
-.hero h1 { margin: 0; max-width: 850px; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: 0; }
-.hero p { margin: 18px 0 0; max-width: 680px; color: var(--muted); font-size: 18px; }
-.badge { display: inline-flex; margin-bottom: 14px; color: var(--green); font-weight: 700; font-size: 14px; }
-.kpis { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
-.kpi { border: 1px solid var(--line); background: white; border-radius: 8px; padding: 14px; }
-.kpi strong { display: block; font-size: 22px; }
-.hero-visual { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px; box-shadow: 0 14px 36px rgba(23,32,38,.08); }
-.route-chart { height: 178px; display: flex; align-items: end; gap: 8px; padding: 14px 8px 8px; border-bottom: 1px solid var(--line); }
-.route-chart i { flex: 1; min-width: 10px; border-radius: 5px 5px 0 0; background: linear-gradient(180deg, #2f6fff, #11a87d); }
-.route-chart i:nth-child(2n) { background: linear-gradient(180deg, #f6a531, #e06d2f); }
-.visual-caption { display: flex; justify-content: space-between; gap: 12px; margin-top: 12px; color: var(--muted); font-size: 13px; }
-.visual-caption strong { color: var(--ink); display: block; font-size: 16px; }
-.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 28px; }
-.card { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 18px; min-height: 230px; display: flex; flex-direction: column; }
-.card h2 { margin: 0 0 8px; font-size: 21px; }
-.card p { margin: 0 0 12px; color: var(--muted); }
-.card ul { padding-left: 18px; margin: 0 0 16px; color: var(--muted); }
-.card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-.icon { width: 42px; height: 42px; border-radius: 8px; display: grid; place-items: center; font-weight: 900; color: white; background: var(--blue); }
-.icon.green { background: var(--green); }
-.icon.amber { background: var(--amber); }
-.mini-bars { display: flex; align-items: end; gap: 5px; height: 46px; margin: 6px 0 14px; }
-.mini-bars i { flex: 1; border-radius: 4px 4px 0 0; background: #c9d8ff; }
-.mini-bars i:nth-child(2n) { background: #afe3d2; }
-.mini-bars i:nth-child(3n) { background: #ffd69a; }
-.button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; padding: 8px 12px; margin-top: auto; border-radius: 6px; background: var(--blue); color: white; font-weight: 700; }
-.button:hover { text-decoration: none; background: #174bd0; }
-.section { margin-top: 34px; }
-.panel { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 22px; }
-.section h2 { margin: 0 0 10px; }
-.pipeline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 16px; }
-.step { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 16px; position: relative; }
-.step span { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; background: #edf3ff; color: var(--blue); font-weight: 800; margin-bottom: 10px; }
-.step h3 { margin: 0 0 6px; font-size: 17px; }
-.step p { margin: 0; color: var(--muted); font-size: 14px; }
-.evidence { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; align-items: stretch; }
-.shot { background: white; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-.shot img { display: block; width: 100%; height: 100%; max-height: 310px; object-fit: cover; object-position: top left; background: #eef3f8; }
-.metric-list { display: grid; gap: 10px; }
-.metric { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 14px; }
-.metric b { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
-.meter { height: 8px; border-radius: 999px; overflow: hidden; background: #e8edf3; }
-.meter i { display: block; height: 100%; background: linear-gradient(90deg, var(--blue), var(--green)); }
-.links-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-.ghost { background: white; color: var(--blue); border: 1px solid var(--line); }
-.ghost:hover { background: #edf3ff; }
-.report { background: white; border: 1px solid var(--line); border-radius: 8px; padding: 28px; }
-.report h1 { font-size: 36px; line-height: 1.12; margin-top: 0; }
-.report h2 { margin-top: 34px; border-top: 1px solid var(--line); padding-top: 22px; }
-.report table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 14px; }
-.report th, .report td { border: 1px solid var(--line); padding: 10px; text-align: left; vertical-align: top; }
-.report th { background: #eef3f8; }
-code { background: #edf1f5; padding: 2px 5px; border-radius: 4px; }
-@media (max-width: 820px) { .hero, .grid, .pipeline, .evidence { grid-template-columns: 1fr; } .kpis { grid-template-columns: 1fr; } .topbar { align-items: flex-start; flex-direction: column; } }
-</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sistema Inteligente de Transporte</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "background":"#fbf9f4","surface":"#fbf9f4","surface-container":"#f0eee9",
+      "surface-container-low":"#f5f3ee","surface-container-high":"#eae8e3",
+      "surface-container-lowest":"#ffffff","surface-dim":"#dbdad5",
+      "surface-variant":"#e4e2dd","surface-bright":"#fbf9f4",
+      "on-background":"#1b1c19","on-surface":"#1b1c19",
+      "on-surface-variant":"#56423d","inverse-on-surface":"#f2f1ec",
+      "inverse-surface":"#30312e","outline":"#89726c","outline-variant":"#ddc0b9",
+      "primary":"#8f361d","on-primary":"#ffffff","primary-container":"#af4d32",
+      "on-primary-container":"#ffe8e2","primary-fixed":"#ffdbd1",
+      "primary-fixed-dim":"#ffb5a1","inverse-primary":"#ffb5a1",
+      "secondary":"#4d6356","on-secondary":"#ffffff","secondary-container":"#cde6d5",
+      "on-secondary-container":"#52685a","secondary-fixed":"#d0e8d7",
+      "secondary-fixed-dim":"#b4ccbc","on-secondary-fixed":"#0b1f15",
+      "on-secondary-fixed-variant":"#364b3f",
+      "tertiary":"#5f5136","on-tertiary":"#ffffff","tertiary-container":"#79694c",
+      "on-tertiary-container":"#ffeac9","tertiary-fixed":"#f5e0bd",
+      "tertiary-fixed-dim":"#d8c4a2","on-tertiary-fixed":"#241a05",
+      "on-tertiary-fixed-variant":"#52452b",
+      "error":"#ba1a1a","on-error":"#ffffff","error-container":"#ffdad6",
+      "on-error-container":"#93000a","surface-tint":"#9f4127"
+    },
+    borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},
+    spacing:{
+      "stack-lg":"48px","stack-md":"24px","gutter":"24px",
+      "margin-desktop":"64px","stack-sm":"8px","margin-mobile":"16px",
+      "unit":"4px","max-content-width":"1280px"
+    },
+    fontFamily:{
+      "body-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],
+      "headline-lg":["Libre Caslon Text"],"headline-md":["Libre Caslon Text"],
+      "display-lg":["Libre Caslon Text"],"display-lg-mobile":["Libre Caslon Text"],
+      "label-caps":["JetBrains Mono"],"caption":["Hanken Grotesk"]
+    },
+    fontSize:{
+      "body-lg":["18px",{"lineHeight":"1.7","fontWeight":"400"}],
+      "body-md":["16px",{"lineHeight":"1.5","fontWeight":"400"}],
+      "headline-lg":["32px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "headline-md":["22px",{"lineHeight":"1.3","fontWeight":"600"}],
+      "display-lg":["60px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"700"}],
+      "display-lg-mobile":["38px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "label-caps":["11px",{"lineHeight":"1.0","letterSpacing":"0.1em","fontWeight":"500"}],
+      "caption":["14px",{"lineHeight":"1.4","fontWeight":"400"}]
+    }
+  }}
+}
+</script>
 </head>
-<body>
-<main class="wrap">
-  <header class="topbar">
-    <div class="brand">Sistema Inteligente de Transporte</div>
-    <nav class="nav">
-      <a href="notebook01.html">Notebook 01 en vivo</a>
-      <a href="reporte.html">Reporte técnico</a>
-      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+<body class="bg-background text-on-background antialiased flex flex-col min-h-screen">
+
+<header class="bg-surface border-b-4 border-primary sticky top-0 z-50 w-full">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-max-content-width mx-auto py-stack-md">
+    <div class="text-headline-md font-headline-md text-primary uppercase tracking-wider text-sm md:text-base">Sistemas Inteligentes</div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-primary border-b-2 border-primary text-label-caps font-label-caps uppercase pb-1" href="index.html">Herramientas</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook01.html">Módulo 01</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook02.html">Módulo 02</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook03.html">Módulo 03</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="reporte.html">Reporte</a>
     </nav>
-  </header>
-  <section class="hero">
-    <div>
-      <span class="badge">Herramientas ejecutables en Google Colab</span>
-      <h1>Predicción, clasificación visual y recomendación para una empresa de transporte</h1>
-      <p>La entrega separa las herramientas de trabajo del reporte técnico. Cada Colab se puede ejecutar de forma independiente y termina con una sección de uso lista para demostrar.</p>
-    </div>
-    <aside class="hero-visual" aria-label="Resumen visual del sistema">
-      <div class="route-chart" aria-hidden="true"><i style="height:46%"></i><i style="height:63%"></i><i style="height:58%"></i><i style="height:81%"></i><i style="height:69%"></i><i style="height:92%"></i><i style="height:77%"></i><i style="height:88%"></i><i style="height:74%"></i><i style="height:96%"></i><i style="height:84%"></i><i style="height:90%"></i></div>
-      <div class="visual-caption">
-        <span><strong>Demanda</strong>Pronóstico por ruta</span>
-        <span><strong>Seguridad</strong>Clasificación visual</span>
-        <span><strong>Usuarios</strong>Top destinos</span>
+    <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="hidden md:flex bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity items-center gap-2">
+      <span class="material-symbols-outlined text-base">code</span> Repositorio
+    </a>
+  </div>
+</header>
+
+<main class="flex-grow w-full max-w-max-content-width mx-auto px-margin-mobile md:px-margin-desktop mt-stack-lg pb-stack-lg">
+
+  <!-- Hero -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
+    <div class="md:col-span-10 md:col-start-2">
+      <span class="block text-label-caps font-label-caps text-primary mb-6 uppercase tracking-wider border-b border-primary pb-2 inline-block">
+        Herramientas ejecutables · Universidad Nacional de Colombia · Mayo 2026
+      </span>
+      <h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-on-surface mb-8">
+        Predicción, clasificación y recomendación para una empresa de transporte
+      </h1>
+      <p class="text-body-lg font-body-lg text-on-surface-variant max-w-3xl mb-8">
+        Tres módulos de aprendizaje automático integrados como herramientas web públicas. Cada Colab se puede ejecutar de forma independiente; la demo web corre en el navegador sin servidor.
+      </p>
+      <div class="grid grid-cols-1 md:grid-cols-3 border-t-2 border-b-2 border-outline py-4 gap-4 bg-surface-container-low px-4">
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">MÓDULOS</span>
+          <span class="block text-headline-md font-headline-md text-primary">3</span>
+          <span class="text-caption font-caption text-on-surface-variant">herramientas Colab independientes</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">PRONÓSTICO</span>
+          <span class="block text-headline-md font-headline-md text-primary">30 días</span>
+          <span class="text-caption font-caption text-on-surface-variant">de demanda futura por ruta</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">VALIDACIÓN</span>
+          <span class="block text-headline-md font-headline-md text-primary">7 pruebas</span>
+          <span class="text-caption font-caption text-on-surface-variant">automatizadas del flujo completo</span>
+        </div>
       </div>
-    </aside>
-  </section>
-  <section class="section kpis">
-    <div class="kpi"><strong>3</strong><span>herramientas Colab independientes</span></div>
-    <div class="kpi"><strong>30 días</strong><span>de pronóstico futuro por ruta</span></div>
-    <div class="kpi"><strong>7 pruebas</strong><span>validación automática del flujo</span></div>
-  </section>
-  <section class="grid">
-    <article class="card">
-  <div class="card-top">
-    <h2>Predicción de demanda</h2>
-    <span class="icon ">01</span>
+    </div>
   </div>
-  <p>Pronóstico de pasajeros por ruta para los próximos 30 días.</p>
-  <div class="mini-bars" aria-hidden="true"><i style="height:35%"></i><i style="height:52%"></i><i style="height:44%"></i><i style="height:68%"></i><i style="height:82%"></i><i style="height:74%"></i><i style="height:91%"></i><i style="height:63%"></i></div>
-  <ul><li>Variables temporales</li><li>Comparación real vs. predicción</li><li>Tabla operativa futura</li></ul>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
-    <a class="button" href="notebook01.html">Ver en vivo</a>
-    <a class="button ghost" href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb">Colab</a>
+
+  <!-- Abstract bar visual -->
+  <div class="w-full h-48 md:h-64 mb-stack-lg bg-surface-container overflow-hidden border-2 border-secondary relative flex items-end">
+    <div class="absolute inset-0 flex items-end gap-1 px-4 pb-4 opacity-30">
+      <div class="flex-1 bg-primary" style="height:46%"></div><div class="flex-1 bg-secondary" style="height:63%"></div>
+      <div class="flex-1 bg-primary" style="height:58%"></div><div class="flex-1 bg-tertiary" style="height:81%"></div>
+      <div class="flex-1 bg-primary" style="height:69%"></div><div class="flex-1 bg-secondary" style="height:92%"></div>
+      <div class="flex-1 bg-primary" style="height:77%"></div><div class="flex-1 bg-tertiary" style="height:88%"></div>
+      <div class="flex-1 bg-primary" style="height:74%"></div><div class="flex-1 bg-secondary" style="height:96%"></div>
+      <div class="flex-1 bg-primary" style="height:84%"></div><div class="flex-1 bg-tertiary" style="height:90%"></div>
+      <div class="flex-1 bg-primary" style="height:55%"></div><div class="flex-1 bg-secondary" style="height:72%"></div>
+      <div class="flex-1 bg-primary" style="height:48%"></div><div class="flex-1 bg-tertiary" style="height:88%"></div>
+      <div class="flex-1 bg-primary" style="height:63%"></div><div class="flex-1 bg-secondary" style="height:91%"></div>
+    </div>
+    <div class="relative z-10 p-6 md:p-10">
+      <span class="text-label-caps font-label-caps text-secondary uppercase tracking-wider block mb-2">Demanda · Visión · Recomendación</span>
+      <p class="text-headline-md font-headline-md text-on-surface max-w-2xl">Dataset CTA 2021–2026 · 7 276 imágenes conductores · 858 usuarios · 866 destinos</p>
+    </div>
+    <div class="absolute top-4 right-4 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">SISTEMA INTEGRADO</div>
   </div>
-</article><article class="card">
-  <div class="card-top">
-    <h2>Clasificación de conducción</h2>
-    <span class="icon green">02</span>
+
+  <!-- Module cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-gutter mb-stack-lg">
+
+    <!-- M01 -->
+    <article class="bg-surface-container-lowest border-2 border-outline-variant flex flex-col">
+      <div class="bg-primary text-on-primary px-6 py-4 flex items-center justify-between">
+        <span class="text-label-caps font-label-caps uppercase tracking-wider">Módulo 01</span>
+        <span class="text-headline-md font-headline-md opacity-60">01</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <h2 class="text-headline-md font-headline-md text-on-surface mb-3">Predicción de demanda</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant mb-4 flex-grow">Pronóstico de pasajeros por ruta para los próximos 30 días. Random Forest + Gradient Boosting con variables temporales y rezagos.</p>
+        <div class="border-t border-outline-variant pt-4 mb-4">
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">MAPE</span><span class="font-bold text-primary">8.24%</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">RUTAS</span><span class="font-bold text-primary">10</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">HORIZONTE</span><span class="font-bold text-primary">30 días</span></div>
+          </div>
+        </div>
+        <div class="flex gap-2 flex-wrap mt-auto">
+          <a href="notebook01.html" class="flex-1 flex items-center justify-center bg-primary text-on-primary text-label-caps font-label-caps px-4 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity text-center">Ver en vivo</a>
+          <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb" class="flex-1 flex items-center justify-center bg-surface text-primary border-2 border-primary text-label-caps font-label-caps px-4 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors text-center">Colab</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- M02 -->
+    <article class="bg-surface-container-lowest border-2 border-outline-variant flex flex-col">
+      <div class="bg-secondary text-on-secondary px-6 py-4 flex items-center justify-between">
+        <span class="text-label-caps font-label-caps uppercase tracking-wider">Módulo 02</span>
+        <span class="text-headline-md font-headline-md opacity-60">02</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <h2 class="text-headline-md font-headline-md text-on-surface mb-3">Clasificación de conducción</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant mb-4 flex-grow">Clasificador de imágenes para comportamientos distractivos en conductores. MobileNetV2 fine-tuned en T4 GPU.</p>
+        <div class="border-t border-outline-variant pt-4 mb-4">
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">CLASES</span><span class="font-bold text-secondary">5</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">F1</span><span class="font-bold text-secondary">0.68</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">IMÁGENES</span><span class="font-bold text-secondary">7 276</span></div>
+          </div>
+        </div>
+        <div class="flex gap-2 flex-wrap mt-auto">
+          <a href="notebook02.html" class="flex-1 flex items-center justify-center bg-secondary text-on-secondary text-label-caps font-label-caps px-4 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity text-center">Ver en vivo</a>
+          <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb" class="flex-1 flex items-center justify-center bg-surface text-secondary border-2 border-secondary text-label-caps font-label-caps px-4 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors text-center">Colab</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- M03 -->
+    <article class="bg-surface-container-lowest border-2 border-outline-variant flex flex-col">
+      <div class="bg-tertiary text-on-tertiary px-6 py-4 flex items-center justify-between">
+        <span class="text-label-caps font-label-caps uppercase tracking-wider">Módulo 03</span>
+        <span class="text-headline-md font-headline-md opacity-60">03</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <h2 class="text-headline-md font-headline-md text-on-surface mb-3">Recomendación de destinos</h2>
+        <p class="text-body-md font-body-md text-on-surface-variant mb-4 flex-grow">Sistema híbrido CF + contenido. Personalización basada en historial y preferencias declaradas de 858 usuarios.</p>
+        <div class="border-t border-outline-variant pt-4 mb-4">
+          <div class="grid grid-cols-3 gap-2 text-center">
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">HIT RATE</span><span class="font-bold text-tertiary">79%</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">COBERTURA</span><span class="font-bold text-tertiary">72%</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">USUARIOS</span><span class="font-bold text-tertiary">858</span></div>
+          </div>
+        </div>
+        <div class="flex gap-2 flex-wrap mt-auto">
+          <a href="notebook03.html" class="flex-1 flex items-center justify-center bg-tertiary text-on-tertiary text-label-caps font-label-caps px-4 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity text-center">Ver en vivo</a>
+          <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb" class="flex-1 flex items-center justify-center bg-surface text-tertiary border-2 border-tertiary text-label-caps font-label-caps px-4 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors text-center">Colab</a>
+        </div>
+      </div>
+    </article>
+
   </div>
-  <p>Clasificador de imágenes para comportamientos distractivos.</p>
-  <div class="mini-bars" aria-hidden="true"><i style="height:82%"></i><i style="height:46%"></i><i style="height:68%"></i><i style="height:38%"></i><i style="height:58%"></i><i style="height:77%"></i><i style="height:51%"></i><i style="height:64%"></i></div>
-  <ul><li>Matriz de confusión</li><li>Probabilidades por clase</li><li>Prueba con imagen nueva</li></ul>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
-    <a class="button" href="notebook02.html">Ver en vivo</a>
-    <a class="button ghost" href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb">Colab</a>
-  </div>
-</article><article class="card">
-  <div class="card-top">
-    <h2>Recomendación de destinos</h2>
-    <span class="icon amber">03</span>
-  </div>
-  <p>Recomendador personalizado basado en historial de usuarios.</p>
-  <div class="mini-bars" aria-hidden="true"><i style="height:43%"></i><i style="height:61%"></i><i style="height:54%"></i><i style="height:80%"></i><i style="height:69%"></i><i style="height:88%"></i><i style="height:76%"></i><i style="height:58%"></i></div>
-  <ul><li>Precision@K y Recall@K</li><li>Top destinos</li><li>Explicación por similitud</li></ul>
-  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;">
-    <a class="button" href="notebook03.html">Ver en vivo</a>
-    <a class="button ghost" href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb">Colab</a>
-  </div>
-</article>
-  </section>
-  <section class="section">
-    <h2>Flujo de la solución</h2>
-    <div class="pipeline">
-      <div class="step"><span>1</span><h3>Datos</h3><p>Series por ruta, imágenes de conducción e historial usuario-destino.</p></div>
-      <div class="step"><span>2</span><h3>Modelos</h3><p>Regresión temporal, clasificador visual y filtrado colaborativo.</p></div>
-      <div class="step"><span>3</span><h3>Métricas</h3><p>MAE/RMSE, accuracy/F1 y Precision@K/Recall@K.</p></div>
-      <div class="step"><span>4</span><h3>Uso</h3><p>Colabs ejecutables, demo web y reporte técnico publicado.</p></div>
+
+  <!-- Pipeline -->
+  <section class="mb-stack-lg">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-6 uppercase tracking-wider border-b border-outline-variant pb-2">Flujo de la solución</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-gutter">
+      <div class="bg-surface-container-lowest border border-outline-variant p-6">
+        <span class="flex items-center justify-center w-8 h-8 bg-primary text-on-primary text-label-caps font-label-caps mb-4">1</span>
+        <h3 class="text-headline-md font-headline-md text-on-surface mb-2">Datos</h3>
+        <p class="text-caption font-caption text-on-surface-variant">Series por ruta CTA, imágenes de conducción Bangladesh e historial usuario-destino Kaggle.</p>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant p-6">
+        <span class="flex items-center justify-center w-8 h-8 bg-primary text-on-primary text-label-caps font-label-caps mb-4">2</span>
+        <h3 class="text-headline-md font-headline-md text-on-surface mb-2">Modelos</h3>
+        <p class="text-caption font-caption text-on-surface-variant">Regresión temporal con rezagos, MobileNetV2 fine-tuned y filtrado colaborativo-híbrido.</p>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant p-6">
+        <span class="flex items-center justify-center w-8 h-8 bg-primary text-on-primary text-label-caps font-label-caps mb-4">3</span>
+        <h3 class="text-headline-md font-headline-md text-on-surface mb-2">Métricas</h3>
+        <p class="text-caption font-caption text-on-surface-variant">MAE/RMSE/MAPE, accuracy/F1 macro, Precision@K, Recall@K y NDCG@K.</p>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant p-6">
+        <span class="flex items-center justify-center w-8 h-8 bg-primary text-on-primary text-label-caps font-label-caps mb-4">4</span>
+        <h3 class="text-headline-md font-headline-md text-on-surface mb-2">Uso</h3>
+        <p class="text-caption font-caption text-on-surface-variant">Colabs ejecutables, demo web GitHub Pages con Pyodide/TF.js y reporte técnico publicado.</p>
+      </div>
     </div>
   </section>
-  <section class="section evidence">
-    <figure class="shot">
-      <img src="assets/app_demanda.png" alt="Vista de predicción de demanda en la herramienta web">
-    </figure>
-    <aside class="metric-list">
-      <div class="metric"><b><span>Demanda</span><span>MAPE 8.24%</span></b><div class="meter"><i style="width:78%"></i></div></div>
-      <div class="metric"><b><span>Visión</span><span>F1 0.448</span></b><div class="meter"><i style="width:45%"></i></div></div>
-      <div class="metric"><b><span>Recomendación</span><span>Recall@5 1.00</span></b><div class="meter"><i style="width:100%"></i></div></div>
-      <div class="metric"><b><span>Reporte</span><span>GitHub Pages</span></b><div class="meter"><i style="width:100%"></i></div></div>
-    </aside>
-  </section>
-  <section class="section panel">
-    <h2>Reporte aparte</h2>
-    <p>El reporte técnico se mantiene como una página independiente con resumen ejecutivo, metodología, desarrollo por módulo, resultados, ética, conclusiones, anexos y bibliografía.</p>
-    <div class="links-row">
-      <a class="button" href="reporte.html">Ver reporte técnico</a>
-      <a class="button ghost" href="assets/app_demanda.png">Ver captura</a>
-      <a class="button ghost" href="datasets_reales.md">Fuentes de datos</a>
+
+  <!-- Metrics summary -->
+  <section class="mb-stack-lg">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-6 uppercase tracking-wider border-b border-outline-variant pb-2">Resultados principales</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+      <div class="bg-surface-container-low border border-outline-variant p-6 space-y-4">
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Demanda — MAPE 8.24%</span><span class="text-label-caps font-label-caps text-primary">78%</span></div>
+          <div class="h-2 bg-surface-dim rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width:78%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Visión — F1 macro 0.68</span><span class="text-label-caps font-label-caps text-secondary">68%</span></div>
+          <div class="h-2 bg-surface-dim rounded-full overflow-hidden"><div class="h-full bg-secondary rounded-full" style="width:68%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Recomendación — Recall@5 79%</span><span class="text-label-caps font-label-caps text-tertiary">79%</span></div>
+          <div class="h-2 bg-surface-dim rounded-full overflow-hidden"><div class="h-full bg-tertiary rounded-full" style="width:79%"></div></div>
+        </div>
+        <div>
+          <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Cobertura catálogo</span><span class="text-label-caps font-label-caps text-on-surface-variant">72%</span></div>
+          <div class="h-2 bg-surface-dim rounded-full overflow-hidden"><div class="h-full bg-outline rounded-full" style="width:72%"></div></div>
+        </div>
+      </div>
+      <div class="bg-surface-container p-6 border-l-4 border-secondary">
+        <h3 class="text-label-caps font-label-caps text-secondary mb-4 uppercase">Stack técnico</h3>
+        <ul class="space-y-2 text-body-md font-body-md text-on-surface-variant">
+          <li><span class="text-primary font-medium">M01:</span> Python · scikit-learn · pandas · Pyodide (WASM)</li>
+          <li><span class="text-secondary font-medium">M02:</span> TensorFlow · MobileNetV2 · TF.js · TFLite</li>
+          <li><span class="text-tertiary font-medium">M03:</span> NumPy · cosine similarity · JSON pre-computado</li>
+          <li><span class="text-on-surface font-medium">Web:</span> HTML + Tailwind CSS + GitHub Pages</li>
+        </ul>
+      </div>
     </div>
   </section>
+
+  <!-- Report link -->
+  <section class="bg-surface-container-lowest border-2 border-outline p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+    <div>
+      <span class="block text-label-caps font-label-caps text-on-surface-variant mb-2 uppercase">Documentación</span>
+      <h3 class="text-headline-md font-headline-md text-on-surface mb-2">Reporte técnico completo</h3>
+      <p class="text-caption font-caption text-on-surface-variant max-w-xl">Resumen ejecutivo, metodología por módulo, análisis ético, bibliografía APA y anexos con enlaces a todas las herramientas.</p>
+    </div>
+    <div class="flex gap-3 flex-wrap flex-shrink-0">
+      <a href="reporte.html" class="flex items-center gap-2 bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity">
+        <span class="material-symbols-outlined text-base">article</span> Ver reporte
+      </a>
+      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="flex items-center gap-2 bg-surface text-primary border-2 border-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors">
+        <span class="material-symbols-outlined text-base">code</span> Repositorio
+      </a>
+    </div>
+  </section>
+
 </main>
+
+<footer class="border-t-2 border-outline-variant mt-stack-lg py-stack-md px-margin-mobile md:px-margin-desktop max-w-max-content-width mx-auto w-full">
+  <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <span class="text-caption font-caption text-on-surface-variant">Universidad Nacional de Colombia · Aplicaciones en sistemas de recomendación e imágenes · 2026</span>
+    <span class="text-label-caps font-label-caps text-on-surface-variant">Andrés F. Guido · Juan José Martínez · Andrés Lemus</span>
+  </div>
+</footer>
+
 </body>
 </html>

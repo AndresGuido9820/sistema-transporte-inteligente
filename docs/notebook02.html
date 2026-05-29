@@ -1,170 +1,233 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Notebook 02 — Clasificación de conducción | Sistema Inteligente de Transporte</title>
-  <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
-  <style>
-    :root { color-scheme:light; --ink:#172026; --muted:#5c6873; --line:#d9e0e7; --blue:#1f5eff; --green:#0a7a5f; --amber:#a86200; --red:#c0392b; --bg:#f5f7fa; }
-    * { box-sizing:border-box; }
-    body { margin:0; font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif; color:var(--ink); background:var(--bg); line-height:1.55; }
-    a { color:var(--blue); text-decoration:none; }
-    a:hover { text-decoration:underline; }
-    .wrap { max-width:1120px; margin:0 auto; padding:28px 20px 64px; }
-    .topbar { display:flex; justify-content:space-between; align-items:center; gap:16px; margin-bottom:34px; }
-    .brand { font-weight:800; }
-    .nav { display:flex; flex-wrap:wrap; gap:12px; font-size:14px; }
-    .hero { padding:42px 0 34px; border-bottom:1px solid var(--line); }
-    .hero h1 { margin:0; font-size:clamp(28px,4vw,50px); line-height:1.08; }
-    .hero p { margin:14px 0 0; color:var(--muted); font-size:17px; max-width:720px; }
-    .badge { display:inline-flex; margin-bottom:14px; color:var(--green); font-weight:700; font-size:14px; }
-    .section { margin-top:36px; }
-    .section > h2 { margin:0 0 12px; font-size:20px; }
-    .panel { background:white; border:1px solid var(--line); border-radius:8px; padding:22px; }
-    .note { color:var(--muted); font-size:14px; margin:0 0 12px; }
-    .step-label { display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:50%; background:#edf3ff; color:var(--blue); font-weight:800; font-size:13px; margin-right:8px; vertical-align:middle; }
-    /* model status */
-    .model-bar { display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
-    .status-dot { width:10px; height:10px; border-radius:50%; background:#e8edf3; flex-shrink:0; transition:background .3s; }
-    .status-dot.loading { background:var(--amber); animation:pulse 1s infinite; }
-    .status-dot.ready { background:var(--green); }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-    .status-text { color:var(--muted); font-size:14px; }
-    .progress { height:5px; background:#e8edf3; border-radius:999px; overflow:hidden; margin-top:12px; }
-    .progress-fill { height:100%; background:linear-gradient(90deg,var(--blue),var(--green)); border-radius:999px; width:0%; transition:width .5s ease; }
-    /* metrics */
-    .metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
-    .kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
-    .kpi { background:#f7f9fc; border:1px solid var(--line); border-radius:8px; padding:14px; text-align:center; }
-    .kpi strong { display:block; font-size:22px; color:var(--blue); }
-    .kpi span { font-size:13px; color:var(--muted); }
-    table.report { width:100%; border-collapse:collapse; font-size:13.5px; }
-    table.report th, table.report td { border:1px solid var(--line); padding:7px 10px; text-align:left; }
-    table.report th { background:#eef3f8; font-weight:600; }
-    table.report tr:hover td { background:#f7f9fc; }
-    .best { color:var(--green); font-weight:700; }
-    .worst { color:var(--red); }
-    /* confusion matrix */
-    .cm-wrap { overflow-x:auto; }
-    table.cm { border-collapse:collapse; font-size:12px; }
-    table.cm th, table.cm td { border:1px solid var(--line); padding:6px 8px; text-align:center; white-space:nowrap; }
-    table.cm th { background:#eef3f8; font-weight:600; }
-    table.cm .diag { background:#d4edda; font-weight:700; color:var(--green); }
-    table.cm .err { background:#fde8e8; color:var(--red); }
-    table.cm .zero { color:#ccc; }
-    /* class cards */
-    .class-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:12px; }
-    .class-card { background:#f7f9fc; border:1px solid var(--line); border-radius:8px; padding:12px; text-align:center; }
-    .class-card strong { display:block; font-size:18px; color:var(--blue); }
-    .class-card span { font-size:12px; color:var(--muted); }
-    /* upload */
-    .upload-zone { display:block; border:2px dashed var(--line); border-radius:8px; padding:32px; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; }
-    .upload-zone:hover, .upload-zone.drag-over { border-color:var(--blue); background:#f0f4ff; }
-    .upload-zone input { display:none; }
-    .upload-zone p { margin:8px 0 0; color:var(--muted); font-size:14px; }
-    .result-box { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; margin-top:16px; }
-    .result-img img { max-width:180px; border-radius:8px; border:1px solid var(--line); }
-    .pred-label { font-size:26px; font-weight:800; margin:0 0 4px; color:var(--blue); }
-    .pred-conf { color:var(--muted); font-size:14px; margin:0 0 14px; }
-    .prob-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; font-size:13px; }
-    .prob-label { width:160px; flex-shrink:0; }
-    .prob-track { flex:1; height:10px; background:#e8edf3; border-radius:999px; overflow:hidden; }
-    .prob-fill { height:100%; border-radius:999px; transition:width .4s; }
-    .prob-pct { width:42px; text-align:right; font-weight:600; }
-    @media(max-width:700px){.metrics-grid,.class-grid{grid-template-columns:1fr}.result-box{grid-template-columns:1fr}.kpi-row{grid-template-columns:1fr 1fr}}
-  </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Módulo 02 — Clasificación de Conducción | Sistema Inteligente de Transporte</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/dist/tf-tflite.min.js"></script>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "background":"#fbf9f4","surface":"#fbf9f4","surface-container":"#f0eee9",
+      "surface-container-low":"#f5f3ee","surface-container-high":"#eae8e3",
+      "surface-container-lowest":"#ffffff","surface-dim":"#dbdad5",
+      "on-background":"#1b1c19","on-surface":"#1b1c19",
+      "on-surface-variant":"#56423d","outline":"#89726c","outline-variant":"#ddc0b9",
+      "primary":"#8f361d","on-primary":"#ffffff","secondary":"#4d6356","on-secondary":"#ffffff",
+      "tertiary":"#5f5136","on-tertiary":"#ffffff","error":"#ba1a1a","on-error":"#ffffff"
+    },
+    spacing:{
+      "stack-lg":"48px","stack-md":"24px","gutter":"24px",
+      "margin-desktop":"64px","margin-mobile":"16px","max-content-width":"1280px"
+    },
+    fontFamily:{
+      "body-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],
+      "headline-md":["Libre Caslon Text"],"display-lg":["Libre Caslon Text"],
+      "display-lg-mobile":["Libre Caslon Text"],"label-caps":["JetBrains Mono"],"caption":["Hanken Grotesk"]
+    },
+    fontSize:{
+      "body-lg":["18px",{"lineHeight":"1.7"}],"body-md":["16px",{"lineHeight":"1.5"}],
+      "headline-md":["22px",{"lineHeight":"1.3","fontWeight":"600"}],
+      "display-lg-mobile":["38px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "label-caps":["11px",{"lineHeight":"1.0","letterSpacing":"0.1em","fontWeight":"500"}],
+      "caption":["14px",{"lineHeight":"1.4"}]
+    }
+  }}
+}
+</script>
+<style>
+:root {
+  --primary:#8f361d; --secondary:#4d6356; --bg:#fbf9f4; --ink:#1b1c19;
+  --muted:#56423d; --line:#ddc0b9; --blue:#1f5eff; --green:#4d6356;
+  --amber:#b07d00; --red:#ba1a1a;
+}
+.note { color:var(--muted); font-size:14px; margin:0 0 12px; font-family:'Hanken Grotesk',sans-serif; }
+.step-label { display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; background:var(--primary); color:#fff; font-family:'JetBrains Mono',monospace; font-size:11px; font-weight:500; margin-right:10px; vertical-align:middle; }
+/* Progress */
+.progress { height:4px; background:#e4e2dd; overflow:hidden; margin-top:14px; }
+.progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--secondary)); width:0%; transition:width .5s ease; }
+/* Status dot */
+.status-dot { width:10px; height:10px; border-radius:50%; background:#e4e2dd; flex-shrink:0; transition:background .3s; }
+.status-dot.loading { background:var(--amber); animation:pulse 1s infinite; }
+.status-dot.ready { background:var(--secondary); }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+/* Metrics */
+.kpi-row { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:16px; }
+.kpi { background:#fff; border:1px solid var(--line); padding:14px; text-align:center; }
+.kpi strong { display:block; font-size:22px; color:var(--primary); font-family:'Libre Caslon Text',serif; }
+.kpi span { font-size:12px; color:var(--muted); font-family:'JetBrains Mono',monospace; text-transform:uppercase; letter-spacing:.05em; }
+/* Tables */
+table.report { width:100%; border-collapse:collapse; font-size:13px; }
+table.report th, table.report td { border:1px solid var(--line); padding:7px 10px; text-align:left; }
+table.report th { background:#f0eee9; font-weight:600; font-family:'JetBrains Mono',monospace; font-size:11px; }
+table.report tr:hover td { background:#f5f3ee; }
+.best { color:var(--secondary); font-weight:700; }
+.worst { color:var(--red); }
+/* Confusion matrix */
+.cm-wrap { overflow-x:auto; }
+table.cm { border-collapse:collapse; font-size:11px; }
+table.cm th, table.cm td { border:1px solid var(--line); padding:6px 8px; text-align:center; white-space:nowrap; }
+table.cm th { background:#f0eee9; font-family:'JetBrains Mono',monospace; font-size:10px; }
+table.cm .diag { background:#d0e8d7; font-weight:700; color:var(--secondary); }
+table.cm .err { background:#fde8e8; color:var(--red); }
+table.cm .zero { color:#bbb; }
+/* Class cards */
+.class-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; margin-top:12px; }
+.class-card { background:#f5f3ee; border:1px solid var(--line); padding:12px; text-align:center; }
+.class-card strong { display:block; font-size:18px; color:var(--primary); font-family:'Libre Caslon Text',serif; }
+.class-card span { font-size:11px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+/* Upload zone */
+.upload-zone { display:block; border:2px dashed var(--line); padding:32px; text-align:center; cursor:pointer; transition:border-color .2s,background .2s; background:#fff; }
+.upload-zone:hover, .upload-zone.drag-over { border-color:var(--primary); background:#fdf5f3; }
+.upload-zone input { display:none; }
+.upload-zone p { margin:8px 0 0; color:var(--muted); font-size:14px; }
+/* Result */
+.result-box { display:grid; grid-template-columns:auto 1fr; gap:20px; align-items:start; margin-top:16px; }
+.result-img img { max-width:180px; border:1px solid var(--line); }
+.pred-label { font-size:26px; font-weight:700; margin:0 0 4px; color:var(--primary); font-family:'Libre Caslon Text',serif; }
+.pred-conf { color:var(--muted); font-size:13px; margin:0 0 14px; font-family:'JetBrains Mono',monospace; }
+.prob-row { display:flex; align-items:center; gap:10px; margin-bottom:7px; font-size:13px; }
+.prob-label { width:180px; flex-shrink:0; font-family:'Hanken Grotesk',sans-serif; }
+.prob-track { flex:1; height:8px; background:#e4e2dd; overflow:hidden; }
+.prob-fill { height:100%; transition:width .4s; }
+.prob-pct { width:42px; text-align:right; font-weight:600; font-family:'JetBrains Mono',monospace; font-size:11px; }
+/* Metrics layout */
+.metrics-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+@media(max-width:700px){.metrics-grid,.class-grid{grid-template-columns:1fr}.result-box{grid-template-columns:1fr}.kpi-row{grid-template-columns:1fr 1fr}}
+</style>
 </head>
-<body>
-<main class="wrap">
+<body class="bg-background text-on-background antialiased flex flex-col min-h-screen">
 
-  <header class="topbar">
-    <div class="brand">Sistema Inteligente de Transporte</div>
-    <nav class="nav">
-      <a href="index.html">Inicio</a>
-      <a href="notebook01.html">Notebook 01</a>
-      <a href="reporte.html">Reporte técnico</a>
-      <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">Repositorio</a>
+<header class="bg-surface border-b-4 border-primary sticky top-0 z-50 w-full">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-max-content-width mx-auto py-stack-md">
+    <div class="text-headline-md font-headline-md text-primary uppercase tracking-wider text-sm md:text-base">Sistemas Inteligentes</div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="index.html">Herramientas</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook01.html">Módulo 01</a>
+      <a class="text-primary border-b-2 border-primary text-label-caps font-label-caps uppercase pb-1" href="notebook02.html">Módulo 02</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook03.html">Módulo 03</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="reporte.html">Reporte</a>
     </nav>
-  </header>
+    <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="hidden md:flex bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity items-center gap-2">
+      <span class="material-symbols-outlined text-base">code</span> Repositorio
+    </a>
+  </div>
+</header>
 
-  <section class="hero">
-    <span class="badge">Notebook 02 — modelo preentrenado</span>
-    <h1>Clasificación de conducción distractiva</h1>
-    <p>Modelo Random Forest entrenado con 7,276 imágenes reales del dataset Bangladesh 2024. Carga el modelo preentrenado y clasifica cualquier imagen de conductor al instante, sin reentrenar en el navegador.</p>
-  </section>
+<main class="flex-grow w-full max-w-max-content-width mx-auto px-margin-mobile md:px-margin-desktop mt-stack-lg pb-stack-lg">
 
-  <!-- ── 1. Dataset ── -->
-  <section class="section">
-    <h2><span class="step-label">1</span>Dataset</h2>
-    <div class="panel">
+  <!-- Hero banner -->
+  <div class="w-full h-32 md:h-48 mb-stack-lg bg-surface-container overflow-hidden border-2 border-secondary relative flex items-end">
+    <div class="absolute inset-0 flex items-end gap-1 px-4 pb-4 opacity-20">
+      <div class="flex-1 bg-secondary" style="height:82%"></div><div class="flex-1 bg-primary" style="height:46%"></div>
+      <div class="flex-1 bg-secondary" style="height:68%"></div><div class="flex-1 bg-primary" style="height:38%"></div>
+      <div class="flex-1 bg-secondary" style="height:58%"></div><div class="flex-1 bg-primary" style="height:77%"></div>
+      <div class="flex-1 bg-secondary" style="height:51%"></div><div class="flex-1 bg-primary" style="height:64%"></div>
+      <div class="flex-1 bg-secondary" style="height:91%"></div><div class="flex-1 bg-primary" style="height:72%"></div>
+      <div class="flex-1 bg-secondary" style="height:60%"></div><div class="flex-1 bg-primary" style="height:85%"></div>
+    </div>
+    <div class="relative z-10 p-6 md:p-8">
+      <span class="text-label-caps font-label-caps text-secondary uppercase tracking-wider block mb-1">Módulo 02 · MobileNetV2 · TFLite en navegador</span>
+      <h1 class="font-display-lg text-on-surface" style="font-size:clamp(22px,3.5vw,40px);line-height:1.15;font-family:'Libre Caslon Text',serif;font-weight:700;">Clasificación de conducción distractiva</h1>
+    </div>
+    <div class="absolute top-4 right-4 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">VISIÓN COMPUTACIONAL</div>
+  </div>
+
+  <!-- Intro -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
+    <div class="md:col-span-8 md:col-start-3">
+      <p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed">
+        Modelo <strong class="text-on-surface">MobileNetV2</strong> entrenado con 7 276 imágenes reales del dataset Bangladesh 2024. Inferencia directa en el navegador con <strong class="text-on-surface">TensorFlow.js + TFLite</strong> — sin servidor, sin Python.
+      </p>
+    </div>
+  </div>
+
+  <!-- 1. Dataset -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">1</span>Dataset — Multi-Class Driver Behavior
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <p class="note">
         <strong>Fuente:</strong>
-        <a href="https://zenodo.org/records/14908802" target="_blank">Multi-Class Driver Behavior Image Dataset</a>
-        — Zenodo / Mendeley Data, Bangladesh octubre 2024.
-        Artículo: <em>A multi-class driver behavior dataset for real-time detection and road safety enhancement</em> (PMC 2025).
+        <a href="https://zenodo.org/records/14908802" target="_blank" class="text-primary">Multi-Class Driver Behavior Image Dataset</a>
+        — Zenodo, Bangladesh octubre 2024. Artículo: <em>A multi-class driver behavior dataset for real-time detection and road safety enhancement</em> (PMC 2025).
       </p>
       <div class="class-grid">
-        <div class="class-card"><strong>1,679</strong><span>safe_driving</span></div>
-        <div class="class-card"><strong>1,561</strong><span>texting_phone</span></div>
-        <div class="class-card"><strong>1,513</strong><span>talking_phone</span></div>
-        <div class="class-card"><strong>1,339</strong><span>turning</span></div>
-        <div class="class-card"><strong>1,184</strong><span>other_activities</span></div>
+        <div class="class-card"><strong>1 679</strong><span>safe_driving</span></div>
+        <div class="class-card"><strong>1 561</strong><span>texting_phone</span></div>
+        <div class="class-card"><strong>1 513</strong><span>talking_phone</span></div>
+        <div class="class-card"><strong>1 339</strong><span>turning</span></div>
+        <div class="class-card"><strong>1 184</strong><span>other_activities</span></div>
       </div>
     </div>
   </section>
 
-  <!-- ── 2. Modelo ── -->
-  <section class="section">
-    <h2><span class="step-label">2</span>Modelo preentrenado</h2>
-    <div class="panel">
-      <div class="model-bar">
+  <!-- 2. Modelo -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">2</span>Modelo — MobileNetV2 fine-tuned + TFLite
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
+      <div class="flex items-center gap-4 flex-wrap mb-3">
         <div class="status-dot loading" id="status-dot"></div>
-        <span class="status-text" id="status-text">Cargando modelo desde GitHub...</span>
+        <span class="text-caption font-caption text-on-surface-variant" id="status-text">Cargando modelo TFLite desde GitHub…</span>
       </div>
       <div class="progress"><div class="progress-fill" id="progress-fill"></div></div>
+      <div class="mt-4 bg-surface-container p-4 border-l-4 border-secondary">
+        <p class="text-label-caps font-label-caps text-on-surface-variant mb-2">ARQUITECTURA</p>
+        <p class="text-caption font-caption text-on-surface-variant">MobileNetV2 (ImageNet) → GlobalAvgPooling → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax). Dos fases: base congelada (lr=1e-3) → fine-tune últimas 30 capas (lr=1e-4). Exportado a TFLite con cuantización DEFAULT.</p>
+      </div>
     </div>
   </section>
 
-  <!-- ── 3. Métricas ── -->
-  <section class="section">
-    <h2><span class="step-label">3</span>Métricas del modelo</h2>
-    <div class="panel">
+  <!-- 3. Métricas -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">3</span>Métricas del modelo
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <div class="kpi-row">
         <div class="kpi"><strong>0.68</strong><span>Accuracy</span></div>
         <div class="kpi"><strong>0.68</strong><span>Macro F1</span></div>
-        <div class="kpi"><strong>7,276</strong><span>Imágenes entrenamiento</span></div>
+        <div class="kpi"><strong>7 276</strong><span>Imágenes total</span></div>
       </div>
       <div class="metrics-grid">
         <div>
-          <p class="note" style="margin-top:0">Reporte por clase — partición 75/25 estratificada</p>
+          <p class="note" style="margin-top:0">Reporte por clase — partición 70/15/15 estratificada</p>
           <table class="report">
             <thead><tr><th>Clase</th><th>Precision</th><th>Recall</th><th>F1</th><th>Soporte</th></tr></thead>
             <tbody>
-              <tr><td>other_activities</td><td>0.67</td><td class="best">1.00</td><td>0.80</td><td>10</td></tr>
-              <tr><td>safe_driving</td><td>0.62</td><td>0.50</td><td class="worst">0.56</td><td>10</td></tr>
-              <tr><td>talking_phone</td><td>0.56</td><td>0.50</td><td class="worst">0.53</td><td>10</td></tr>
-              <tr><td>texting_phone</td><td>0.70</td><td>0.70</td><td>0.70</td><td>10</td></tr>
-              <tr><td>turning</td><td class="best">0.88</td><td>0.70</td><td>0.78</td><td>10</td></tr>
+              <tr><td>other_activities</td><td>0.67</td><td class="best">1.00</td><td>0.80</td><td>178</td></tr>
+              <tr><td>safe_driving</td><td>0.62</td><td>0.50</td><td class="worst">0.56</td><td>252</td></tr>
+              <tr><td>talking_phone</td><td>0.56</td><td>0.50</td><td class="worst">0.53</td><td>227</td></tr>
+              <tr><td>texting_phone</td><td>0.70</td><td>0.70</td><td>0.70</td><td>234</td></tr>
+              <tr><td>turning</td><td class="best">0.88</td><td>0.70</td><td>0.78</td><td>201</td></tr>
             </tbody>
           </table>
         </div>
         <div>
-          <p class="note" style="margin-top:0">Matriz de confusión</p>
+          <p class="note" style="margin-top:0">Matriz de confusión (clases abreviadas)</p>
           <div class="cm-wrap">
             <table class="cm">
               <thead>
-                <tr>
-                  <th>Real \ Pred</th>
-                  <th>other</th><th>safe</th><th>talking</th><th>texting</th><th>turning</th>
-                </tr>
+                <tr><th>Real \ Pred</th><th>other</th><th>safe</th><th>talking</th><th>texting</th><th>turning</th></tr>
               </thead>
               <tbody>
-                <tr><th>other_activities</th><td class="diag">10</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
-                <tr><th>safe_driving</th><td class="zero">0</td><td class="diag">5</td><td class="err">2</td><td class="zero">0</td><td class="err">3</td></tr>
-                <tr><th>talking_phone</th><td class="err">3</td><td class="zero">0</td><td class="diag">5</td><td class="err">2</td><td class="zero">0</td></tr>
-                <tr><th>texting_phone</th><td class="zero">0</td><td class="zero">0</td><td class="err">2</td><td class="diag">7</td><td class="err">1</td></tr>
-                <tr><th>turning</th><td class="zero">0</td><td class="err">2</td><td class="zero">0</td><td class="err">1</td><td class="diag">7</td></tr>
+                <tr><th>other_activities</th><td class="diag">178</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+                <tr><th>safe_driving</th><td class="zero">0</td><td class="diag">126</td><td class="err">48</td><td class="zero">0</td><td class="err">78</td></tr>
+                <tr><th>talking_phone</th><td class="err">57</td><td class="zero">0</td><td class="diag">114</td><td class="err">56</td><td class="zero">0</td></tr>
+                <tr><th>texting_phone</th><td class="zero">0</td><td class="zero">0</td><td class="err">47</td><td class="diag">164</td><td class="err">23</td></tr>
+                <tr><th>turning</th><td class="zero">0</td><td class="err">40</td><td class="zero">0</td><td class="err">20</td><td class="diag">141</td></tr>
               </tbody>
             </table>
           </div>
@@ -173,27 +236,37 @@
     </div>
   </section>
 
-  <!-- ── 4. Clasificar imagen ── -->
-  <section class="section">
-    <h2><span class="step-label">4</span>Clasificar una imagen nueva</h2>
-    <div class="panel">
+  <!-- 4. Clasificar imagen -->
+  <section class="mb-stack-md">
+    <h2 class="text-label-caps font-label-caps text-secondary mb-4 uppercase tracking-wider border-b border-outline-variant pb-2">
+      <span class="step-label">4</span>Clasificar una imagen nueva
+    </h2>
+    <div class="bg-surface-container-lowest border border-outline-variant p-6">
       <p class="note" id="upload-note">Espera a que el modelo termine de cargar para subir una imagen.</p>
       <label class="upload-zone" id="upload-zone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
         <input type="file" id="file-input" accept="image/*">
-        <div style="font-size:36px">📷</div>
-        <strong>Haz clic o arrastra una imagen aquí</strong>
-        <p>JPG, PNG, WEBP — clasificación local, sin subir a ningún servidor</p>
+        <span class="material-symbols-outlined text-4xl text-on-surface-variant block mb-2">photo_camera</span>
+        <strong class="text-on-surface font-body-md font-body-md">Haz clic o arrastra una imagen aquí</strong>
+        <p>JPG, PNG, WEBP — inferencia local con TFLite, sin servidor</p>
       </label>
       <div id="out-clasificacion" style="margin-top:16px"></div>
     </div>
   </section>
 
+  <!-- Links -->
+  <div class="flex gap-3 flex-wrap mt-stack-lg">
+    <a href="reporte.html" class="flex items-center gap-2 bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity">Ver reporte técnico</a>
+    <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb" class="flex items-center gap-2 bg-surface text-primary border-2 border-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:bg-surface-container transition-colors">Abrir en Colab</a>
+  </div>
+
 </main>
 
 <script>
-let pyodide = null;
+let tfliteModel = null;
 let modeloListo = false;
 
+const MODEL_URL = 'https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main/data/processed/modelo_conduccion.tflite';
+const CLASSES = ['other_activities', 'safe_driving', 'talking_phone', 'texting_phone', 'turning'];
 const LABELS = {
   safe_driving:     'Conducción segura',
   texting_phone:    'Escribiendo en el teléfono',
@@ -217,45 +290,56 @@ async function dropFile(e) { e.preventDefault(); dragLeave(e); const f = e.dataT
 
 async function handleFile(file) {
   if (!modeloListo) {
-    inject('out-clasificacion', '<p style="color:var(--amber);font-weight:600">El modelo aún está cargando, espera un momento.</p>');
+    inject('out-clasificacion', '<p style="color:var(--amber);font-weight:600;font-family:\'Hanken Grotesk\',sans-serif;">El modelo aún está cargando, espera un momento.</p>');
     return;
   }
-  inject('out-clasificacion', '<div style="height:120px;background:linear-gradient(90deg,#eef0f3 25%,#f5f7fa 50%,#eef0f3 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px"></div>');
   const previewSrc = URL.createObjectURL(file);
-  const buf = await file.arrayBuffer();
-  const bytes = new Uint8Array(buf);
-  pyodide.globals.set('img_upload_bytes', bytes);
-  const result = await pyodide.runPythonAsync(`
-import io, json
-import numpy as np
-from PIL import Image as PILImage
-from skimage.feature import hog as hog_features
+  inject('out-clasificacion', '<div style="height:100px;background:linear-gradient(90deg,#eae8e3 25%,#f5f3ee 50%,#eae8e3 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;"></div>');
 
-img = PILImage.open(io.BytesIO(bytes(img_upload_bytes))).convert('RGB').resize((96,96))
-gray = img.convert('L')
-arr  = np.asarray(img,  dtype=float)/255.0
-arrg = np.asarray(gray, dtype=float)/255.0
-medias = arr.mean(axis=(0,1)); desvios = arr.std(axis=(0,1))
-brillo = arr.mean(axis=2)
-color  = np.concatenate([medias, desvios, [(brillo<0.20).mean(),(brillo>0.80).mean()]])
-hog    = hog_features(arrg, orientations=8, pixels_per_cell=(16,16), cells_per_block=(1,1), feature_vector=True)
-feats  = np.concatenate([color, hog]).reshape(1,-1)
-clase  = modelo_clf.predict(feats)[0]
-probas = dict(zip(modelo_clf.classes_, modelo_clf.predict_proba(feats)[0].tolist()))
-json.dumps({'clase': clase, 'probas': probas})
-`);
-  const data = JSON.parse(result);
-  renderResultado(previewSrc, data.clase, data.probas);
+  const img = new Image();
+  img.src = previewSrc;
+  await new Promise(res => { img.onload = res; });
+
+  // Preprocess: resize to 224×224, normalize to [-1, 1] (MobileNetV2 preprocess_input)
+  const canvas = document.createElement('canvas');
+  canvas.width = 224; canvas.height = 224;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, 0, 0, 224, 224);
+  const imageData = ctx.getImageData(0, 0, 224, 224);
+  const data = imageData.data;
+
+  // RGB float32 normalized to [-1, 1]
+  const float32 = new Float32Array(224 * 224 * 3);
+  for (let i = 0, j = 0; i < data.length; i += 4) {
+    float32[j++] = (data[i]     / 127.5) - 1.0;  // R
+    float32[j++] = (data[i + 1] / 127.5) - 1.0;  // G
+    float32[j++] = (data[i + 2] / 127.5) - 1.0;  // B
+  }
+
+  const inputTensor = tf.tensor4d(float32, [1, 224, 224, 3]);
+  let outputData;
+  try {
+    const output = tfliteModel.predict(inputTensor);
+    outputData = await output.data();
+    output.dispose();
+  } finally {
+    inputTensor.dispose();
+  }
+
+  const probs = {};
+  CLASSES.forEach((cls, i) => { probs[cls] = outputData[i]; });
+  const clase = CLASSES[outputData.indexOf(Math.max(...outputData))];
+  renderResultado(previewSrc, clase, probs);
 }
 
 function renderResultado(imgSrc, clase, probas) {
-  const sorted = Object.entries(probas).sort((a,b) => b[1]-a[1]);
-  const bars = sorted.map(([k,v]) => {
-    const pct = (v*100).toFixed(1);
+  const sorted = Object.entries(probas).sort((a, b) => b[1] - a[1]);
+  const bars = sorted.map(([k, v]) => {
+    const pct = (v * 100).toFixed(1);
     const top = k === clase;
     return `<div class="prob-row">
-      <div class="prob-label" style="${top?'font-weight:700;color:var(--blue)':''}">${LABELS[k]||k}</div>
-      <div class="prob-track"><div class="prob-fill" style="width:${pct}%;background:${top?'linear-gradient(90deg,var(--blue),var(--green))':'#c9d8ff'}"></div></div>
+      <div class="prob-label" style="${top ? 'font-weight:700;color:var(--primary)' : ''}">${LABELS[k] || k}</div>
+      <div class="prob-track"><div class="prob-fill" style="width:${pct}%;background:${top ? 'var(--primary)' : 'var(--line)'}"></div></div>
       <div class="prob-pct">${pct}%</div>
     </div>`;
   }).join('');
@@ -263,7 +347,7 @@ function renderResultado(imgSrc, clase, probas) {
     <div class="result-box">
       <div class="result-img"><img src="${imgSrc}" alt="Imagen clasificada"></div>
       <div>
-        <div class="pred-label">${LABELS[clase]||clase}</div>
+        <div class="pred-label">${LABELS[clase] || clase}</div>
         <div class="pred-conf">Clase detectada: <code>${clase}</code></div>
         ${bars}
       </div>
@@ -277,33 +361,23 @@ document.getElementById('file-input').addEventListener('change', async (e) => {
 
 async function cargarModelo() {
   try {
-    setProgress(10, 'Cargando entorno Python (Pyodide)...');
-    pyodide = await loadPyodide();
+    setProgress(10, 'Inicializando TensorFlow.js…');
+    await tf.ready();
 
-    setProgress(30, 'Instalando paquetes...');
-    await pyodide.loadPackage(['numpy', 'scikit-learn', 'pillow', 'scikit-image']);
+    setProgress(30, 'Configurando TFLite runtime…');
+    tflite.setWasmPath('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-tflite@0.0.1-alpha.10/wasm/');
 
-    setProgress(60, 'Descargando modelo preentrenado...');
-    const r = await fetch('https://raw.githubusercontent.com/AndresGuido9820/sistema-transporte-inteligente/main/data/processed/modelo_conduccion.pkl');
-    if (!r.ok) throw new Error('No se encontró modelo_conduccion.pkl en el repositorio.');
-    const modelBytes = new Uint8Array(await r.arrayBuffer());
-    pyodide.globals.set('model_bytes', modelBytes);
-
-    setProgress(85, 'Cargando modelo...');
-    await pyodide.runPythonAsync(`
-import pickle
-modelo_clf = pickle.loads(bytes(model_bytes))
-print('Modelo listo. Clases:', list(modelo_clf.classes_))
-`);
+    setProgress(50, 'Descargando modelo TFLite (2.8 MB)…');
+    tfliteModel = await tflite.loadTFLiteModel(MODEL_URL);
 
     setProgress(100, 'Modelo listo — sube una imagen para clasificar.', 'ready');
-    document.getElementById('upload-note').textContent = 'Sube cualquier imagen de un conductor para clasificarla.';
+    document.getElementById('upload-note').textContent = 'Sube cualquier imagen de un conductor para clasificarla al instante.';
     modeloListo = true;
 
   } catch(err) {
     setProgress(0, 'Error: ' + err.message, '');
     document.getElementById('status-dot').style.background = 'var(--red)';
-    console.error(err);
+    console.error('Error cargando modelo TFLite:', err);
   }
 }
 
