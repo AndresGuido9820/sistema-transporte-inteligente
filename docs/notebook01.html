@@ -122,7 +122,7 @@ tailwind.config = {
   <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
     <div class="md:col-span-8 md:col-start-3">
       <p class="text-body-lg font-body-lg text-on-surface-variant leading-relaxed">
-        Este módulo corre el mismo código del notebook directamente en tu navegador usando <strong class="text-on-surface">Pyodide</strong> (Python/WebAssembly). Sin servidor: carga los datos reales del CTA, entrena Random Forest y Gradient Boosting, y genera el pronóstico de 30 días a partir del <strong class="text-on-surface">último registro disponible en el dataset</strong> — no desde la fecha de hoy.
+        Este módulo corre el mismo código del notebook directamente en tu navegador usando <strong class="text-on-surface">Pyodide</strong> (Python/WebAssembly). Sin servidor: carga los datos reales del CTA, entrena dos redes neuronales profundas (MLP de 3 capas y MLP de 4 capas), y genera el pronóstico de 30 días a partir del <strong class="text-on-surface">último registro disponible en el dataset</strong> — no desde la fecha de hoy.
       </p>
     </div>
   </div>
@@ -193,7 +193,7 @@ tailwind.config = {
       <span class="step-label">5</span>Resultados del modelo por ruta
     </h2>
     <div class="bg-surface-container-lowest border border-outline-variant p-6">
-      <p class="note">Partición temporal 80/20 — el 20% más reciente se usa como set de prueba. El modelo ganador por ruta se selecciona por menor RMSE.</p>
+      <p class="note">Partición temporal 80/20 — el 20% más reciente se usa como set de prueba. Se comparan dos redes neuronales (MLP-3 capas y MLP-4 capas). El modelo ganador por ruta se selecciona por menor RMSE.</p>
       <div id="out-metricas"><div class="skeleton placeholder"></div></div>
     </div>
   </section>
@@ -420,32 +420,52 @@ for col in ['lag_1', 'lag_7', 'rolling_7', 'passengers']:
 sample.to_html(index=False, classes='output-table', border=0)
 `);
     inject('out-variables', varHTML);
-    setProgress(72, 'Variables listas. Entrenando modelos (puede tardar ~40 s)...');
+    setProgress(72, 'Variables listas. Entrenando redes neuronales (puede tardar ~60 s)...');
 
     const metHTML = await pyodide.runPythonAsync(`
-from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
+from sklearn.neural_network import MLPRegressor
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 modelos_def = {
-    'Random Forest':    RandomForestRegressor(n_estimators=100, min_samples_leaf=2, random_state=SEED),
-    'Gradient Boosting': GradientBoostingRegressor(random_state=SEED),
+    'MLP-3 capas': MLPRegressor(
+        hidden_layer_sizes=(128, 64, 32), activation='relu',
+        max_iter=300, random_state=SEED,
+        early_stopping=True, validation_fraction=0.1, n_iter_no_change=10
+    ),
+    'MLP-4 capas': MLPRegressor(
+        hidden_layer_sizes=(256, 128, 64, 32), activation='relu',
+        max_iter=300, random_state=SEED+1,
+        early_stopping=True, validation_fraction=0.1, n_iter_no_change=10
+    ),
 }
 
-resultados   = []
+resultados      = []
 mejores_modelos = {}
-predicciones = []
+mejores_nombres = {}
+scalers         = {}
+predicciones    = []
 
 for ruta, datos_ruta in model_data.groupby('route'):
     datos_ruta = datos_ruta.sort_values('date')
     corte = int(len(datos_ruta) * 0.8)
     train, test = datos_ruta.iloc[:corte], datos_ruta.iloc[corte:]
+    scaler_x = MinMaxScaler()
+    scaler_y = MinMaxScaler()
+    X_train  = scaler_x.fit_transform(train[features])
+    y_train  = scaler_y.fit_transform(train[['passengers']]).ravel()
+    X_test   = scaler_x.transform(test[features])
+    y_test   = test['passengers'].values
+    scalers[ruta] = (scaler_x, scaler_y)
     mejor_rmse = float('inf')
     for nombre, modelo in modelos_def.items():
-        modelo.fit(train[features], train['passengers'])
-        pred = modelo.predict(test[features])
-        mae  = mean_absolute_error(test['passengers'], pred)
-        rmse = float(np.sqrt(mean_squared_error(test['passengers'], pred)))
-        mape = float(np.mean(np.abs((test['passengers'] - pred) / test['passengers'])) * 100)
+        modelo.fit(X_train, y_train)
+        pred_norm = modelo.predict(X_test)
+        pred = scaler_y.inverse_transform(pred_norm.reshape(-1,1)).flatten()
+        pred = np.maximum(pred, 0)
+        mae  = mean_absolute_error(y_test, pred)
+        rmse = float(np.sqrt(mean_squared_error(y_test, pred)))
+        mape = float(np.mean(np.abs((y_test - pred) / y_test)) * 100)
         resultados.append({
             'Ruta': ruta, 'Modelo': nombre,
             'MAE': round(mae, 1), 'RMSE': round(rmse, 1), 'MAPE (%)': round(mape, 2)
@@ -453,6 +473,7 @@ for ruta, datos_ruta in model_data.groupby('route'):
         if rmse < mejor_rmse:
             mejor_rmse = rmse
             mejores_modelos[ruta] = modelo
+            mejores_nombres[ruta] = nombre
             tmp = test[['date', 'route', 'passengers']].copy()
             tmp['prediction'] = pred
             predicciones.append(tmp)
@@ -487,29 +508,33 @@ for ruta in rutas_sel:
     setProgress(94, 'Gráficas listas. Generando pronóstico 30 días...');
 
     const forecastHTML = await pyodide.runPythonAsync(`
-def pronosticar_ruta(df, ruta, modelo, dias=30):
-    hist   = df[df['route'] == ruta].sort_values('date')[['date', 'passengers']].copy()
+def pronosticar_ruta(df, ruta, modelo, scaler_x, scaler_y, dias=30):
+    hist    = df[df['route'] == ruta].sort_values('date')[['date', 'passengers']].copy()
     valores = hist['passengers'].astype(float).tolist()
     ultima  = hist['date'].max()
     filas   = []
     for paso in range(1, dias + 1):
         fecha = ultima + pd.Timedelta(days=paso)
-        fila  = pd.DataFrame([{
-            'dayofweek': fecha.dayofweek,
-            'month':     fecha.month,
+        raw   = pd.DataFrame([{
+            'dayofweek':  fecha.dayofweek,
+            'month':      fecha.month,
             'is_weekend': int(fecha.dayofweek >= 5),
             'holiday':    int(fecha.dayofweek == 6),
             'lag_1':      valores[-1],
             'lag_7':      valores[-7] if len(valores) >= 7 else valores[-1],
             'rolling_7':  float(np.mean(valores[-7:])),
         }])[features]
-        pred = max(float(modelo.predict(fila)[0]), 0)
+        X = scaler_x.transform(raw)
+        pred_norm = modelo.predict(X)
+        pred = float(scaler_y.inverse_transform(pred_norm.reshape(-1,1))[0][0])
+        pred = max(pred, 0)
         valores.append(pred)
         filas.append({'Fecha': fecha.strftime('%Y-%m-%d'), 'Ruta': ruta, 'Pasajeros estimados': int(round(pred))})
     return pd.DataFrame(filas)
 
-ruta_sel  = list(mejores_modelos.keys())[0]
-pronostico = pronosticar_ruta(demanda, ruta_sel, mejores_modelos[ruta_sel], 30)
+ruta_sel   = list(mejores_modelos.keys())[0]
+sx, sy     = scalers[ruta_sel]
+pronostico = pronosticar_ruta(demanda, ruta_sel, mejores_modelos[ruta_sel], sx, sy, 30)
 
 plt.figure(figsize=(11, 3.8))
 plt.plot(range(len(pronostico)), pronostico['Pasajeros estimados'],
