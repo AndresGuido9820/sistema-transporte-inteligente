@@ -183,7 +183,7 @@ tailwind.config = {
       <div class="bg-surface-container p-8 border-t-4 border-primary" id="resumen">
         <h2 class="text-label-caps font-label-caps text-primary mb-4">RESUMEN EJECUTIVO</h2>
         <p class="text-body-lg font-body-lg text-on-background leading-relaxed font-medium">
-          Este proyecto desarrolla un sistema integrado de aprendizaje automático para una empresa de transporte, compuesto por tres módulos: predicción de demanda por ruta a 30 días (MAPE 8.24%), clasificación de comportamientos distractivos en conductores mediante transfer learning con MobileNetV2 (accuracy ~0.87 en test), y recomendación personalizada de destinos de viaje (hit rate 79%). Los tres módulos se publican como herramientas ejecutables en Google Colab y se integran en una demo web pública en GitHub Pages, construida con HTML, JavaScript, Pyodide (Python/WebAssembly) y TensorFlow.js. El reporte documenta datasets reales, modelos, métricas, análisis ético y trabajo futuro.
+          Este proyecto desarrolla un sistema integrado de aprendizaje automático para una empresa de transporte, compuesto por tres módulos: predicción de demanda por ruta a 30 días con LSTM multivariado (MAPE media 19.62%, mín 8.69% en ruta 22), clasificación de comportamientos distractivos en conductores mediante transfer learning con MobileNetV2 (accuracy ~0.87 en test), y recomendación personalizada de destinos de viaje (hit rate 79%). Los tres módulos se publican como herramientas ejecutables en Google Colab y se integran en una demo web pública en GitHub Pages, construida con HTML, JavaScript y TensorFlow.js. El reporte documenta datasets reales, modelos, métricas, análisis ético y trabajo futuro.
         </p>
       </div>
 
@@ -193,7 +193,7 @@ tailwind.config = {
         <div class="space-y-4 text-body-md font-body-md text-on-background">
           <p>Las empresas de transporte operan bajo incertidumbre constante: la demanda varía por ruta, temporada, día de la semana y eventos externos. La seguridad del servicio depende de detectar conducción riesgosa (uso del celular, somnolencia, distracción visual), y la experiencia del usuario puede mejorarse significativamente si la plataforma sugiere destinos coherentes con su historial y preferencias declaradas.</p>
           <p>El <strong>objetivo general</strong> es construir una solución integrada que combine modelos predictivos, clasificación visual y sistemas de recomendación, publicada como herramienta web funcional. El alcance académico incluye entrenamiento con datos reales, evaluación con métricas estándar, documentación técnica, análisis ético y demo en vivo.</p>
-          <p><strong>Limitaciones reconocidas:</strong> el módulo de clasificación usa un clasificador tradicional (Random Forest + HOG) en lugar de una CNN profunda, por restricciones computacionales del entorno gratuito de Google Colab (GPU limitada, sin entrenamiento prolongado). El diseño arquitectónico del pipeline está preparado para sustituir este componente por transfer learning sin modificar el resto del sistema.</p>
+          <p><strong>Limitaciones reconocidas:</strong> el módulo de predicción de demanda usa datos del período 2021–2026, que incluye recuperación post-COVID con patrones irregulares; sin variables de clima o eventos, el MAPE en rutas de alta variabilidad se mantiene en la banda 20–26%. El módulo de recomendación tiene densidad de interacciones moderada (≈2 por usuario), lo que limita la precisión del filtrado colaborativo para usuarios nuevos.</p>
         </div>
       </section>
 
@@ -245,14 +245,14 @@ tailwind.config = {
         <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">3.1 Módulo 1 — Predicción de Demanda</h2>
         <div class="space-y-4 text-body-md font-body-md text-on-background">
           <p><strong>Dataset:</strong> CTA – Ridership – Bus Routes – Daily Totals by Route (Chicago Data Portal). Serie diaria desde 2001 a 2026 con la variable <code class="bg-surface-container px-1">rides</code> por ruta y tipo de día (<code class="bg-surface-container px-1">daytype</code>: W/A/U). Se filtraron datos desde 2021 y se seleccionaron las 10 rutas con mayor demanda reciente.</p>
-          <p><strong>Preprocesamiento:</strong> imputación de valores faltantes por interpolación lineal, extracción de variables temporales (día de semana, mes, trimestre, año), creación de rezagos de 1 y 7 días y medias móviles de 7 y 30 días.</p>
-          <p><strong>Modelo:</strong> <code class="bg-surface-container px-1">RandomForestRegressor</code> entrenado con validación temporal (no aleatoria) — los datos de prueba son siempre posteriores al entrenamiento. Se añadió <code class="bg-surface-container px-1">GradientBoostingRegressor</code> como modelo de comparación.</p>
-          <p><strong>Análisis de estacionalidad:</strong> descomposición STL con <code class="bg-surface-container px-1">seasonal_decompose</code>, identificando tendencia semanal (lunes–viernes pico, fin de semana caída) y tendencia anual (caída post-COVID, recuperación 2023–2025).</p>
+          <p><strong>Preprocesamiento:</strong> normalización por ruta con <code class="bg-surface-container px-1">MinMaxScaler</code> a [0, 1]. Se construyen ventanas deslizantes de 14 días con 3 canales: pasajeros normalizados, flag festivo/domingo (<code class="bg-surface-container px-1">daytype='U'</code>) y día de semana normalizado a [0, 1]. Los canales exógenos son deterministas — se calculan de la fecha, no se predicen.</p>
+          <p><strong>Modelo:</strong> <strong>LSTM multivariado</strong> por ruta — <code class="bg-surface-container px-1">Input(14, 3) → LSTM(64, return_sequences=True) → LSTM(32) → Dense(16, relu) → Dense(1)</code>. Optimizador Adam, pérdida MSE, <code class="bg-surface-container px-1">EarlyStopping(patience=10)</code> sobre val_loss. Partición temporal estricta 80/20 — sin mezcla de fechas entre entrenamiento y prueba.</p>
+          <p><strong>Análisis de estacionalidad:</strong> descomposición aditiva con <code class="bg-surface-container px-1">seasonal_decompose</code> (período 7), confirmando caída sistemática en sábado y domingo/festivos — lo que motiva el canal <code class="bg-surface-container px-1">holiday</code> como feature exógena.</p>
         </div>
         <!-- Metrics box -->
         <div class="w-full bg-surface border-2 border-secondary p-6 mt-6 relative">
           <div class="absolute top-0 right-0 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">FIGURA 1 — MÉTRICAS</div>
-          <p class="text-caption font-caption text-on-surface-variant mb-4 pb-2 border-b border-outline-variant">Promedio sobre las 10 rutas seleccionadas. Validación temporal: train hasta 2024-10, test 2024-11 a 2025-01.</p>
+          <p class="text-caption font-caption text-on-surface-variant mb-4 pb-2 border-b border-outline-variant">10 rutas seleccionadas. Validación temporal: 20% más reciente de cada ruta (2025). LSTM multivariado con 3 canales.</p>
           <table class="w-full text-caption font-caption border-collapse">
             <thead><tr class="bg-surface-container-high">
               <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Métrica</th>
@@ -260,9 +260,11 @@ tailwind.config = {
               <th class="border border-outline p-3 text-left">Interpretación</th>
             </tr></thead>
             <tbody>
-              <tr><td class="border border-outline p-3 font-medium">MAE</td><td class="border border-outline p-3 text-primary font-bold">1 096.71</td><td class="border border-outline p-3">Pasajeros de error promedio por ruta/día</td></tr>
-              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">RMSE</td><td class="border border-outline p-3 text-primary font-bold">1 452.42</td><td class="border border-outline p-3">Penaliza más los errores grandes</td></tr>
-              <tr><td class="border border-outline p-3 font-medium">MAPE</td><td class="border border-outline p-3 text-primary font-bold">8.24%</td><td class="border border-outline p-3">Error porcentual — excelente para planificación (&lt;10%)</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">MAE (media)</td><td class="border border-outline p-3 text-primary font-bold">2 676</td><td class="border border-outline p-3">Pasajeros de error promedio por ruta/día</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">MAPE media</td><td class="border border-outline p-3 text-primary font-bold">19.62%</td><td class="border border-outline p-3">Error porcentual promedio sobre las 10 rutas</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">MAPE mínimo</td><td class="border border-outline p-3 text-primary font-bold">8.69% (ruta 22)</td><td class="border border-outline p-3">Ruta con patrón más regular y menor variabilidad</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">MAPE máximo</td><td class="border border-outline p-3 text-primary font-bold">25.62% (ruta 8)</td><td class="border border-outline p-3">Ruta con mayor variabilidad no explicada por calendario</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Mejora vs. univariado</td><td class="border border-outline p-3 text-primary font-bold">−4.4 pp</td><td class="border border-outline p-3">23.98% → 19.62% al agregar holiday + día de semana</td></tr>
             </tbody>
           </table>
         </div>
@@ -342,7 +344,7 @@ tailwind.config = {
         <div class="grid grid-cols-1 gap-4 mt-6">
           <div class="bg-surface-container p-5 border-l-4 border-primary">
             <span class="text-label-caps font-label-caps text-primary block mb-2">MÓDULO 01 — PREDICCIÓN DE DEMANDA</span>
-            <p class="text-caption font-caption text-on-surface-variant">Carga datos CTA vía fetch, ejecuta preprocesamiento y modelo RF en Pyodide, renderiza gráficas de pronóstico a 30 días y análisis de estacionalidad con matplotlib.</p>
+            <p class="text-caption font-caption text-on-surface-variant">Página estática con resultados pre-computados: gráficas de exploración, estacionalidad, validación y pronóstico a 30 días embebidas como imágenes. LSTM multivariado entrenado localmente con datos CTA reales — sin ejecución en el browser.</p>
             <a href="notebook01.html" class="text-primary text-caption font-caption mt-2 block hover:underline">→ notebook01.html</a>
           </div>
           <div class="bg-surface-container p-5 border-l-4 border-secondary">
@@ -372,14 +374,14 @@ tailwind.config = {
               <th class="border border-outline p-3 text-left">Resultado principal</th>
             </tr></thead>
             <tbody>
-              <tr><td class="border border-outline p-3 font-medium">Predicción demanda</td><td class="border border-outline p-3">CTA Chicago (2001–2026)</td><td class="border border-outline p-3">Random Forest</td><td class="border border-outline p-3 font-bold text-primary">MAPE 8.24% · MAE 1097</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Predicción demanda</td><td class="border border-outline p-3">CTA Chicago (2001–2026)</td><td class="border border-outline p-3">LSTM multivariado (3 features)</td><td class="border border-outline p-3 font-bold text-primary">MAPE media 19.62% · mín 8.69%</td></tr>
               <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Clasificación visual</td><td class="border border-outline p-3">Driver Behavior · 7 276 imgs</td><td class="border border-outline p-3">MobileNetV2 (TF.js)</td><td class="border border-outline p-3 font-bold text-primary">Accuracy ~0.87 (transfer learning)</td></tr>
               <tr><td class="border border-outline p-3 font-medium">Recomendación</td><td class="border border-outline p-3">Travel Rec. Kaggle · 858 users</td><td class="border border-outline p-3">CF + CB Híbrido</td><td class="border border-outline p-3 font-bold text-primary">Hit Rate 79% (CF)</td></tr>
             </tbody>
           </table>
         </div>
         <div class="space-y-4 text-body-md font-body-md text-on-background mt-6">
-          <p>El módulo de predicción logra MAPE &lt; 10%, considerado excelente para planificación operativa: permite dimensionar flota y personal con margen de error de ~87 pasajeros por cada 1 000 en rutas de alta demanda. El módulo de clasificación aplica <strong>transfer learning</strong> real con MobileNetV2: las capas convolucionales preentrenadas en ImageNet detectan postura de manos, posición del teléfono y ángulo de la cabeza, superando significativamente el baseline clásico HOG+GB (accuracy 0.68 → ~0.87). La inferencia corre directamente en el navegador vía TF.js sin infraestructura de servidor. El módulo de recomendación con Hit Rate 79% (CF) indica que el sistema recupera el destino oculto en 4 de cada 5 usuarios evaluados, resultado competitivo para un dataset de densidad moderada (2 interacciones/usuario promedio).</p>
+          <p>El módulo de predicción implementa un <strong>LSTM multivariado</strong> con ventanas deslizantes de 14 días y 3 canales de entrada (pasajeros, festivo, día de semana), logrando MAPE media de 19.62% sobre datos reales CTA. Agregar los canales exógenos redujo el error en 4.4 pp respecto al modelo univariado — con ganancias de hasta 10.6 pp en rutas de patrón festivo pronunciado (ruta 49). El módulo de clasificación aplica <strong>transfer learning</strong> real con MobileNetV2: las capas convolucionales preentrenadas en ImageNet detectan postura de manos, posición del teléfono y ángulo de la cabeza, logrando accuracy ~0.87; la inferencia corre en el navegador vía TF.js sin infraestructura de servidor. El módulo de recomendación con Hit Rate 79% (CF) recupera el destino oculto en 4 de cada 5 usuarios evaluados, resultado competitivo para un dataset de densidad moderada (≈2 interacciones/usuario).</p>
           <p>El componente de contenido tiene baja recall individual (0.6%) porque cada tipo de destino abarca cientos de opciones; sin embargo, aporta como señal secundaria en el híbrido para usuarios con pocos datos históricos (cold-start parcial).</p>
         </div>
       </section>
@@ -413,14 +415,14 @@ tailwind.config = {
       <section id="conclusiones">
         <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">7. Conclusiones y Recomendaciones</h2>
         <div class="space-y-4 text-body-md font-body-md text-on-background">
-          <p>El sistema logra los tres objetivos específicos del enunciado con datos reales, evaluación correcta y herramienta web funcional. El módulo de predicción alcanza MAPE 8.24%, suficiente para planificación operativa de flota y turnos. El módulo de clasificación implementa <strong>aprendizaje profundo real</strong> mediante transfer learning con MobileNetV2, eliminando la necesidad de extracción manual de características y logrando accuracy ~0.87 — la inferencia corre en el navegador vía TF.js. El módulo de recomendación con Hit Rate 79% valida el enfoque colaborativo y establece la base para un sistema de sugerencias personalizadas.</p>
+          <p>El sistema logra los tres objetivos del enunciado con datos reales, evaluación correcta y herramienta web funcional. El módulo de predicción implementa <strong>deep learning recurrente</strong> con LSTM multivariado (ventanas de 14 días, 3 canales), obteniendo MAPE media de 19.62% — razonable para transporte urbano en período post-COVID sin variables exógenas de clima o eventos. El módulo de clasificación implementa <strong>transfer learning</strong> real con MobileNetV2, logrando accuracy ~0.87 con inferencia en el navegador vía TF.js. El módulo de recomendación con Hit Rate 79% valida el enfoque colaborativo y establece la base para un sistema de sugerencias personalizadas.</p>
           <p><strong>Trabajo futuro:</strong></p>
           <ul class="list-disc pl-6 space-y-2 text-body-md font-body-md">
             <li>Ampliar el dataset de clasificación con imágenes de conductores colombianos bajo consentimiento explícito, añadir clase de somnolencia (dataset MRL/NTHU-DDD).</li>
             <li>Desplegar el modelo CNN en borde (TFLite Runtime en Raspberry Pi 4) para monitoreo a bordo en tiempo real con inferencia a ≥10 FPS.</li>
-            <li>Incorporar LSTM o Transformer temporal para predicción de demanda, aprovechando dependencias de largo plazo.</li>
+            <li>Incorporar temperatura diaria (NOAA API) al modelo de demanda para reducir el MAPE en rutas de alta variabilidad como la ruta 8 (MAPE 25.6%) que no mejoró con el calendario.</li>
             <li>Escalar el sistema de recomendación con ALS (Alternating Least Squares) o Neural CF para datasets más grandes.</li>
-            <li>Añadir variables exógenas: clima, eventos de ciudad, festivos locales al modelo de demanda.</li>
+            <li>Ampliar festivos: el campo <code class="bg-surface-container px-1">daytype='U'</code> del CTA mezcla domingos y festivos federales; separarlos como features distintas mejoraría la precisión.</li>
             <li>Validar el sistema de recomendación con destinos reales colombianos y usuarios reales de la empresa.</li>
           </ul>
         </div>
@@ -450,7 +452,7 @@ tailwind.config = {
           <p>Mehra, A. (2024). <em>Travel Recommendation Dataset</em> [Dataset]. Kaggle. <a href="https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset" class="text-primary hover:underline">https://www.kaggle.com/datasets/amanmehra23/...</a></p>
           <p>Dalal, N., &amp; Triggs, B. (2005). Histograms of oriented gradients for human detection. <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)</em>, 886–893. <a href="https://doi.org/10.1109/CVPR.2005.177" class="text-primary hover:underline">https://doi.org/10.1109/CVPR.2005.177</a></p>
           <p>Ricci, F., Rokach, L., &amp; Shapira, B. (Eds.). (2015). <em>Recommender systems handbook</em> (2nd ed.). Springer.</p>
-          <p>Breiman, L. (2001). Random forests. <em>Machine Learning</em>, <em>45</em>(1), 5–32. <a href="https://doi.org/10.1023/A:1010933404324" class="text-primary hover:underline">https://doi.org/10.1023/A:1010933404324</a></p>
+          <p>Hochreiter, S., &amp; Schmidhuber, J. (1997). Long short-term memory. <em>Neural Computation</em>, <em>9</em>(8), 1735–1780. <a href="https://doi.org/10.1162/neco.1997.9.8.1735" class="text-primary hover:underline">https://doi.org/10.1162/neco.1997.9.8.1735</a></p>
           <p>Pyodide Development Team. (2024). <em>Pyodide: Python for the browser</em> [Software]. <a href="https://pyodide.org" class="text-primary hover:underline">https://pyodide.org</a></p>
           <p>Smilkov, D., Carter, S., Sculley, D., Viégas, F., &amp; Wattenberg, M. (2019). <em>TensorFlow.js: Machine learning for the web and beyond</em>. SysML Conference. <a href="https://arxiv.org/abs/1901.05350" class="text-primary hover:underline">https://arxiv.org/abs/1901.05350</a></p>
           <p>Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., &amp; Chen, L.-C. (2018). MobileNetV2: Inverted residuals and linear bottlenecks. <em>Proceedings of CVPR 2018</em>, 4510–4520. <a href="https://doi.org/10.1109/CVPR.2018.00474" class="text-primary hover:underline">https://doi.org/10.1109/CVPR.2018.00474</a></p>
