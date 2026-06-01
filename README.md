@@ -2,127 +2,226 @@
 
 <div align="center">
 
-[![Python](https://img.shields.io/badge/Python-3.10%2B-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.11-blue?logo=python&logoColor=white)](https://www.python.org/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.15-orange?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
 [![TF.js](https://img.shields.io/badge/TensorFlow.js-GraphModel-orange?logo=tensorflow&logoColor=white)](https://www.tensorflow.org/js)
-[![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-live-brightgreen?logo=github&logoColor=white)](https://andresguido9820.github.io/sistema-transporte-inteligente/)
+[![GitHub Pages](https://img.shields.io/badge/Demo-live-brightgreen?logo=github&logoColor=white)](https://andresguido9820.github.io/sistema-transporte-inteligente/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-**Curso:** Aplicaciones en sistemas de recomendación e imágenes · **Profesor:** Juan David Ospina Arango  
-**Universidad Nacional de Colombia** · 2026  
+**Curso:** Aplicaciones en sistemas de recomendación e imágenes  
+**Profesor:** Juan David Ospina Arango  
+**Universidad Nacional de Colombia · 2026**  
 **Autores:** Andrés F. Guido Montoya · Juan José Martínez · Andrés Lemus
 
-[Herramientas web](https://andresguido9820.github.io/sistema-transporte-inteligente/) · [Reporte técnico](https://andresguido9820.github.io/sistema-transporte-inteligente/reporte.html) · [Reporte fuente](report/blog_post.md)
+---
+
+[🌐 Herramientas web](https://andresguido9820.github.io/sistema-transporte-inteligente/) &nbsp;·&nbsp;
+[📄 Reporte técnico](https://andresguido9820.github.io/sistema-transporte-inteligente/reporte.html) &nbsp;·&nbsp;
+[▶️ Demo en video](https://www.youtube.com/watch?v=iRVR9MBd5Jg)
 
 </div>
 
 ---
 
-## Resumen
+## Descripción general
 
-Proyecto académico que integra tres soluciones para una empresa de transporte:
+Proyecto académico que diseña, entrena y despliega tres módulos de aprendizaje automático orientados a problemas operativos reales de una empresa de transporte. Cada módulo es independiente, entrena sobre datos reales y se publica como herramienta ejecutable en Google Colab y como demo web en GitHub Pages — sin servidor, sin instalación.
 
-| Módulo | Objetivo | Métricas |
-|---|---|---|
-| Predicción de demanda | Estimar pasajeros por ruta para los próximos 30 días | MAE, RMSE, MAPE |
-| Clasificación de conducción distractiva | Detectar comportamientos de riesgo desde imágenes | Accuracy, precision, recall, F1 |
-| Recomendación de destinos | Sugerir destinos personalizados por usuario | Precision@K, Recall@K |
-
-El repositorio incluye datos procesados reproducibles en `data/processed/` para que los Colabs corran sin credenciales externas. La procedencia de cada archivo está documentada en [data/README.md](data/README.md). La demanda de transporte usa datos reales diarios por ruta de Chicago Transit Authority, y los módulos de imágenes y recomendación usan datasets de Kaggle. Si los datasets reales están descargados en `data/raw/`, `scripts/prepare_real_datasets.py` crea muestras livianas para entrenamiento local sin versionar archivos grandes.
+| Módulo | Problema | Modelo | Resultado |
+|--------|----------|--------|-----------|
+| **M1 — Predicción de demanda** | Pronosticar pasajeros por ruta a 30 días | LSTM multivariado (3 canales, ventana 14 días) | MAPE media **19.62%**, mín 8.69% (ruta 22) |
+| **M2 — Clasificación de conducción** | Detectar comportamiento distractivo en conductores | MobileNetV2 fine-tuned → TF.js GraphModel | Accuracy **~0.87**, +19 pp vs baseline HOG+GB |
+| **M3 — Recomendación de destinos** | Sugerir destinos personalizados por usuario | CF + CB Híbrido (0.7/0.3) | Hit Rate **79%**, NDCG@5 0.699 |
 
 ---
 
-## Ejecución Local
+## Demo en vivo
 
-Los notebooks corren en Google Colab (links en la tabla de abajo). La herramienta web corre en el navegador sin instalación:
+La herramienta web corre completamente en el navegador — sin servidor, sin instalar nada:
 
 ```
 https://andresguido9820.github.io/sistema-transporte-inteligente/
 ```
 
-Para reproducir localmente con Python:
+- **Módulo 01:** resultados pre-computados con pronóstico a 30 días por ruta
+- **Módulo 02:** clasifica una imagen de conductor en tiempo real vía TF.js (~220 ms)
+- **Módulo 03:** búsqueda instantánea de recomendaciones para cualquier usuario del dataset
+
+---
+
+## Módulos en detalle
+
+### M1 — Predicción de demanda (LSTM multivariado)
+
+**Dataset:** CTA – Bus Routes Daily Totals (Chicago Data Portal, 2021–2026). 10 rutas de mayor demanda, ~1 800 registros por ruta.
+
+**Arquitectura:**
+```
+Input(14, 3) → LSTM(64, return_sequences=True) → LSTM(32) → Dense(16, relu) → Dense(1)
+```
+
+Los 3 canales de entrada son: (1) pasajeros normalizados por MinMaxScaler, (2) flag festivo/domingo (`daytype='U'`), (3) día de semana normalizado a [0,1]. Los canales 2 y 3 son deterministas — se calculan desde la fecha sin error acumulado.
+
+**Resultados por ruta:**
+
+| Ruta | MAE | MAPE | Nota |
+|------|-----|------|------|
+| 22 | 1 842 | **8.69%** | Más estable |
+| 49 | 2 491 | 17.04% | Mayor mejora con canal festivo (−10.6 pp) |
+| 8  | 3 420 | **25.62%** | Mayor variabilidad (CV=0.31) |
+| Media | 2 676 | **19.62%** | −4.4 pp vs LSTM univariado |
+
+**Colab:** [01_prediccion_demanda.ipynb](https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb)
+
+---
+
+### M2 — Clasificación de conducción distractiva (MobileNetV2)
+
+**Dataset:** Multi-Class Driver Behavior Image Dataset (Afridi, 2024; DOI: [10.17632/mzb4b6dff3.1](https://doi.org/10.17632/mzb4b6dff3.1)). 7 276 imágenes, 5 clases: `safe_driving`, `texting_phone`, `talking_phone`, `turning`, `other_activities`.
+
+**Pipeline:**
+- Redimensión a 96×96, normalización a [−1, 1]
+- Data augmentation: flip horizontal, variación de brillo/contraste/saturación
+- Partición estratificada 70/15/15 (seed=42)
+
+**Entrenamiento en dos fases:**
+1. Base MobileNetV2 congelada, solo cabeza: `GAP → Dense(256) → Dropout(0.4) → Dense(128) → Dropout(0.3) → Softmax(5)`, Adam lr=1e-3
+2. Fine-tuning últimas 30 capas de MobileNetV2, Adam lr=1e-4
+
+**Comparativa:**
+
+| Modelo | Accuracy | F1 Macro |
+|--------|----------|----------|
+| HOG + Gradient Boosting (baseline) | 0.68 | 0.67 |
+| MobileNetV2 solo cabeza | 0.81 | 0.79 |
+| **MobileNetV2 fine-tuned** | **~0.87** | **0.85** |
+
+El modelo exportado en TF.js GraphModel (`docs/model/`) corre inferencia directamente en el navegador a ~220 ms por imagen.
+
+**Colab:** [02_clasificacion_conduccion.ipynb](https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb)
+
+---
+
+### M3 — Recomendación de destinos (CF + CB híbrido)
+
+**Dataset:** Travel Recommendation Dataset (Mehra, 2024, MIT). 858 usuarios, 866 destinos, 1 998 interacciones únicas (sparsity 99.73%).
+
+**Sistema híbrido:**
+- **CF:** similitud coseno user-user sobre matriz de ratings → `score_CF(u,i) = Σ sim(u,v)·r(v,i)`
+- **CB:** match de preferencias declaradas al tipo de destino + bonus de popularidad
+- **Híbrido:** `0.7 × CF + 0.3 × CB`
+
+**Evaluación Leave-One-Out (181 usuarios, K=5):**
+
+| Modo | Precision@5 | Recall@5 (Hit Rate) | NDCG@5 |
+|------|-------------|---------------------|--------|
+| CF | 0.158 | **0.790** | 0.699 |
+| Híbrido 0.7/0.3 | 0.141 | 0.707 | 0.626 |
+| CB puro | 0.001 | 0.006 | 0.004 |
+
+Cobertura de catálogo: 72% (624 de 866 destinos aparecen en al menos un Top-5).
+
+**Colab:** [03_recomendacion_destinos.ipynb](https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb)
+
+---
+
+## Herramienta web — arquitectura sin servidor
+
+Toda la lógica corre en el navegador del usuario:
+
+- **Módulo 01:** resultados pre-computados embebidos como imágenes (sin ejecución en tiempo real)
+- **Módulo 02:** TensorFlow.js 4.17 — carga `docs/model/model.json` + shards (~10 MB), inferencia vía WebGL
+- **Módulo 03:** Pyodide 0.25 (Python/WASM) — carga JSONs pre-computados, búsqueda y filtrado en Python puro
+
+Ventajas: cero costos de backend, privacidad (los datos no salen del dispositivo), disponibilidad garantizada en GitHub Pages.
+
+---
+
+## Estructura del repositorio
+
+```
+sistema-transporte-inteligente/
+├── data/
+│   ├── processed/             # CSVs y JSONs listos para Colab
+│   │   ├── cta_bus_ridership_daily_by_route.csv
+│   │   ├── driver_images.csv
+│   │   ├── travel_interactions.csv
+│   │   ├── users.csv · destinations.csv · reviews.csv · user_history.csv
+│   │   └── recommendations.json  # Top-5 por usuario (858 entradas)
+│   └── README.md              # Procedencia de cada dataset
+├── docs/                      # Herramienta web — GitHub Pages
+│   ├── index.html             # Portal principal con los 3 módulos
+│   ├── notebook01.html        # Demo predicción (resultados pre-computados)
+│   ├── notebook02.html        # Demo clasificación (TF.js en vivo)
+│   ├── notebook03.html        # Demo recomendación (Pyodide + JSON)
+│   ├── reporte.html           # Reporte técnico completo (808 líneas)
+│   ├── model/                 # MobileNetV2 TF.js GraphModel (~10 MB)
+│   └── assets/                # Imágenes para la web
+├── notebooks/                 # Notebooks de entrenamiento (Colab)
+│   ├── 01_prediccion_demanda.ipynb
+│   ├── 02_clasificacion_conduccion.ipynb
+│   └── 03_recomendacion_destinos.ipynb
+├── outputs/
+│   ├── figures/               # Gráficas de demanda y matriz de confusión
+│   ├── metrics/               # demand_metrics.json · vision_metrics.json · recommender_metrics.json
+│   └── predictions/           # Predicciones y pronósticos CSV
+├── report/                    # Documentos teóricos por módulo
+├── scripts/                   # Scripts de preparación de datos y entrenamiento
+├── src/transport_ai/          # Módulos Python reutilizables
+├── tests/                     # Pruebas automatizadas (pytest)
+├── .github/workflows/         # validacion.yml — CI con pytest en cada push
+├── requirements.txt
+└── pyproject.toml
+```
+
+---
+
+## Ejecución local
+
+Los notebooks están diseñados para Google Colab (T4 GPU para M2). Para ejecutar localmente:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+git clone https://github.com/AndresGuido9820/sistema-transporte-inteligente.git
+cd sistema-transporte-inteligente
+python -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
+```
+
+Los datos en `data/processed/` están listos para usar directamente. Las imágenes de conducción (`driver_images_real/`) no se versionan en git por su tamaño (2.4 GB); se obtienen desde el dataset original en Mendeley Data (DOI: 10.17632/mzb4b6dff3.1).
+
+Para regenerar los datos procesados desde las fuentes originales:
+
+```bash
 python scripts/prepare_real_datasets.py
 ```
 
----
+Para ejecutar las pruebas:
 
-## Estructura
-
-```txt
-sistema-transporte-inteligente/
-├── data/                      # Datos raw y processed
-├── docs/                      # Herramienta web (GitHub Pages)
-│   ├── index.html             #   Portal principal
-│   ├── notebook01.html        #   Módulo predicción (Pyodide)
-│   ├── notebook02.html        #   Módulo clasificación (TF.js)
-│   ├── notebook03.html        #   Módulo recomendación
-│   ├── reporte.html           #   Reporte técnico
-│   └── model/                 #   CNN MobileNetV2 (TF.js GraphModel)
-├── notebooks/                 # Colabs de entrenamiento
-├── outputs/                   # Métricas, figuras y predicciones
-├── report/                    # Reporte tipo blog y teoría por módulo
-├── scripts/                   # Scripts de preparación de datos
-└── tests/                     # Pruebas automatizadas
+```bash
+pytest -q
 ```
 
 ---
 
-## Documentación
+## Datasets
 
-| Archivo | Descripción |
-|---|---|
-| [blog_post.md](report/blog_post.md) | Reporte principal tipo blog |
-| [teoria_01_prediccion_demanda.md](report/teoria_01_prediccion_demanda.md) | Marco teórico de series de tiempo |
-| [teoria_02_clasificacion_imagenes.md](report/teoria_02_clasificacion_imagenes.md) | Marco teórico de clasificación visual |
-| [teoria_03_recomendacion_destinos.md](report/teoria_03_recomendacion_destinos.md) | Marco teórico de recomendación |
-| [casos_de_uso.md](report/casos_de_uso.md) | Casos de uso |
-| [discusion.md](report/discusion.md) | Limitaciones y trabajo futuro |
-| [aspectos_eticos.md](report/aspectos_eticos.md) | Privacidad, sesgos y uso responsable |
-| [datasets_reales.md](docs/datasets_reales.md) | Fuentes y preparación de datasets reales |
+| Módulo | Fuente | Acceso |
+|--------|--------|--------|
+| M1 — Demanda | CTA Bus Routes Daily Totals · Chicago Data Portal | [data.cityofchicago.org](https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm) |
+| M2 — Conducción | Multi-Class Driver Behavior Image Dataset · Mendeley Data | [doi.org/10.17632/mzb4b6dff3.1](https://doi.org/10.17632/mzb4b6dff3.1) |
+| M3 — Recomendación | Travel Recommendation Dataset · Kaggle | [kaggle.com/datasets/amanmehra23](https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset) |
 
 ---
 
-## Herramientas en Colab
+## CI/CD
 
-Cada notebook está organizado como una herramienta independiente: carga datos, entrena/evalúa el modelo y termina con una celda de uso con parámetros editables.
+Cada push a cualquier rama ejecuta el workflow `.github/workflows/validacion.yml`:
+- Checkout con sparse-checkout (solo archivos necesarios, sin imágenes)
+- Setup Python 3.11
+- `pip install` de dependencias de prueba
+- `pytest -q` sobre `tests/test_flujos_principales.py`
 
-| # | Herramienta | Salidas principales | Colab |
-|---|---|---|
-| 01 | Predicción de demanda | Métricas por ruta, gráficas real vs. predicción y pronóstico de 30 días | [Abrir](https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb) |
-| 02 | Clasificación de conducción | Matriz de confusión, reporte por clase y clasificador de imagen nueva | [Abrir](https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb) |
-| 03 | Recomendación de destinos | Precision@K, Recall@K y recomendaciones explicadas por usuario | [Abrir](https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb) |
-
----
-
-## Resultados Actuales
-
-| Módulo | Resultado |
-|---|---|
-| Demanda | MAE promedio 1096.71, RMSE promedio 1452.42, MAPE promedio 8.24% |
-| Visión | MobileNetV2 fine-tuned — accuracy ~0.87, macro F1 ~0.86 (ver Colab para métricas exactas) |
-| Recomendación | Precision@5 0.20, Recall@5 1.00 |
-
-Las salidas reproducibles están en `outputs/metrics/`, `outputs/figures/`, `outputs/predictions/` y `outputs/screenshots/`.
-
----
-
-## Datasets Recomendados
-
-- Chicago Data Portal. CTA - Ridership - Bus Routes - Daily Totals by Route. https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm
-- Kaggle. Multi-Class Driver Behavior Image Dataset.
-- Kaggle. Travel Recommendation Dataset.
-
-## Datos Usados
-
-| Módulo | Archivo usado en Colab | Fuente documentada |
-|---|---|---|
-| Demanda | `data/processed/cta_bus_ridership_daily_by_route.csv` | Chicago Transit Authority, demanda diaria por ruta de bus |
-| Conducción | `data/processed/driver_images.csv` | Kaggle Multi-Class Driver Behavior Image Dataset |
-| Recomendación | `data/processed/travel_interactions.csv` | Kaggle Travel Recommendation Dataset |
+El deploy a GitHub Pages se realiza manualmente pusheando a la rama `gh-pages`.
 
 ---
 
@@ -130,9 +229,9 @@ Las salidas reproducibles están en `outputs/metrics/`, `outputs/figures/`, `out
 
 ```bibtex
 @misc{guido2026transporte,
-  author = {Guido Montoya, Andres Felipe and Martinez, Juan Jose and Lemus, Andres},
-  title = {Sistema Inteligente Integrado para Transporte},
-  year = {2026},
-  url = {https://github.com/AndresGuido9820/sistema-transporte-inteligente}
+  author  = {Guido Montoya, Andres Felipe and Martinez, Juan Jose and Lemus, Andres},
+  title   = {Sistema Inteligente Integrado para Transporte},
+  year    = {2026},
+  url     = {https://github.com/AndresGuido9820/sistema-transporte-inteligente}
 }
 ```

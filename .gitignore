@@ -1,18 +1,24 @@
+# Python
 __pycache__/
 .pytest_cache/
 .venv/
 venv/
 *.pyc
+
+# Modelos binarios locales (se usan versiones TF.js en docs/model/)
 *.pkl
-!data/processed/modelo_conduccion.pkl
 *.joblib
 *.pt
+*.tflite
+*.keras
+*.h5
+
+# Datos raw y voluminosos
+data/raw/
+data/processed/driver_images_real/
+
+# Archivos de sistema
 .DS_Store
-data/raw/*.zip
-data/raw/**/*.jpg
-data/raw/**/*.png
-data/raw/**
-!data/raw/
-!data/raw/README.md
-kaggle_transport_demand/
+
+# Outputs temporales
 outputs/**/*.tmp
