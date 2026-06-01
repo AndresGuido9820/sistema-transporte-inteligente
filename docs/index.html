@@ -145,10 +145,10 @@ tailwind.config = {
       </div>
       <div class="p-6 flex flex-col flex-grow">
         <h2 class="text-headline-md font-headline-md text-on-surface mb-3">Predicción de demanda</h2>
-        <p class="text-body-md font-body-md text-on-surface-variant mb-4 flex-grow">Pronóstico de pasajeros por ruta para los próximos 30 días. LSTM + MLP (redes neuronales profundas) con variables temporales y rezagos.</p>
+        <p class="text-body-md font-body-md text-on-surface-variant mb-4 flex-grow">Pronóstico de pasajeros por ruta para los próximos 30 días. LSTM multivariado con ventanas deslizantes de 14 días y 3 canales: pasajeros normalizados, flag festivo/domingo y día de semana.</p>
         <div class="border-t border-outline-variant pt-4 mb-4">
           <div class="grid grid-cols-3 gap-2 text-center">
-            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">MAPE</span><span class="font-bold text-primary">8.24%</span></div>
+            <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">MAPE</span><span class="font-bold text-primary">19.6%</span></div>
             <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">RUTAS</span><span class="font-bold text-primary">10</span></div>
             <div><span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">HORIZONTE</span><span class="font-bold text-primary">30 días</span></div>
           </div>
@@ -241,8 +241,8 @@ tailwind.config = {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
       <div class="bg-surface-container-low border border-outline-variant p-6 space-y-4">
         <div>
-          <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Demanda — MAPE 8.24%</span><span class="text-label-caps font-label-caps text-primary">78%</span></div>
-          <div class="h-2 bg-surface-dim rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width:78%"></div></div>
+          <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Demanda — MAPE media 19.6% (mín 8.69%)</span><span class="text-label-caps font-label-caps text-primary">80%</span></div>
+          <div class="h-2 bg-surface-dim rounded-full overflow-hidden"><div class="h-full bg-primary rounded-full" style="width:80%"></div></div>
         </div>
         <div>
           <div class="flex justify-between mb-2"><span class="text-caption font-caption text-on-surface font-medium">Visión — F1 macro 0.68</span><span class="text-label-caps font-label-caps text-secondary">68%</span></div>
