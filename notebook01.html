@@ -450,13 +450,18 @@ Objetivo y[0] (pax_norm día siguiente): 0.445</pre>
   <section class="mb-stack-md">
     <div class="bg-surface-container border border-outline-variant p-6">
       <p class="text-label-caps font-label-caps text-secondary mb-3 uppercase tracking-wider">Fuente del dataset</p>
-      <p class="text-body-md font-body-md text-on-surface-variant">
+      <p class="text-body-md font-body-md text-on-surface-variant mb-4">
         <strong>Chicago Transit Authority (CTA) — CTA Bus Ridership Daily Totals by Route</strong><br/>
         Portal: <a href="https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm" target="_blank" class="text-primary underline">Chicago Data Portal</a> &nbsp;|&nbsp;
         Licencia: Public Domain (U.S. Government Open Data) &nbsp;|&nbsp;
         Cobertura: 2001-01-01 al presente &nbsp;|&nbsp;
         Granularidad: demanda diaria por ruta con tipo de día (W/A/U)
       </p>
+      <p class="text-label-caps font-label-caps text-secondary mb-3 uppercase tracking-wider border-t border-outline-variant pt-4">Notebook ejecutable</p>
+      <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb" target="_blank" class="inline-flex items-center gap-2 bg-primary text-on-primary text-label-caps font-label-caps px-5 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity">
+        <span class="material-symbols-outlined text-base">open_in_new</span> Abrir en Google Colab
+      </a>
+      <p style="font-size:13px;color:var(--muted);margin-top:10px">El notebook entrena el LSTM con datos reales del CTA y genera el pronóstico de 30 días.</p>
     </div>
   </section>
 
