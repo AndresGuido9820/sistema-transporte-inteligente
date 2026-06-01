@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Reporte Técnico — Sistema Inteligente de Transporte</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;500&family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<style>.material-symbols-outlined{font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;}</style>
+<script>
+tailwind.config = {
+  darkMode:"class",
+  theme:{extend:{
+    colors:{
+      "background":"#fbf9f4","surface":"#fbf9f4","surface-container":"#f0eee9",
+      "surface-container-low":"#f5f3ee","surface-container-high":"#eae8e3",
+      "surface-container-lowest":"#ffffff","surface-dim":"#dbdad5",
+      "surface-variant":"#e4e2dd","surface-bright":"#fbf9f4",
+      "on-background":"#1b1c19","on-surface":"#1b1c19",
+      "on-surface-variant":"#56423d","inverse-on-surface":"#f2f1ec",
+      "inverse-surface":"#30312e","outline":"#89726c","outline-variant":"#ddc0b9",
+      "primary":"#8f361d","on-primary":"#ffffff","primary-container":"#af4d32",
+      "on-primary-container":"#ffe8e2","primary-fixed":"#ffdbd1",
+      "primary-fixed-dim":"#ffb5a1","inverse-primary":"#ffb5a1",
+      "secondary":"#4d6356","on-secondary":"#ffffff","secondary-container":"#cde6d5",
+      "on-secondary-container":"#52685a","secondary-fixed":"#d0e8d7",
+      "secondary-fixed-dim":"#b4ccbc","on-secondary-fixed":"#0b1f15",
+      "on-secondary-fixed-variant":"#364b3f",
+      "tertiary":"#5f5136","on-tertiary":"#ffffff","tertiary-container":"#79694c",
+      "on-tertiary-container":"#ffeac9","tertiary-fixed":"#f5e0bd",
+      "tertiary-fixed-dim":"#d8c4a2","on-tertiary-fixed":"#241a05",
+      "on-tertiary-fixed-variant":"#52452b",
+      "error":"#ba1a1a","on-error":"#ffffff","error-container":"#ffdad6",
+      "on-error-container":"#93000a","surface-tint":"#9f4127"
+    },
+    borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},
+    spacing:{
+      "stack-lg":"48px","stack-md":"24px","gutter":"24px",
+      "margin-desktop":"64px","stack-sm":"8px","margin-mobile":"16px",
+      "unit":"4px","max-content-width":"1280px"
+    },
+    fontFamily:{
+      "body-lg":["Hanken Grotesk"],"body-md":["Hanken Grotesk"],
+      "headline-lg":["Libre Caslon Text"],"headline-md":["Libre Caslon Text"],
+      "display-lg":["Libre Caslon Text"],"display-lg-mobile":["Libre Caslon Text"],
+      "label-caps":["JetBrains Mono"],"caption":["Hanken Grotesk"]
+    },
+    fontSize:{
+      "body-lg":["18px",{"lineHeight":"1.7","fontWeight":"400"}],
+      "body-md":["16px",{"lineHeight":"1.5","fontWeight":"400"}],
+      "headline-lg":["32px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "headline-md":["22px",{"lineHeight":"1.3","fontWeight":"600"}],
+      "display-lg":["60px",{"lineHeight":"1.1","letterSpacing":"-0.02em","fontWeight":"700"}],
+      "display-lg-mobile":["38px",{"lineHeight":"1.2","fontWeight":"700"}],
+      "label-caps":["11px",{"lineHeight":"1.0","letterSpacing":"0.1em","fontWeight":"500"}],
+      "caption":["14px",{"lineHeight":"1.4","fontWeight":"400"}]
+    }
+  }}
+}
+</script>
+</head>
+<body class="bg-background text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container flex flex-col min-h-screen">
+
+<!-- Header -->
+<header class="bg-surface border-b-4 border-primary sticky top-0 z-50 w-full">
+  <div class="flex justify-between items-center w-full px-margin-mobile md:px-margin-desktop max-w-max-content-width mx-auto py-stack-md">
+    <div class="text-headline-md font-headline-md text-primary uppercase tracking-wider text-sm md:text-base">
+      Sistemas Inteligentes
+    </div>
+    <nav class="hidden md:flex items-center gap-8">
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="index.html">Herramientas</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook01.html">Módulo 01</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook02.html">Módulo 02</a>
+      <a class="text-on-surface-variant hover:text-primary transition-colors text-label-caps font-label-caps uppercase pb-1" href="notebook03.html">Módulo 03</a>
+    </nav>
+    <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="hidden md:flex bg-primary text-on-primary text-label-caps font-label-caps px-6 py-3 uppercase tracking-wider hover:opacity-90 transition-opacity rounded-none items-center gap-2">
+      <span class="material-symbols-outlined text-base">code</span> Repositorio
+    </a>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="flex-grow w-full max-w-max-content-width mx-auto px-margin-mobile md:px-margin-desktop mt-stack-lg pb-stack-lg">
+
+  <!-- Editorial Header -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter mb-stack-lg">
+    <div class="md:col-span-10 md:col-start-2">
+      <span class="block text-label-caps font-label-caps text-primary mb-6 uppercase tracking-wider border-b border-primary pb-2 inline-block">
+        Reporte Técnico // Universidad Nacional de Colombia · Mayo 2026
+      </span>
+      <h1 class="text-display-lg-mobile md:text-display-lg font-display-lg text-on-surface mb-8">
+        Sistema Inteligente Integrado para Predicción, Clasificación y Recomendación en una Empresa de Transporte
+      </h1>
+      <!-- Meta -->
+      <div class="grid grid-cols-2 md:grid-cols-4 border-t-2 border-b-2 border-outline py-4 gap-4 bg-surface-container-low px-4">
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">AUTORES</span>
+          <span class="block text-caption font-caption text-on-surface font-medium">Andrés F. Guido Montoya<br/>Juan José Martínez<br/>Andrés Lemus</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">INSTITUCIÓN</span>
+          <span class="block text-caption font-caption text-on-surface font-medium">Universidad Nacional de Colombia</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">CURSO</span>
+          <span class="block text-caption font-caption text-on-surface font-medium">Aplicaciones en sistemas de recomendación e imágenes<br/>Prof. Juan David Ospina Arango</span>
+        </div>
+        <div>
+          <span class="block text-label-caps font-label-caps text-on-surface-variant mb-1">REPOSITORIO</span>
+          <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="block text-caption font-caption text-primary font-medium break-all">github.com/AndresGuido9820/<br/>sistema-transporte-inteligente</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero visual: abstract data banner -->
+  <div class="w-full h-48 md:h-72 mb-stack-lg bg-surface-container overflow-hidden border-2 border-secondary relative flex items-end">
+    <!-- Abstract bar visualization -->
+    <div class="absolute inset-0 flex items-end gap-1 px-4 pb-4 opacity-30">
+      <div class="flex-1 bg-primary" style="height:55%"></div><div class="flex-1 bg-secondary" style="height:72%"></div>
+      <div class="flex-1 bg-primary" style="height:48%"></div><div class="flex-1 bg-tertiary" style="height:88%"></div>
+      <div class="flex-1 bg-primary" style="height:63%"></div><div class="flex-1 bg-secondary" style="height:91%"></div>
+      <div class="flex-1 bg-primary" style="height:79%"></div><div class="flex-1 bg-tertiary" style="height:67%"></div>
+      <div class="flex-1 bg-primary" style="height:84%"></div><div class="flex-1 bg-secondary" style="height:74%"></div>
+      <div class="flex-1 bg-primary" style="height:58%"></div><div class="flex-1 bg-tertiary" style="height:96%"></div>
+      <div class="flex-1 bg-primary" style="height:70%"></div><div class="flex-1 bg-secondary" style="height:82%"></div>
+      <div class="flex-1 bg-primary" style="height:45%"></div><div class="flex-1 bg-tertiary" style="height:61%"></div>
+      <div class="flex-1 bg-primary" style="height:77%"></div><div class="flex-1 bg-secondary" style="height:53%"></div>
+      <div class="flex-1 bg-primary" style="height:89%"></div><div class="flex-1 bg-tertiary" style="height:66%"></div>
+    </div>
+    <div class="relative z-10 p-6 md:p-10">
+      <span class="text-label-caps font-label-caps text-secondary uppercase tracking-wider block mb-2">Pronóstico · Visión · Recomendación</span>
+      <p class="text-headline-md font-headline-md text-on-surface max-w-2xl">Tres módulos de aprendizaje automático integrados en una herramienta web pública</p>
+    </div>
+    <div class="absolute top-4 right-4 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">
+      SISTEMA INTEGRADO
+    </div>
+  </div>
+
+  <!-- Article Body -->
+  <!-- Article Body -->
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+    <!-- Sticky Sidebar -->
+    <aside class="md:col-span-3 hidden md:block">
+      <div class="sticky top-32 border-r-2 border-outline-variant pr-6">
+        <h3 class="text-label-caps font-label-caps text-secondary mb-6 border-b border-outline-variant pb-2">Contenido</h3>
+        <ul class="space-y-3 text-caption font-caption text-on-surface-variant">
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#resumen"><span class="w-2 h-2 bg-primary inline-block"></span> Resumen Ejecutivo</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#intro"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 1. Introducción</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#marco"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 2. Marco Teórico</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#relacionado"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 3. Trabajo Relacionado</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#metodologia"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 4. Metodología</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#modulo1"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 5.1 Predicción de demanda</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#modulo2"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 5.2 Clasificación visual</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#modulo3"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 5.3 Recomendación</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#web"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 6. Herramienta Web</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#resultados"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 7. Resultados Generales</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#etica"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 8. Ética</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#conclusiones"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 9. Conclusiones</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#biblio"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 10. Bibliografía</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#anexos"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 11. Anexos</a></li>
+          <li><a class="hover:text-primary transition-colors flex items-center gap-2" href="#ia"><span class="w-2 h-2 bg-surface-variant inline-block"></span> 12. Uso de IA</a></li>
+        </ul>
+        <div class="mt-10 bg-surface-container p-4 border-l-4 border-secondary">
+          <h4 class="text-label-caps font-label-caps text-on-surface mb-2">Palabras Clave</h4>
+          <div class="flex flex-wrap gap-2">
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Series de tiempo</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">LSTM multivariado</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Visión computacional</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">MobileNetV2</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Transfer learning</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Filtrado colaborativo</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Sistema híbrido</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">TF.js</span>
+            <span class="bg-surface text-caption font-caption px-2 py-1 border border-outline">Pyodide</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="md:col-span-8 md:col-start-5 space-y-12">
+
+      <!-- Resumen Ejecutivo -->
+      <div class="bg-surface-container p-8 border-t-4 border-primary" id="resumen">
+        <h2 class="text-label-caps font-label-caps text-primary mb-4">RESUMEN EJECUTIVO</h2>
+        <p class="text-body-lg font-body-lg text-on-background leading-relaxed font-medium">
+          Este proyecto presenta el diseño, entrenamiento y despliegue de un sistema integrado de aprendizaje automático orientado a tres problemas operativos centrales de una empresa de transporte: la incertidumbre en la demanda futura por ruta, el riesgo asociado a conducción distractiva, y la baja personalización en la experiencia del pasajero. El sistema consta de tres módulos independientes pero complementarios.
+        </p>
+        <p class="text-body-md font-body-md text-on-background mt-4 leading-relaxed">
+          El <strong>Módulo 1</strong> implementa un modelo LSTM multivariado con ventanas deslizantes de 14 días y tres canales de entrada —pasajeros normalizados, indicador festivo/domingo y día de semana codificado—, entrenado sobre datos reales del sistema de buses de Chicago (CTA, 2021–2026) para las diez rutas de mayor demanda. El error porcentual absoluto medio (MAPE) alcanza 19.62% como promedio entre rutas, con un mínimo de 8.69% en la ruta 22 y un máximo de 25.62% en la ruta 8. La incorporación de las variables exógenas de calendario redujo el MAPE en 4.4 puntos porcentuales respecto al modelo univariado de referencia.
+        </p>
+        <p class="text-body-md font-body-md text-on-background mt-4 leading-relaxed">
+          El <strong>Módulo 2</strong> aplica transfer learning sobre MobileNetV2 preentrenada en ImageNet para clasificar cinco categorías de comportamiento en conductores (conducción segura, uso del teléfono mientras se escribe, uso del teléfono mientras se habla, giro del volante y otras actividades), alcanzando una exactitud de ~0.87 en el conjunto de prueba. El modelo exportado en formato TF.js GraphModel corre completamente en el navegador sin servidor, con latencia de inferencia inferior a 300 ms en hardware de gama media.
+        </p>
+        <p class="text-body-md font-body-md text-on-background mt-4 leading-relaxed">
+          El <strong>Módulo 3</strong> combina filtrado colaborativo basado en similitud coseno entre usuarios con filtrado por contenido derivado de preferencias declaradas, en un esquema híbrido ponderado (0.7 CF + 0.3 CB). Evaluado sobre 181 usuarios mediante Leave-One-Out, el modo colaborativo obtiene Hit Rate 79.0%, Precision@5 0.158 y NDCG@5 0.699.
+        </p>
+        <p class="text-body-md font-body-md text-on-background mt-4 leading-relaxed">
+          Los tres módulos se publican como herramientas ejecutables en Google Colab y se integran en una demo web pública sobre GitHub Pages (HTML + JavaScript + Pyodide + TF.js), sin requerir infraestructura de servidor.
+        </p>
+      </div>
+
+      <!-- 1. Introducción -->
+      <section id="intro">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">1. Introducción</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">1.1 Contexto y motivación</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Las empresas de transporte público urbano enfrentan tres presiones operativas que se intensifican con el crecimiento de las ciudades. Primero, la demanda de pasajeros fluctúa de forma compleja en función del día de la semana, los periodos festivos, eventos masivos y condiciones climáticas; los métodos clásicos de planificación basados en promedios históricos resultan insuficientes para absorber esta variabilidad y generan asignación subóptima de flota. Segundo, la distracción al volante —fundamentalmente el uso del teléfono móvil— es reconocida por la Organización Mundial de la Salud como uno de los principales factores de riesgo en accidentes de tránsito; la detección automatizada en tiempo real permitiría intervenciones preventivas antes de que ocurra un incidente. Tercero, las plataformas de movilidad que ofrecen recomendaciones genéricas de destino pierden oportunidad de retener usuarios frente a alternativas más personalizadas.</p>
+          <p>El aprendizaje automático ofrece herramientas maduras para abordar los tres problemas con datos reales y sin requerir modelos de dominio explícitos. La disponibilidad de datasets públicos de alta calidad —series de demanda del CTA de Chicago, imágenes etiquetadas de conducción en Bangladesh y registros de preferencias de viaje en Kaggle— hace viable un proyecto académico integrado que demuestre la aplicabilidad de distintas familias de modelos sobre problemas industriales reales.</p>
+          <p>El proyecto se desarrolla en el marco del curso <em>Aplicaciones en sistemas de recomendación e imágenes</em> de la Universidad Nacional de Colombia, con énfasis en la implementación real, la evaluación rigurosa y la publicación de herramientas funcionales accesibles para cualquier usuario con un navegador web.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">1.2 Objetivos</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Objetivo general:</strong> diseñar, entrenar y desplegar un sistema integrado de aprendizaje automático que resuelva tres problemas operativos de una empresa de transporte —predicción de demanda, clasificación de conducción y recomendación de destinos— y lo publique como herramienta web funcional.</p>
+          <div class="bg-surface-container-low border-l-4 border-primary p-4 mt-4">
+            <p class="text-label-caps font-label-caps text-on-surface mb-3">OBJETIVOS ESPECÍFICOS</p>
+            <ul class="space-y-2 list-none">
+              <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">M1.</span><span>Implementar un modelo LSTM multivariado que pronostique la demanda diaria de pasajeros por ruta para un horizonte de 30 días, con MAPE inferior al 25% sobre datos reales de series temporales.</span></li>
+              <li class="flex gap-3"><span class="text-secondary font-bold flex-shrink-0">M2.</span><span>Entrenar un clasificador de comportamiento de conductores mediante transfer learning que supere en accuracy a un modelo baseline clásico (HOG + Gradient Boosting) en al menos 15 puntos porcentuales.</span></li>
+              <li class="flex gap-3"><span class="text-tertiary font-bold flex-shrink-0">M3.</span><span>Construir un sistema de recomendación híbrido que alcance un Hit Rate superior al 60% en evaluación Leave-One-Out sobre usuarios con historial de interacciones.</span></li>
+              <li class="flex gap-3"><span class="text-on-surface font-bold flex-shrink-0">Web.</span><span>Integrar los tres módulos en una demo web pública sobre GitHub Pages que funcione sin servidor, ejecutando inferencia directamente en el navegador del usuario.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">1.3 Alcance y limitaciones</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El alcance del proyecto es académico-demostrativo: se trabaja con datasets públicos que aproximan escenarios industriales reales, pero cuyas condiciones de recolección difieren de las de una empresa colombiana. Los modelos no están diseñados para producción directa; requieren adaptación de dominio, reentrenamiento con datos propios y validación operativa antes de cualquier despliegue real.</p>
+          <p><strong>Limitaciones del Módulo 1:</strong> los datos del CTA cubren el período post-COVID (2021–2026), caracterizado por recuperación irregular de la demanda y patrones atípicos que incrementan el error en rutas de alta variabilidad. La ausencia de variables exógenas de clima, eventos especiales o incidentes viales impide reducir el MAPE por debajo del 20% en rutas inestables como la ruta 8.</p>
+          <p><strong>Limitaciones del Módulo 2:</strong> el dataset fue recolectado en Bangladesh bajo condiciones de iluminación, tipo de vehículo y comportamiento cultural específicos; su generalización directa a contextos latinoamericanos no está validada. La clase <em>somnolencia</em> —una de las causas más relevantes de accidentes— no está representada en el dataset.</p>
+          <p><strong>Limitaciones del Módulo 3:</strong> la densidad de interacciones es de aproximadamente 2.3 interacciones por usuario, lo que genera una matriz muy dispersa y limita la capacidad del filtrado colaborativo para usuarios nuevos (problema de cold-start). Todos los destinos pertenecen al contexto geográfico de India, por lo que el sistema no es directamente transferible a una empresa colombiana sin reemplazar el dataset.</p>
+        </div>
+      </section>
+
+      <!-- 2. Marco Teórico -->
+      <section id="marco">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">2. Marco Teórico</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">2.1 Predicción de series de tiempo con LSTM</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Los modelos clásicos de series de tiempo como ARIMA (Box &amp; Jenkins, 1976) asumen linealidad y estacionariedad, condiciones frecuentemente violadas en la demanda de transporte urbano, donde coexisten patrones semanales, efectos de calendario y perturbaciones exógenas no lineales. Las redes neuronales recurrentes (RNN) surgieron como alternativa para capturar dependencias temporales de largo alcance, pero su entrenamiento sufre el problema del gradiente que desaparece (vanishing gradient) cuando las secuencias son largas (Hochreiter &amp; Schmidhuber, 1997).</p>
+          <p>Las Long Short-Term Memory (LSTM) resuelven este problema mediante tres compuertas multiplicativas: la compuerta de olvido (<em>forget gate</em>) decide qué información del estado de celda anterior se descarta; la compuerta de entrada (<em>input gate</em>) controla qué nueva información se escribe en el estado de celda; y la compuerta de salida (<em>output gate</em>) filtra el estado de celda para producir la activación de la unidad. Este mecanismo permite al modelo mantener o descartar selectivamente información a través de secuencias de longitud arbitraria, lo que resulta especialmente útil para series con periodicidad semanal (ventana de 7 días) o mensual (ventana de 30 días).</p>
+          <p>Los modelos LSTM multivariados extienden la arquitectura para procesar múltiples series temporales en paralelo como canales de entrada, de forma análoga a los canales RGB en una imagen. Esto permite incorporar variables exógenas deterministas —como el día de la semana o los indicadores de festivo— cuya evolución futura es conocida con certeza, lo que evita el error de predicción encadenada que ocurriría si se trataran como variables a predecir.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">2.2 Redes neuronales convolucionales y Transfer Learning</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Las redes neuronales convolucionales (CNN) procesan imágenes mediante capas de convolución que aprenden detectores de características jerárquicos: las capas iniciales detectan bordes y texturas, las capas intermedias combinan estos detectores para reconocer partes de objetos (ruedas, manos, caras), y las capas profundas componen representaciones semánticas de alto nivel. Entrenadas desde cero sobre un dataset pequeño, las CNN tienden a sobreajustar; el Transfer Learning (Pan &amp; Yang, 2010) mitiga este problema reutilizando los pesos de una red entrenada en un dataset grande (ImageNet, 1.2 millones de imágenes, 1 000 clases).</p>
+          <p>MobileNetV2 (Sandler et al., 2018) es una arquitectura diseñada específicamente para inferencia en dispositivos de bajo consumo. Su innovación principal son los <em>inverted residuals with linear bottlenecks</em>: a diferencia de los bloques residuales tradicionales (ResNet) que comprimen el canal antes de la convolución, MobileNetV2 expande el canal (factor 6×), aplica una convolución profunda separable (<em>depthwise separable convolution</em>) y luego proyecta de vuelta a un espacio de menor dimensión. Esto reduce el número de parámetros de ~14 M (VGG16) a ~3.4 M manteniendo accuracy competitiva en ImageNet, y hace viable la inferencia en TF.js sobre hardware de gama media.</p>
+          <p>La estrategia de fine-tuning en dos fases —primero entrenar solo la cabeza clasificadora con la base congelada, luego descongelar las últimas capas con una tasa de aprendizaje reducida— previene la destrucción de los pesos preentrenados en las etapas iniciales del entrenamiento, cuando los gradientes de la cabeza aleatoria son grandes.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">2.3 Sistemas de recomendación</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Los sistemas de recomendación se dividen en tres paradigmas principales (Ricci et al., 2015): filtrado basado en contenido (CB), filtrado colaborativo (CF) y sistemas híbridos. El filtrado por contenido recomienda ítems con características similares a los que el usuario ha calificado positivamente; tiene baja dependencia de otros usuarios pero no captura preferencias latentes no expresadas. El filtrado colaborativo asume que usuarios con historial similar tendrán preferencias futuras similares; en la variante <em>user-user</em>, se construye una matriz usuario × ítem y se calcula la similitud entre filas (perfiles de usuario) para ponderar los ratings de vecinos.</p>
+          <p>La similitud coseno entre dos usuarios <em>u</em> y <em>v</em> se define como el coseno del ángulo entre sus vectores de rating: <code class="bg-surface-container px-1 text-caption">sim(u,v) = (r_u · r_v) / (||r_u|| ||r_v||)</code>, donde solo se consideran los ítems calificados por ambos. El score de recomendación del ítem <em>i</em> para el usuario <em>u</em> es la suma ponderada de los ratings de sus vecinos: <code class="bg-surface-container px-1 text-caption">score(u,i) = Σ sim(u,v) · r(v,i)</code> para todos los vecinos <em>v</em> que calificaron <em>i</em>.</p>
+          <p>Las métricas estándar de evaluación para recomendación son la Precisión@K (fracción de ítems relevantes entre los K recomendados), Recall@K (fracción de ítems relevantes recuperados), NDCG@K (Normalized Discounted Cumulative Gain, que penaliza los aciertos en posiciones bajas de la lista) y Hit Rate@K (fracción de usuarios para los que al menos un ítem relevante aparece entre los K recomendados). La evaluación Leave-One-Out oculta un ítem positivo del historial de cada usuario y mide si el sistema lo recupera entre los Top-K.</p>
+        </div>
+      </section>
+
+      <!-- 3. Trabajo Relacionado -->
+      <section id="relacionado">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">3. Trabajo Relacionado</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">3.1 Pronóstico de demanda en transporte</h3>
+          <p>La literatura sobre predicción de demanda en transporte urbano muestra una transición progresiva desde modelos estadísticos clásicos hacia enfoques de deep learning. Ma et al. (2015) propusieron usar redes recurrentes para predicción de velocidad en autopistas, siendo uno de los primeros trabajos en aplicar LSTM a datos de tráfico. Yao et al. (2018) extendieron este enfoque con modelos de atención espaciotemporal que integran información geográfica de la red vial. En el contexto específico de buses urbanos, estudios con datos de sistemas de tarjeta inteligente (Munizaga &amp; Palma, 2012) han mostrado que los patrones semanales y festivos son los principales factores explicativos, lo que justifica su inclusión como variables exógenas en el presente trabajo. La ventaja del LSTM multivariado frente a ARIMA se ha documentado consistentemente en horizontes superiores a 7 días y en series con alta no-estacionariedad post-perturbación, condición que caracteriza los datos CTA durante la recuperación post-COVID.</p>
+
+          <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">3.2 Detección de comportamiento distractivo en conductores</h3>
+          <p>La detección visual de distracción al volante ha sido abordada con distintas modalidades de señal: EEG (electroencefalografía), señales fisiológicas, puntos de fijación visual y cámaras convencionales. Esta última modalidad es la más práctica para despliegue en flotas. Baheti et al. (2020) aplicaron CNN shallow sobre el dataset StateFarm Driver Distraction con accuracy 0.96, pero en condiciones de iluminación controlada; Khaled et al. (2021) reportaron que la variabilidad de iluminación y la diversidad de vehículos reducen el accuracy a rangos de 0.78–0.85 en datasets heterogéneos, rango en el que se ubica el resultado del presente trabajo (~0.87) dado que el dataset de Bangladesh presenta condiciones variables de luz y fondo. El uso de MobileNetV2 como backbone es coherente con trabajos que priorizan la inferencia en borde (edge inference), donde arquitecturas como ResNet-50 tienen latencia impráctica en hardware embebido.</p>
+
+          <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">3.3 Sistemas de recomendación de destinos de viaje</h3>
+          <p>La recomendación de destinos turísticos y de transporte ha sido explorada ampliamente con técnicas de CF, CB e híbridas. Lim et al. (2019) demostraron que los modelos híbridos CF+CB superan consistentemente a los modos puros cuando la densidad de interacciones es baja (menos de 5 interacciones por usuario), que es exactamente la condición del dataset utilizado (≈2.3/usuario). El sistema presentado obtiene Hit Rate 79% (CF) en Leave-One-Out@5, resultado competitivo frente a trabajos similares con datasets de baja densidad que reportan rangos de 65–82% (Lim et al., 2019). El componente de contenido, aunque con baja recall individual (0.6%), actúa como señal de regularización para el cold-start parcial, mejorando la diversidad del catálogo recomendado.</p>
+        </div>
+      </section>
+
+      <!-- 4. Metodología -->
+      <section id="metodologia">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">4. Metodología</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El proyecto se organizó en cuatro fases iterativas: (1) adquisición y preprocesamiento de los tres datasets reales, (2) modelado independiente por módulo con evaluación controlada, (3) análisis de resultados e iteración sobre hiperparámetros, y (4) integración en herramienta web pública. La arquitectura del sistema separa explícitamente datos, modelos y visualización, lo que permite reemplazar cualquier componente —por ejemplo, sustituir el dataset CTA por datos de una empresa colombiana— sin afectar los otros módulos.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-4">4.1 Canvas del Proyecto</h3>
+        <div class="w-full bg-surface border-2 border-secondary p-6 mb-6 relative">
+          <div class="absolute top-0 right-0 bg-secondary text-on-secondary px-3 py-1 text-label-caps font-label-caps">CANVAS</div>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left text-label-caps font-label-caps">Elemento</th>
+              <th class="border border-outline p-3 text-left">Definición</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">Usuarios principales</td><td class="border border-outline p-3">Planificadores de operación, equipo de seguridad vial y clientes de la plataforma</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Problemas clave</td><td class="border border-outline p-3">Demanda variable por ruta, riesgo por distracción del conductor, baja personalización de destinos</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Propuesta de valor</td><td class="border border-outline p-3">Reducir incertidumbre operativa, apoyar prevención de incidentes y mejorar experiencia del usuario con modelos ejecutables sin infraestructura</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Datos necesarios</td><td class="border border-outline p-3">Historial de afluencia por ruta (CTA), imágenes etiquetadas de conducción (Kaggle/Mendeley), interacciones usuario-destino (Kaggle)</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Métricas de éxito</td><td class="border border-outline p-3">MAPE &lt; 25% en demanda, accuracy &gt; 0.80 en visión (vs 0.68 baseline), Hit Rate &gt; 60% en recomendación</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Riesgos</td><td class="border border-outline p-3">Sesgos de clase (M2), privacidad de imágenes (M2), cold-start en usuarios nuevos (M3), recuperación post-COVID irregular (M1)</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Canales</td><td class="border border-outline p-3">Demo web GitHub Pages, notebooks ejecutables en Google Colab, repositorio público en GitHub</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-4">4.2 Herramientas y tecnologías</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="bg-surface-container-low border border-outline-variant p-4">
+            <span class="text-label-caps font-label-caps text-primary block mb-2">MODELADO</span>
+            <ul class="text-caption font-caption text-on-surface-variant space-y-1">
+              <li>Python 3.11 · Google Colab (T4 GPU)</li>
+              <li>TensorFlow 2.15 / Keras</li>
+              <li>MobileNetV2 (ImageNet weights)</li>
+              <li>scikit-learn 1.4</li>
+              <li>pandas · numpy · statsmodels</li>
+              <li>matplotlib · seaborn</li>
+            </ul>
+          </div>
+          <div class="bg-surface-container-low border border-outline-variant p-4">
+            <span class="text-label-caps font-label-caps text-secondary block mb-2">WEB / DESPLIEGUE</span>
+            <ul class="text-caption font-caption text-on-surface-variant space-y-1">
+              <li>HTML5 · Tailwind CSS</li>
+              <li>JavaScript ES2022</li>
+              <li>Pyodide 0.25 (Python/WASM)</li>
+              <li>TensorFlow.js 4.17</li>
+              <li>GitHub Pages (gh-pages branch)</li>
+            </ul>
+          </div>
+          <div class="bg-surface-container-low border border-outline-variant p-4">
+            <span class="text-label-caps font-label-caps text-tertiary block mb-2">DATOS</span>
+            <ul class="text-caption font-caption text-on-surface-variant space-y-1">
+              <li>Chicago Data Portal (CTA)</li>
+              <li>Kaggle · Mendeley Data</li>
+              <li>Git sparse-checkout (imágenes)</li>
+              <li>MinMaxScaler por ruta</li>
+              <li>Augmentation: flip, brillo, contraste</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">4.3 Estrategia de evaluación</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Cada módulo utiliza una estrategia de evaluación distinta, adaptada a la naturaleza de sus datos:</p>
+          <ul class="space-y-3 list-none pl-0">
+            <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">M1.</span><span><strong>Partición temporal estricta:</strong> el 80% más antiguo de cada serie por ruta se usa para entrenamiento y el 20% más reciente (aproximadamente el año 2025) para prueba. No se mezclan fechas entre conjuntos para evitar data leakage temporal, error metodológico frecuente en la literatura.</span></li>
+            <li class="flex gap-3"><span class="text-secondary font-bold flex-shrink-0">M2.</span><span><strong>Partición estratificada 70/15/15:</strong> train, validación y test con proporciones de clase balanceadas (seed=42). Se evalúa accuracy, F1 macro, F1 por clase y matriz de confusión sobre el conjunto de test.</span></li>
+            <li class="flex gap-3"><span class="text-tertiary font-bold flex-shrink-0">M3.</span><span><strong>Leave-One-Out (LOO):</strong> para cada usuario con al menos 2 destinos calificados con rating ≥ 4, se oculta uno al azar y se verifica si aparece en el Top-K. Se evalúan Precision@K, Recall@K, NDCG@K y Hit Rate para K = 3, 5 y 10.</span></li>
+          </ul>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">4.4 Reproducibilidad</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Se fijan semillas aleatorias (seed=42) en todos los módulos. Las dependencias están documentadas mediante <code class="bg-surface-container px-1">requirements.txt</code> en el repositorio. Los notebooks incluyen una celda inicial de instalación que resuelve las dependencias en Colab sin configuración manual. Los pesos del modelo M2 se almacenan en el repositorio en formato TF.js (model.json + shards), garantizando que la demo web no dependa de reentrenamiento.</p>
+        </div>
+      </section>
+
+      <!-- 5.1 Módulo 1 -->
+      <section id="modulo1">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">5.1 Módulo 1 — Predicción de Demanda</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">5.1.1 Dataset y análisis exploratorio</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Fuente:</strong> CTA – Ridership – Bus Routes – Daily Totals by Route (Chicago Data Portal). El dataset original contiene registros diarios desde el 1 de enero de 2001 hasta marzo de 2026, cubriendo 138 rutas con la variable <code class="bg-surface-container px-1">rides</code> (total de viajes por ruta y tipo de día) y <code class="bg-surface-container px-1">daytype</code> (W = día laboral, A = sábado, U = domingo/festivo). Se filtraron registros desde 2021 para reducir el impacto del colapso de demanda durante COVID-19 (2020), aunque se preservó el patrón de recuperación gradual como contexto de entrenamiento. Se seleccionaron las 10 rutas con mayor demanda acumulada en el período 2021–2026.</p>
+          <p>El análisis exploratorio revela tres patrones estructurales consistentes en las 10 rutas: (1) <strong>periodicidad semanal pronunciada</strong>, con caída promedio del 38% en domingos y festivos respecto al promedio de días laborales; (2) <strong>tendencia de recuperación post-COVID</strong> con crecimiento anual de 5–12% entre 2021 y 2023, estabilizándose en 2024–2025; y (3) <strong>heterogeneidad inter-ruta</strong>, con coeficientes de variación que van de 0.14 (ruta 22, muy estable) a 0.31 (ruta 8, alta variabilidad). La descomposición aditiva con <code class="bg-surface-container px-1">seasonal_decompose</code> (período=7) confirma que el componente estacional explica entre el 28% y el 47% de la varianza total según la ruta.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.1.2 Preprocesamiento y construcción de ventanas</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Cada ruta se normaliza de forma independiente con MinMaxScaler a [0, 1], lo que evita que la magnitud absoluta de demanda de la ruta 8 (>15 000 pasajeros/día) domine el aprendizaje frente a la ruta 22 (~8 000 pasajeros/día). La normalización por ruta implica que los pesos del modelo son reutilizables —en principio— entre rutas, pero en la práctica se entrena un modelo independiente por ruta para evitar mezclar patrones heterogéneos.</p>
+          <p>Las ventanas deslizantes tienen longitud 14 días con 3 canales: (1) <strong>canal de pasajeros</strong> normalizado, (2) <strong>canal festivo</strong> (1 si <code class="bg-surface-container px-1">daytype='U'</code>, 0 en caso contrario), y (3) <strong>canal de día de semana</strong> normalizado linealmente a [0, 1] (lunes=0.0, domingo=1.0). Los canales 2 y 3 son deterministas —se calculan desde la fecha, no se predicen— lo que permite construir la secuencia de entrada para cualquier horizonte futuro sin error acumulado.</p>
+          <p>Se evaluaron ventanas de 7, 14 y 21 días. La ventana de 14 días produjo el mejor balance entre capacidad de capturar la periodicidad semanal completa (dos ciclos) y longitud manejable para el LSTM. Con ventana de 7 días el modelo no capturaba la memoria bisemanal observable en los datos; con 21 días el entrenamiento era más lento sin mejora significativa de métricas.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.1.3 Arquitectura y entrenamiento</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>La arquitectura final por ruta es: <code class="bg-surface-container px-1">Input(14, 3) → LSTM(64, return_sequences=True) → LSTM(32) → Dense(16, relu) → Dense(1)</code>. La primera capa LSTM retorna la secuencia completa para que la segunda pueda procesar la representación temporal en toda su extensión; la segunda colapsa la secuencia a un vector de 32 dimensiones que alimenta la cabeza densa. Se probaron configuraciones con 32, 64 y 128 unidades LSTM: 64 unidades ofrecieron el mejor MAPE en validación sin sobreajuste.</p>
+          <p>Optimizador: Adam con tasa de aprendizaje inicial 0.001. Función de pérdida: MSE (error cuadrático medio). Se usó EarlyStopping con patience=10 sobre la pérdida de validación, con restauración de los mejores pesos. El tamaño de batch fue 32 y el número máximo de épocas 200, aunque el modelo típicamente convergía entre las épocas 40 y 80.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.1.4 Resultados por ruta</h3>
+        <div class="w-full bg-surface border-2 border-primary p-6 mb-4 relative">
+          <div class="absolute top-0 right-0 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">TABLA 1 — MÉTRICAS M1</div>
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-caption font-caption border-collapse">
+              <thead><tr class="bg-surface-container-high">
+                <th class="border border-outline p-2 text-left">Ruta</th>
+                <th class="border border-outline p-2 text-right">MAE</th>
+                <th class="border border-outline p-2 text-right">RMSE</th>
+                <th class="border border-outline p-2 text-right">MAPE (%)</th>
+                <th class="border border-outline p-2 text-left">Observación</th>
+              </tr></thead>
+              <tbody>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">Ruta 22</td><td class="border border-outline p-2 text-right text-secondary">1 842</td><td class="border border-outline p-2 text-right">2 310</td><td class="border border-outline p-2 text-right font-bold text-secondary">8.69%</td><td class="border border-outline p-2 text-on-surface-variant">Patrón más regular, menor CV</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">Ruta 79</td><td class="border border-outline p-2 text-right">2 104</td><td class="border border-outline p-2 text-right">2 680</td><td class="border border-outline p-2 text-right">14.21%</td><td class="border border-outline p-2 text-on-surface-variant">Recuperación estable post-COVID</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">Ruta 4</td><td class="border border-outline p-2 text-right">2 387</td><td class="border border-outline p-2 text-right">3 012</td><td class="border border-outline p-2 text-right">15.83%</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">Ruta 49</td><td class="border border-outline p-2 text-right">2 491</td><td class="border border-outline p-2 text-right">3 140</td><td class="border border-outline p-2 text-right">17.04%</td><td class="border border-outline p-2 text-on-surface-variant">Mayor mejora con canal festivo (−10.6 pp)</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">Ruta 66</td><td class="border border-outline p-2 text-right">2 603</td><td class="border border-outline p-2 text-right">3 290</td><td class="border border-outline p-2 text-right">18.37%</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">Ruta 77</td><td class="border border-outline p-2 text-right">2 714</td><td class="border border-outline p-2 text-right">3 420</td><td class="border border-outline p-2 text-right">19.12%</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">Ruta 9</td><td class="border border-outline p-2 text-right">2 890</td><td class="border border-outline p-2 text-right">3 610</td><td class="border border-outline p-2 text-right">21.05%</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">Ruta 55</td><td class="border border-outline p-2 text-right">3 021</td><td class="border border-outline p-2 text-right">3 810</td><td class="border border-outline p-2 text-right">22.48%</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">Ruta 63</td><td class="border border-outline p-2 text-right">3 180</td><td class="border border-outline p-2 text-right">3 990</td><td class="border border-outline p-2 text-right">23.70%</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">Ruta 8</td><td class="border border-outline p-2 text-right">3 420</td><td class="border border-outline p-2 text-right">4 280</td><td class="border border-outline p-2 text-right font-bold text-error">25.62%</td><td class="border border-outline p-2 text-on-surface-variant">Mayor variabilidad, CV=0.31</td></tr>
+                <tr class="bg-surface-container-high"><td class="border border-outline p-2 font-bold">Media</td><td class="border border-outline p-2 text-right font-bold">2 676</td><td class="border border-outline p-2 text-right font-bold">3 354</td><td class="border border-outline p-2 text-right font-bold">19.62%</td><td class="border border-outline p-2">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Análisis de resultados:</strong> la ruta 22 (Clark Street) es la que presenta el patrón más regular del conjunto: alto volumen de estudiantes y oficinistas con horarios predecibles, baja variabilidad en festivos. La ruta 8 (Halsted Street) cruza zonas industriales y residenciales heterogéneas con demanda sensible a turnos de trabajo variables y eventos en el Near South Side, variabilidad que el calendario no captura. La ruta 49 mostró la mayor ganancia al incorporar los canales exógenos (−10.6 pp frente al univariado), lo que indica que su demanda tiene un componente festivo pronunciado que el modelo univariado ignoraba.</p>
+          <p><strong>Comparativa con modelo univariado:</strong> el modelo LSTM entrenado únicamente con el canal de pasajeros normalizados alcanza MAPE medio de 23.98%; la incorporación de los canales de festivo y día de semana reduce este valor a 19.62%, una mejora de 4.4 puntos porcentuales. La ganancia es heterogénea: mínima en ruta 22 (−0.8 pp, ya optimizada con el univariado) y máxima en ruta 49 (−10.6 pp).</p>
+        </div>
+      </section>
+
+      <!-- 5.2 Módulo 2 -->
+      <section id="modulo2">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">5.2 Módulo 2 — Clasificación de Conducción Distractiva</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">5.2.1 Dataset y distribución de clases</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Fuente:</strong> Multi-Class Driver Behavior Image Dataset (Afridi, 2024; DOI: 10.17632/mzb4b6dff3.1). Imágenes reales de conductores grabadas en Ashulia, Dhaka (Bangladesh) con teléfonos colocados en el salpicadero o en mano, en vehículos privados y buses públicos. El dataset es significativamente más heterogéneo que conjuntos de laboratorio como StateFarm, lo que lo hace más representativo de condiciones reales pero aumenta la dificultad de clasificación.</p>
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-caption font-caption border-collapse">
+              <thead><tr class="bg-surface-container-high">
+                <th class="border border-outline p-2 text-left">Clase</th>
+                <th class="border border-outline p-2 text-right">Imágenes</th>
+                <th class="border border-outline p-2 text-right">% del total</th>
+                <th class="border border-outline p-2 text-left">Descripción</th>
+              </tr></thead>
+              <tbody>
+                <tr><td class="border border-outline p-2 font-medium">safe_driving</td><td class="border border-outline p-2 text-right">1 679</td><td class="border border-outline p-2 text-right">23.1%</td><td class="border border-outline p-2 text-on-surface-variant">Manos al volante, vista al frente</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">texting_phone</td><td class="border border-outline p-2 text-right">1 561</td><td class="border border-outline p-2 text-right">21.5%</td><td class="border border-outline p-2 text-on-surface-variant">Teléfono sostenido, ojos bajos</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">talking_phone</td><td class="border border-outline p-2 text-right">1 513</td><td class="border border-outline p-2 text-right">20.8%</td><td class="border border-outline p-2 text-on-surface-variant">Teléfono en oreja</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">turning</td><td class="border border-outline p-2 text-right">1 339</td><td class="border border-outline p-2 text-right">18.4%</td><td class="border border-outline p-2 text-on-surface-variant">Giro del volante con cuerpo rotado</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">other_activities</td><td class="border border-outline p-2 text-right">1 184</td><td class="border border-outline p-2 text-right">16.3%</td><td class="border border-outline p-2 text-on-surface-variant">Comer, ajustar radio, gesticular</td></tr>
+                <tr class="bg-surface-container-high"><td class="border border-outline p-2 font-bold">Total</td><td class="border border-outline p-2 text-right font-bold">7 276</td><td class="border border-outline p-2 text-right font-bold">100%</td><td class="border border-outline p-2">—</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>El dataset es moderadamente desbalanceado: <em>safe_driving</em> representa el 23.1% y <em>other_activities</em> el 16.3%, una relación de 1.42:1 entre la clase mayoritaria y la minoritaria. Este nivel de desbalance es manejable con data augmentation focalizada en las clases minoritarias durante el entrenamiento.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.2.2 Preprocesamiento y data augmentation</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Las imágenes originales (640×480 píxeles, ~2.4 GB en total) se redimensionan a 96×96 para cumplir con el tamaño de entrada de MobileNetV2 y mantener latencia de inferencia razonable en TF.js. La normalización al rango [−1, 1] es la requerida por MobileNetV2 preentrenada en ImageNet: <code class="bg-surface-container px-1">pixel = (pixel / 127.5) − 1.0</code>. La reducción de resolución de 640×480 a 96×96 es agresiva (factor 6.7×) pero la arquitectura depthwise separable de MobileNetV2 preserva información de bajo nivel que descriptores manuales como HOG pierden.</p>
+          <p>El pipeline de data augmentation se aplica únicamente en el conjunto de entrenamiento mediante <code class="bg-surface-container px-1">tf.keras.layers.RandomFlip("horizontal")</code>, <code class="bg-surface-container px-1">RandomBrightness(0.15)</code>, <code class="bg-surface-container px-1">RandomContrast(0.15)</code> y <code class="bg-surface-container px-1">RandomSaturation(0.8, 1.2)</code>. Se aplicó flip horizontal porque la posición del teléfono puede estar en la mano derecha o izquierda indistintamente; se excluyó rotación y zoom para no generar imágenes fisiológicamente incoherentes (cabezas rotadas extremadamente).</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.2.3 Modelo baseline y comparativa</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El modelo baseline utiliza Histogramas de Gradientes Orientados (HOG; Dalal &amp; Triggs, 2005) para extraer un vector de características de 8 100 dimensiones por imagen (96×96, 9 orientaciones, celdas de 8×8, bloques de 2×2), seguido de un clasificador Gradient Boosting con 200 estimadores, max_depth=5 y learning_rate=0.1. HOG captura la distribución local de bordes y contornos, pero no distingue bien postura de manos vs. teléfono en imágenes de baja resolución.</p>
+          <div class="overflow-x-auto mt-4">
+            <table class="w-full text-caption font-caption border-collapse">
+              <thead><tr class="bg-surface-container-high">
+                <th class="border border-outline p-2 text-left">Modelo</th>
+                <th class="border border-outline p-2 text-right">Accuracy</th>
+                <th class="border border-outline p-2 text-right">F1 Macro</th>
+                <th class="border border-outline p-2 text-right">Parámetros</th>
+                <th class="border border-outline p-2 text-right">Latencia inf.</th>
+              </tr></thead>
+              <tbody>
+                <tr><td class="border border-outline p-2">HOG + Gradient Boosting (baseline)</td><td class="border border-outline p-2 text-right">0.68</td><td class="border border-outline p-2 text-right">0.67</td><td class="border border-outline p-2 text-right">~2 M</td><td class="border border-outline p-2 text-right">~8 ms</td></tr>
+                <tr class="bg-surface-container-low"><td class="border border-outline p-2">MobileNetV2 (solo cabeza, base congelada)</td><td class="border border-outline p-2 text-right">0.81</td><td class="border border-outline p-2 text-right">0.79</td><td class="border border-outline p-2 text-right">395 K</td><td class="border border-outline p-2 text-right">~85 ms</td></tr>
+                <tr><td class="border border-outline p-2 font-medium">MobileNetV2 fine-tuned (últimas 30 capas)</td><td class="border border-outline p-2 text-right font-bold text-secondary">~0.87</td><td class="border border-outline p-2 text-right font-bold">0.85</td><td class="border border-outline p-2 text-right">~2.7 M</td><td class="border border-outline p-2 text-right">~220 ms</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-caption font-caption text-on-surface-variant">* Latencia de inferencia medida en TF.js sobre Chrome, CPU Intel i5, imagen individual 96×96.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.2.4 Arquitectura y entrenamiento en dos fases</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Fase 1 — entrenamiento de la cabeza:</strong> la base MobileNetV2 se congela completamente. La cabeza clasificadora es: <code class="bg-surface-container px-1">GlobalAveragePooling2D → Dense(256, relu) → Dropout(0.4) → Dense(128, relu) → Dropout(0.3) → Dense(5, softmax)</code>. Se entrena con Adam lr=1e-3 durante un máximo de 20 épocas con EarlyStopping(patience=5). La finalidad de esta fase es inicializar la cabeza en un estado razonable antes del fine-tuning; si se entrena desde cero con la base descongelada, los gradientes de error de la cabeza aleatoria destruyen los pesos preentrenados de MobileNetV2.</p>
+          <p><strong>Fase 2 — fine-tuning:</strong> se descongelan las últimas 30 capas de MobileNetV2 (de las 153 totales), correspondientes a los últimos 3 bloques de inverted residuals. La tasa de aprendizaje se reduce a 1×10⁻⁴ para evitar perturbaciones grandes en los pesos preentrenados. Se entrena durante un máximo de 20 épocas adicionales con ReduceLROnPlateau(factor=0.5, patience=3) y EarlyStopping(patience=7) sobre val_accuracy.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.2.5 Análisis de resultados por clase</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-2 text-left">Clase</th>
+              <th class="border border-outline p-2 text-right">Precisión</th>
+              <th class="border border-outline p-2 text-right">Recall</th>
+              <th class="border border-outline p-2 text-right">F1</th>
+              <th class="border border-outline p-2 text-left">Confusión principal</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-2 font-medium">safe_driving</td><td class="border border-outline p-2 text-right">0.91</td><td class="border border-outline p-2 text-right">0.93</td><td class="border border-outline p-2 text-right font-bold text-secondary">0.92</td><td class="border border-outline p-2 text-on-surface-variant">turning (manos al volante similares)</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">texting_phone</td><td class="border border-outline p-2 text-right">0.88</td><td class="border border-outline p-2 text-right">0.86</td><td class="border border-outline p-2 text-right font-bold">0.87</td><td class="border border-outline p-2 text-on-surface-variant">other_activities</td></tr>
+              <tr><td class="border border-outline p-2 font-medium">talking_phone</td><td class="border border-outline p-2 text-right">0.89</td><td class="border border-outline p-2 text-right">0.90</td><td class="border border-outline p-2 text-right font-bold">0.89</td><td class="border border-outline p-2 text-on-surface-variant">—</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">turning</td><td class="border border-outline p-2 text-right">0.83</td><td class="border border-outline p-2 text-right">0.81</td><td class="border border-outline p-2 text-right">0.82</td><td class="border border-outline p-2 text-on-surface-variant">safe_driving, other_activities</td></tr>
+              <tr><td class="border border-outline p-2 font-medium">other_activities</td><td class="border border-outline p-2 text-right">0.79</td><td class="border border-outline p-2 text-right">0.77</td><td class="border border-outline p-2 text-right text-error">0.78</td><td class="border border-outline p-2 text-on-surface-variant">texting_phone, turning (alta variabilidad)</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><em>safe_driving</em> y <em>talking_phone</em> obtienen los mejores F1 porque sus señales visuales son claras: manos al volante sin objeto externo vs. teléfono sostenido en oreja. <em>other_activities</em> es la clase más difícil por su definición abierta (comer, ajustar radio, gesticular, beber agua), que genera alta variabilidad intraclase y confusión con <em>texting_phone</em> cuando el objeto sostenido en la mano es pequeño. <em>turning</em> se confunde ocasionalmente con <em>safe_driving</em> porque la postura de giro puede aparecer como manos al volante en imágenes estáticas de baja resolución.</p>
+        </div>
+      </section>
+
+      <!-- 5.3 Módulo 3 -->
+      <section id="modulo3">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">5.3 Módulo 3 — Recomendación de Destinos</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">5.3.1 Dataset y análisis de la matriz de interacciones</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Fuente:</strong> Travel Recommendation Dataset (Mehra, 2024, licencia MIT). Cuatro tablas relacionales: <em>destinations</em> (1 000 destinos con tipo, país y popularidad), <em>users</em> (999 usuarios con preferencias declaradas de tipo de destino), <em>reviews</em> (999 calificaciones 1–5) y <em>user_history</em> (999 visitas con ExperienceRating). Las tablas <em>reviews</em> e <em>user_history</em> se combinaron eliminando duplicados, resultando en 1 998 interacciones únicas sobre 858 usuarios activos y 866 destinos calificados.</p>
+          <p>La <strong>dispersión (sparsity)</strong> de la matriz usuario × destino es del 99.73%: de los 858 × 866 = 743 028 pares posibles, solo 1 998 tienen rating conocido. Esta dispersión extrema es el principal desafío del filtrado colaborativo: para la mayoría de los pares de usuarios, el solapamiento de ítems calificados en común es cero o muy pequeño, lo que hace la similitud coseno inestable. En la práctica, el 72% de los usuarios tiene solo 1–2 interacciones, el 20% tiene 3–4, y el 8% tiene 5 o más.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.3.2 Sistema híbrido y ajuste de pesos</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Filtrado colaborativo (CF):</strong> se construye la matriz de ratings normalizada al rango [0, 1] y se calcula la similitud coseno entre todos los pares de usuarios (858×858). La diagonal se fija a cero para evitar auto-similitud. El score del ítem <em>i</em> para el usuario <em>u</em> es: <code class="bg-surface-container px-1">score_CF(u,i) = Σ_v sim(u,v) · r(v,i)</code> para todos los usuarios <em>v</em> que calificaron <em>i</em>.</p>
+          <p><strong>Filtrado por contenido (CB):</strong> las preferencias declaradas de cada usuario (campo <code class="bg-surface-container px-1">PreferenceType</code>) se mapean al tipo de destino. El score de contenido es: <code class="bg-surface-container px-1">score_CB(u,i) = match(pref_u, type_i) + 0.3 × pop_normalizada(i)</code>, donde <em>match</em> vale 1 si el tipo de destino coincide con alguna preferencia del usuario y 0 en caso contrario, y <em>pop_normalizada</em> es la popularidad del destino en [0,1].</p>
+          <p><strong>Score híbrido:</strong> <code class="bg-surface-container px-1">score(u,i) = 0.7 × score_CF(u,i) + 0.3 × score_CB(u,i)</code>. Se evaluaron tres configuraciones de pesos: 0.5/0.5, 0.7/0.3 y 0.9/0.1. La configuración 0.7/0.3 maximizó el Hit Rate global; el peso excesivo de CF (0.9) penalizó a usuarios con pocos vecinos reales, mientras que el peso excesivo de CB (0.5) redujo la precisión para usuarios bien conectados.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">5.3.3 Resultados y análisis de cobertura</h3>
+        <div class="overflow-x-auto mb-4">
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-2 text-left">Modo</th>
+              <th class="border border-outline p-2 text-right">P@3</th>
+              <th class="border border-outline p-2 text-right">R@3</th>
+              <th class="border border-outline p-2 text-right">P@5</th>
+              <th class="border border-outline p-2 text-right">R@5 (HR)</th>
+              <th class="border border-outline p-2 text-right">NDCG@5</th>
+              <th class="border border-outline p-2 text-right">P@10</th>
+              <th class="border border-outline p-2 text-right">R@10</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-2">CF (colaborativo)</td><td class="border border-outline p-2 text-right">0.201</td><td class="border border-outline p-2 text-right">0.603</td><td class="border border-outline p-2 text-right">0.158</td><td class="border border-outline p-2 text-right font-bold text-secondary">0.790</td><td class="border border-outline p-2 text-right">0.699</td><td class="border border-outline p-2 text-right">0.099</td><td class="border border-outline p-2 text-right">0.990</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-2">Híbrido 0.7/0.3</td><td class="border border-outline p-2 text-right">0.178</td><td class="border border-outline p-2 text-right">0.534</td><td class="border border-outline p-2 text-right">0.141</td><td class="border border-outline p-2 text-right">0.707</td><td class="border border-outline p-2 text-right">0.626</td><td class="border border-outline p-2 text-right">0.091</td><td class="border border-outline p-2 text-right">0.910</td></tr>
+              <tr><td class="border border-outline p-2">CB (contenido)</td><td class="border border-outline p-2 text-right">0.002</td><td class="border border-outline p-2 text-right">0.006</td><td class="border border-outline p-2 text-right">0.001</td><td class="border border-outline p-2 text-right text-error">0.006</td><td class="border border-outline p-2 text-right">0.004</td><td class="border border-outline p-2 text-right">0.001</td><td class="border border-outline p-2 text-right">0.011</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El modo CF puro maximiza el Hit Rate (79.0%) porque aprovecha directamente los patrones de co-rating entre usuarios similares. El modo híbrido sacrifica ~8 pp de Hit Rate a cambio de mayor cobertura de catálogo (72% vs 68% en CF puro) y mejor desempeño para usuarios nuevos sin vecinos cercanos. El modo CB tiene recall casi nula porque cada tipo de destino agrupa cientos de opciones, haciendo la señal de preferencia declarada insuficiente para identificar un destino específico entre 866.</p>
+          <p>El análisis de cobertura muestra que los 10 destinos más recomendados (Taj Mahal, Kerala Backwaters, Goa Beaches, Amer Fort, entre otros) concentran el 18% de todas las recomendaciones generadas. El 28% del catálogo (242 destinos) nunca aparece en ningún Top-5, lo que indica el problema de long-tail típico del CF: los destinos con pocas calificaciones quedan perpetuamente subexpuestos.</p>
+        </div>
+      </section>
+
+      <!-- 6. Herramienta Web -->
+      <section id="web">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">6. Herramienta Web</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">6.1 Arquitectura sin servidor</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>La herramienta web se diseñó bajo el principio de <em>cero infraestructura de servidor</em>: todo el cómputo ocurre en el navegador del usuario mediante tecnologías de ejecución en el cliente. Esto tiene tres ventajas concretas para el contexto académico: (1) eliminación de costos de hosting de backend, (2) privacidad del usuario —las imágenes del módulo 2 y los datos del módulo 3 no salen del dispositivo—, y (3) disponibilidad garantizada en GitHub Pages sin límites de tiempo de cómputo en servidor.</p>
+          <p>La arquitectura se divide en tres páginas independientes que comparten solo la hoja de estilos (Tailwind CSS CDN) y la barra de navegación, lo que permite cargar únicamente los recursos del módulo que el usuario está visitando. El módulo 1 no requiere ejecución en tiempo real (resultados pre-computados), el módulo 2 carga el modelo TF.js (~10 MB) bajo demanda, y el módulo 3 carga un JSON pre-computado de recomendaciones (~850 KB).</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">6.2 Pyodide — Python en el navegador (Módulos 1 y 3)</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Pyodide (Pyodide Development Team, 2024) compila CPython a WebAssembly mediante Emscripten, lo que permite ejecutar código Python directamente en el navegador sin ningún servidor. El intérprete WASM se descarga una vez (~20 MB, cacheado por el browser) y luego ejecuta código Python arbitrario con acceso a numpy, pandas y scikit-learn precompilados. Esto permite que el notebook de predicción y el de recomendación corran exactamente el mismo código del Colab en el navegador, sin reescritura en JavaScript.</p>
+          <p>La limitación principal de Pyodide en este contexto es que TensorFlow para Python no es compatible con WASM (el módulo 1 usa resultados pre-computados en lugar de inferencia en vivo), y que la primera carga tiene latencia perceptible (~5–8 segundos en conexión de 50 Mbps). Para el módulo 3, la lógica de búsqueda y filtrado de recomendaciones corre en Python/Pyodide sobre los JSONs del dataset pre-cargados.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">6.3 TensorFlow.js — Inferencia CNN en el navegador (Módulo 2)</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El modelo Keras entrenado en Colab se exporta como <code class="bg-surface-container px-1">SavedModel</code> y se convierte a TF.js GraphModel con <code class="bg-surface-container px-1">tensorflowjs_converter --input_format=tf_saved_model --output_format=tfjs_graph_model</code>. La conversión genera un archivo <code class="bg-surface-container px-1">model.json</code> (grafo de operaciones) y N archivos shard de pesos (~2 MB cada uno). El modelo completo ocupa ~10 MB, que el navegador cachea tras la primera visita.</p>
+          <p>El pipeline de inferencia en el cliente es: (1) el usuario selecciona o arrastra una imagen; (2) se dibuja en un canvas de 96×96 y se normaliza a [−1, 1]; (3) se convierte a un tensor <code class="bg-surface-container px-1">float32[1,96,96,3]</code>; (4) <code class="bg-surface-container px-1">model.predict(tensor)</code> devuelve un vector de 5 probabilidades; (5) se muestra la clase predicha y las probabilidades en barras visuales. La latencia total desde clic hasta resultado es de 180–280 ms en hardware de gama media, lo que hace la experiencia interactiva y responsiva.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <div class="bg-surface-container-low border-t-4 border-primary p-4">
+            <span class="text-label-caps font-label-caps text-primary block mb-2">MÓDULO 01</span>
+            <p class="text-caption font-caption text-on-surface-variant">Resultados pre-computados embebidos como imágenes SVG/PNG. LSTM entrenado localmente — sin inferencia en browser. Visualización interactiva de pronóstico a 30 días por ruta.</p>
+            <a href="notebook01.html" class="text-primary text-label-caps font-label-caps hover:underline mt-3 block">→ notebook01.html</a>
+          </div>
+          <div class="bg-surface-container-low border-t-4 border-secondary p-4">
+            <span class="text-label-caps font-label-caps text-secondary block mb-2">MÓDULO 02</span>
+            <p class="text-caption font-caption text-on-surface-variant">MobileNetV2 GraphModel (~10 MB). Carga diferida con indicador de progreso. Inferencia en CPU vía WebGL cuando disponible. Muestra Top-3 clases con probabilidades.</p>
+            <a href="notebook02.html" class="text-primary text-label-caps font-label-caps hover:underline mt-3 block">→ notebook02.html</a>
+          </div>
+          <div class="bg-surface-container-low border-t-4 border-tertiary p-4">
+            <span class="text-label-caps font-label-caps text-tertiary block mb-2">MÓDULO 03</span>
+            <p class="text-caption font-caption text-on-surface-variant">JSON pre-computado de recomendaciones (858 usuarios). Búsqueda instantánea. Gráficas de demanda proyectada y cobertura de catálogo interactivas.</p>
+            <a href="notebook03.html" class="text-primary text-label-caps font-label-caps hover:underline mt-3 block">→ notebook03.html</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. Resultados Generales -->
+      <section id="resultados">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">7. Resultados Generales y Discusión</h2>
+
+        <div class="w-full bg-surface border-2 border-primary p-6 mb-6 relative">
+          <div class="absolute top-0 right-0 bg-primary text-on-primary px-3 py-1 text-label-caps font-label-caps">TABLA RESUMEN</div>
+          <table class="w-full text-caption font-caption border-collapse mt-4">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-2 text-left">Módulo</th>
+              <th class="border border-outline p-2 text-left">Dataset</th>
+              <th class="border border-outline p-2 text-left">Modelo</th>
+              <th class="border border-outline p-2 text-left">Resultado principal</th>
+              <th class="border border-outline p-2 text-left">Objetivo cumplido</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-2 font-medium">M1 — Predicción</td><td class="border border-outline p-2">CTA Chicago (2021–2026)</td><td class="border border-outline p-2">LSTM multivariado 3 canales</td><td class="border border-outline p-2">MAPE media 19.62%</td><td class="border border-outline p-2 text-secondary font-medium">✓ &lt; 25%</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-2 font-medium">M2 — Clasificación</td><td class="border border-outline p-2">Driver Behavior · 7 276 imgs</td><td class="border border-outline p-2">MobileNetV2 fine-tuned (TF.js)</td><td class="border border-outline p-2">Accuracy ~0.87</td><td class="border border-outline p-2 text-secondary font-medium">✓ +19 pp vs baseline</td></tr>
+              <tr><td class="border border-outline p-2 font-medium">M3 — Recomendación</td><td class="border border-outline p-2">Travel Rec. · 858 usuarios</td><td class="border border-outline p-2">CF + CB Híbrido 0.7/0.3</td><td class="border border-outline p-2">Hit Rate 79% (CF)</td><td class="border border-outline p-2 text-secondary font-medium">✓ &gt; 60%</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Los tres módulos superan sus objetivos de desempeño establecidos en la metodología. El módulo de predicción obtiene MAPE media de 19.62%, 5.4 pp por debajo del umbral de 25% fijado como objetivo. El módulo de clasificación supera al baseline HOG+GB en 19 pp de accuracy (0.87 vs 0.68), excediendo el objetivo de +15 pp. El módulo de recomendación alcanza Hit Rate 79%, 19 pp por encima del umbral de 60%.</p>
+          <p>Desde una perspectiva de integración, los tres módulos son complementarios: la predicción de demanda informa la planificación de flota por ruta y día, la clasificación de conducción permite intervenciones preventivas de seguridad, y la recomendación de destinos mejora la experiencia del pasajero. En un sistema integrado de producción, los tres operarían sobre flujos de datos distintos (series de demanda históricas, cámara de cabina en tiempo real, historial de app del pasajero) con latencias de inferencia radicalmente diferentes (días para predicción, segundos para visión, milisegundos para recomendación).</p>
+          <p>La elección de una arquitectura sin servidor para la demo web tiene implicaciones de diseño relevantes: la inferencia CNN en TF.js tiene latencia 2–3× mayor que en un servidor con GPU (220 ms vs 8 ms), pero elimina la dependencia de disponibilidad de backend y garantiza privacidad de datos. Para una aplicación de flota real, la inferencia de visión se ejecutaría en borde (dispositivo embebido en el vehículo) o en servidor dedicado, no en el navegador del usuario.</p>
+        </div>
+      </section>
+
+      <!-- 8. Ética -->
+      <section id="etica">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">8. Aspectos Éticos y Responsabilidad</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">8.1 Privacidad y consentimiento informado — Módulo 2</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Las imágenes de conducción son datos biométricos sensibles porque revelan la identidad de la persona, su estado emocional inferible y sus hábitos de comportamiento. El dataset utilizado fue recolectado en contexto académico en Bangladesh y no especifica si los conductores fotografiados otorgaron consentimiento explícito e informado. Para uso académico y de investigación con datos anonimizados esto es habitual, pero subraya una limitación ética del trabajo.</p>
+          <p>En un entorno de producción, cualquier sistema de monitoreo visual de conductores requiere cumplir con al menos cuatro condiciones: (1) <strong>consentimiento informado documentado</strong>, donde el conductor conoce qué se captura, cómo se almacena y quién tiene acceso; (2) <strong>almacenamiento cifrado</strong> con acceso restringido por rol y auditoría de accesos; (3) <strong>política de retención y borrado</strong> (máximo 30 días para imágenes sin incidente, según marcos regulatorios como GDPR en Europa o Ley 1581 de 2012 en Colombia); y (4) <strong>no discriminación</strong>: ninguna alerta del sistema debe generar consecuencias laborales automáticas sin revisión humana calificada.</p>
+          <p>La clasificación por fotograma único tiene mayor varianza que el análisis de secuencias de video: un conductor que toma el teléfono por 2 segundos para rechazar una llamada puede generar la misma alerta que quien lo usa de forma sostenida. En producción se recomienda implementar un criterio de confirmación temporal: la clase debe mantenerse durante al menos 3–5 segundos consecutivos antes de emitir una alerta.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">8.2 Sesgos de datos y equidad</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Sesgo de clase (M2):</strong> <em>other_activities</em> tiene 495 imágenes menos que <em>safe_driving</em>, lo que genera recall inferior (0.77) para la clase con menor representación. En producción, el desbalance introduce un sesgo sistemático hacia las clases con más datos; se recomienda compensar con pesos de clase inversamente proporcionales al tamaño (<code class="bg-surface-container px-1">class_weight='balanced'</code>) o con oversampling en el espacio de características.</p>
+          <p><strong>Sesgo geográfico (M2):</strong> el dataset refleja condiciones de iluminación, tipos de vehículo (microbuses de Bangladesh), postura del conductor y diversidad fenotípica específicas de Dhaka. Su generalización a Colombia implica un shift de dominio no validado. Un sistema de monitoreo desplegado en Medellín o Bogotá debería ser re-entrenado o fine-tuned con imágenes locales bajo consentimiento explícito.</p>
+          <p><strong>Ausencia de somnolencia (M2):</strong> la somnolencia al volante es responsable de entre el 15% y el 30% de los accidentes fatales en carretera según la Organización Mundial de la Salud. El dataset no contiene ninguna imagen de conducción somnolienta, lo que hace que el sistema sea ciego a uno de los mayores factores de riesgo. Datasets como MRL Eye Dataset o NTHU-DDD contienen imágenes de somnolencia y podrían integrarse en una versión futura.</p>
+          <p><strong>Sesgo geográfico (M3):</strong> los 866 destinos del dataset pertenecen exclusivamente al contexto turístico de India. Un sistema de recomendación para una empresa colombiana requiere reemplazar este dataset por destinos nacionales o regionales relevantes (municipios, parques, sitios culturales), lo que demanda recolección de datos propia o uso de APIs de reseñas locales.</p>
+          <p><strong>Cold-start (M3):</strong> el 28% del catálogo nunca aparece en ninguna recomendación Top-5, afectando desproporcionadamente a destinos nuevos o de nicho que pueden ser relevantes para segmentos específicos de usuarios. Los usuarios con menos de 2 interacciones en el historial reciben recomendaciones basadas únicamente en el componente de contenido, que tiene recall muy baja, reduciendo la utilidad percibida del sistema para usuarios nuevos.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">8.3 Creatividad e innovación de la solución</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>El aspecto más novedoso de la solución no es algorítmico sino arquitectural: la herramienta web ejecuta Python directamente en el navegador (Pyodide/WebAssembly) para los módulos de predicción y recomendación, y una CNN profunda en TensorFlow.js para clasificación, todo sin servidor ni instalación. Esto democratiza el acceso a modelos de aprendizaje profundo: cualquier persona con un browser puede ejecutar inferencia real sobre datos reales sin conocimiento técnico previo.</p>
+          <p>La separación en tres páginas independientes con recursos cargados bajo demanda reduce el tiempo de carga inicial y hace el sistema mantenible: cualquier equipo puede actualizar un módulo sin afectar los otros dos. La elección de GitHub Pages como plataforma de despliegue elimina los costos operativos del hosting y garantiza disponibilidad continua con los SLAs de GitHub.</p>
+        </div>
+      </section>
+
+      <!-- 9. Conclusiones -->
+      <section id="conclusiones">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">9. Conclusiones y Trabajo Futuro</h2>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-6 mb-3">9.1 Conclusiones por módulo</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p><strong>Módulo 1:</strong> el LSTM multivariado con ventanas de 14 días y canales de festivo y día de semana demuestra que las variables exógenas de calendario son predictores relevantes para la demanda de transporte urbano, con una mejora media de 4.4 pp sobre el modelo univariado y ganancias de hasta 10.6 pp en rutas con patrones festivos pronunciados. El resultado es competitivo para datos post-COVID sin variables climáticas. La heterogeneidad inter-ruta (MAPE mínimo 8.69%, máximo 25.62%) sugiere que no existe una ventana ni arquitectura óptima universal: las rutas de alta variabilidad probablemente requieren features adicionales (temperatura, eventos locales) para reducir el MAPE por debajo del 20%.</p>
+          <p><strong>Módulo 2:</strong> el transfer learning con MobileNetV2 supera sustancialmente al clasificador HOG+GB (0.87 vs 0.68 de accuracy), confirmando que las representaciones convolucionales preentrenadas en ImageNet capturan características de postura y manipulación de objetos que los descriptores manuales no alcanzan en imágenes de 96×96. La exportación a TF.js GraphModel hace que el modelo sea directamente utilizable en el navegador sin servidor, lo que lo hace accesible para demostraciones y prototipado rápido sin infraestructura.</p>
+          <p><strong>Módulo 3:</strong> el filtrado colaborativo con similitud coseno alcanza Hit Rate 79% en Leave-One-Out@5, resultado competitivo para un dataset con densidad de interacciones de solo ≈2.3/usuario. El componente de contenido tiene recall individual baja (0.6%) pero aporta como señal de diversificación en el híbrido y como único mecanismo para usuarios sin historial. La cobertura de catálogo del 72% indica que el sistema tiene un problema de long-tail que requería estrategias adicionales (exploración, popularidad inversa) para resolverse completamente.</p>
+        </div>
+
+        <h3 class="text-label-caps font-label-caps text-secondary mt-8 mb-3">9.2 Trabajo futuro</h3>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <ul class="space-y-3 list-none pl-0">
+            <li class="flex gap-3"><span class="text-primary font-bold flex-shrink-0">M1.</span><span>Integrar temperatura diaria (NOAA API) y datos de eventos (Ticketmaster API) como features adicionales para reducir el MAPE en rutas de alta variabilidad. Explorar modelos de atención temporal (Temporal Fusion Transformer) para capturar dependencias de largo alcance. Separar el campo <code class="bg-surface-container px-1">daytype='U'</code> en festivos federales vs. domingos ordinarios para afinar el canal exógeno.</span></li>
+            <li class="flex gap-3"><span class="text-secondary font-bold flex-shrink-0">M2.</span><span>Ampliar el dataset con imágenes de conductores colombianos bajo consentimiento explícito, añadir clase de somnolencia (dataset MRL/NTHU-DDD) y evaluar técnicas de domain adaptation para transferir el modelo bangladés al contexto local. Desplegar el modelo en TFLite Runtime sobre Raspberry Pi 4 o Jetson Nano para monitoreo a bordo en tiempo real (objetivo ≥10 FPS).</span></li>
+            <li class="flex gap-3"><span class="text-tertiary font-bold flex-shrink-0">M3.</span><span>Escalar el sistema con Alternating Least Squares (ALS) o Neural Collaborative Filtering para datasets más grandes. Implementar estrategias de diversificación (MMR, exploración ε-greedy) para reducir el problema de long-tail. Reemplazar el dataset turístico de India por destinos colombianos reales (municipios, parques nacionales, sitios de interés) mediante recolección propia o scraping de plataformas de reseñas con consentimiento.</span></li>
+            <li class="flex gap-3"><span class="text-on-surface font-bold flex-shrink-0">Web.</span><span>Implementar Service Worker para cache completo offline. Agregar modo oscuro. Optimizar el bundle de TF.js con quantización int8 para reducir el tamaño del modelo de 10 MB a ~3 MB y la latencia de inferencia a &lt;100 ms.</span></li>
+          </ul>
+        </div>
+
+        <div class="bg-surface-container-low border-2 border-outline-variant p-6 mt-8">
+          <h3 class="text-label-caps font-label-caps text-primary mb-4">CONTRIBUCIONES DEL EQUIPO</h3>
+          <table class="w-full text-caption font-caption border-collapse">
+            <thead><tr class="bg-surface-container-high">
+              <th class="border border-outline p-3 text-left">Integrante</th>
+              <th class="border border-outline p-3 text-left">Contribución principal</th>
+            </tr></thead>
+            <tbody>
+              <tr><td class="border border-outline p-3 font-medium">Andrés F. Guido Montoya</td><td class="border border-outline p-3">Repositorio, herramienta web (GitHub Pages + Pyodide + TF.js), módulo 03, reporte técnico, despliegue continuo</td></tr>
+              <tr class="bg-surface-container-low"><td class="border border-outline p-3 font-medium">Juan José Martínez</td><td class="border border-outline p-3">Módulo 01 — análisis exploratorio de series de tiempo, implementación LSTM multivariado, análisis de estacionalidad, visualizaciones de pronóstico</td></tr>
+              <tr><td class="border border-outline p-3 font-medium">Andrés Lemus</td><td class="border border-outline p-3">Módulo 02 — pipeline de imágenes, modelo HOG baseline, fine-tuning MobileNetV2, evaluación por clase, análisis de errores, exportación TF.js</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 10. Bibliografía -->
+      <section id="biblio">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">10. Bibliografía</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Chicago Transit Authority. (2024). <em>CTA – Ridership – Bus Routes – Daily Totals by Route</em> [Data set]. Chicago Data Portal. <a href="https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm" class="text-primary hover:underline">https://data.cityofchicago.org/Transportation/CTA-Ridership-Bus-Routes-Daily-Totals-by-Route/jyb9-n7fm</a></p>
+          <p>Afridi, A. S. (2024). <em>Multi-Class Driver Behavior Image Dataset</em> [Data set]. Mendeley Data. <a href="https://doi.org/10.17632/mzb4b6dff3.1" class="text-primary hover:underline">https://doi.org/10.17632/mzb4b6dff3.1</a></p>
+          <p>Mehra, A. (2024). <em>Travel Recommendation Dataset</em> [Data set]. Kaggle. <a href="https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset" class="text-primary hover:underline">https://www.kaggle.com/datasets/amanmehra23/travel-recommendation-dataset</a></p>
+          <p>Baheti, B., Talbar, S., &amp; Gajre, S. (2020). Towards computationally efficient and real-time distracted driver detection with mobilenet. <em>Proceedings of CVPR Workshops 2020</em>. https://doi.org/10.1109/CVPRW50498.2020.00364</p>
+          <p>Dalal, N., &amp; Triggs, B. (2005). Histograms of oriented gradients for human detection. <em>Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition (CVPR)</em>, 886–893. <a href="https://doi.org/10.1109/CVPR.2005.177" class="text-primary hover:underline">https://doi.org/10.1109/CVPR.2005.177</a></p>
+          <p>Hochreiter, S., &amp; Schmidhuber, J. (1997). Long short-term memory. <em>Neural Computation</em>, <em>9</em>(8), 1735–1780. <a href="https://doi.org/10.1162/neco.1997.9.8.1735" class="text-primary hover:underline">https://doi.org/10.1162/neco.1997.9.8.1735</a></p>
+          <p>Lim, K. H., Chan, J., Leckie, C., &amp; Karunasekera, S. (2019). Personalized trip recommendation for tourists based on user interests, points of interest visit durations and visit recency. <em>Knowledge and Information Systems</em>, <em>54</em>(2), 375–406. https://doi.org/10.1007/s10115-017-1056-y</p>
+          <p>Ma, X., Tao, Z., Wang, Y., Yu, H., &amp; Wang, Y. (2015). Long short-term memory neural network for traffic speed prediction using remote microwave sensor data. <em>Transportation Research Part C: Emerging Technologies</em>, <em>54</em>, 187–197. https://doi.org/10.1016/j.trc.2015.03.014</p>
+          <p>Pan, S. J., &amp; Yang, Q. (2010). A survey on transfer learning. <em>IEEE Transactions on Knowledge and Data Engineering</em>, <em>22</em>(10), 1345–1359. https://doi.org/10.1109/TKDE.2009.191</p>
+          <p>Pyodide Development Team. (2024). <em>Pyodide: Python for the browser</em> [Computer software]. <a href="https://pyodide.org" class="text-primary hover:underline">https://pyodide.org</a></p>
+          <p>Ricci, F., Rokach, L., &amp; Shapira, B. (Eds.). (2015). <em>Recommender systems handbook</em> (2nd ed.). Springer.</p>
+          <p>Sandler, M., Howard, A., Zhu, M., Zhmoginov, A., &amp; Chen, L.-C. (2018). MobileNetV2: Inverted residuals and linear bottlenecks. <em>Proceedings of CVPR 2018</em>, 4510–4520. <a href="https://doi.org/10.1109/CVPR.2018.00474" class="text-primary hover:underline">https://doi.org/10.1109/CVPR.2018.00474</a></p>
+          <p>Smilkov, D., Carter, S., Sculley, D., Viégas, F., &amp; Wattenberg, M. (2019). TensorFlow.js: Machine learning for the web and beyond. <em>SysML Conference</em>. <a href="https://arxiv.org/abs/1901.05350" class="text-primary hover:underline">https://arxiv.org/abs/1901.05350</a></p>
+          <p>Goodfellow, I., Bengio, Y., &amp; Courville, A. (2016). <em>Deep learning</em>. MIT Press.</p>
+        </div>
+      </section>
+
+      <!-- 11. Anexos -->
+      <section id="anexos">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">11. Anexos</h2>
+        <div class="grid grid-cols-1 gap-3 text-caption font-caption">
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-primary">open_in_new</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-primary block mb-1">HERRAMIENTA WEB EN VIVO</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/" class="text-primary hover:underline">andresguido9820.github.io/sistema-transporte-inteligente/</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-secondary">bar_chart</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-secondary block mb-1">MÓDULO 01 — PREDICCIÓN (EN VIVO)</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/notebook01.html" class="text-primary hover:underline">…/notebook01.html</a>
+              &nbsp;·&nbsp;
+              <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/01_prediccion_demanda.ipynb" class="text-primary hover:underline">Colab</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-secondary">camera</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-secondary block mb-1">MÓDULO 02 — CLASIFICACIÓN (EN VIVO)</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/notebook02.html" class="text-primary hover:underline">…/notebook02.html</a>
+              &nbsp;·&nbsp;
+              <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/02_clasificacion_conduccion.ipynb" class="text-primary hover:underline">Colab</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-secondary">recommend</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-secondary block mb-1">MÓDULO 03 — RECOMENDACIÓN (EN VIVO)</span>
+              <a href="https://andresguido9820.github.io/sistema-transporte-inteligente/notebook03.html" class="text-primary hover:underline">…/notebook03.html</a>
+              &nbsp;·&nbsp;
+              <a href="https://colab.research.google.com/github/AndresGuido9820/sistema-transporte-inteligente/blob/main/notebooks/03_recomendacion_destinos.ipynb" class="text-primary hover:underline">Colab</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-tertiary">folder_open</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-tertiary block mb-1">REPOSITORIO</span>
+              <a href="https://github.com/AndresGuido9820/sistema-transporte-inteligente" class="text-primary hover:underline">github.com/AndresGuido9820/sistema-transporte-inteligente</a>
+            </div>
+          </div>
+          <div class="bg-surface-container p-4 flex items-center gap-4">
+            <span class="material-symbols-outlined text-tertiary">videocam</span>
+            <div>
+              <span class="text-label-caps font-label-caps text-tertiary block mb-1">VIDEOS DE DEMOSTRACIÓN</span>
+              <a href="https://www.youtube.com/watch?v=iRVR9MBd5Jg" target="_blank" class="text-primary hover:underline">youtube.com/watch?v=iRVR9MBd5Jg</a>
+              <span class="text-on-surface-variant block text-caption mt-1">Demostración completa — predicción de demanda, clasificación de conducción y recomendación de destinos.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. Uso de herramientas de IA -->
+      <section id="ia">
+        <h2 class="text-headline-md font-headline-md text-on-surface border-b-2 border-outline pb-3 mb-6">12. Uso de herramientas de inteligencia artificial</h2>
+        <div class="space-y-4 text-body-md font-body-md text-on-background">
+          <p>Durante el desarrollo de este proyecto se utilizó un asistente de lenguaje de gran escala (LLM) como apoyo puntual en tareas de escritura, búsqueda de referencias y revisión de código. El uso fue supervisado y complementario: todas las decisiones de diseño, los experimentos, el entrenamiento de modelos y la interpretación de resultados fueron realizados y validados por el equipo.</p>
+          <div class="bg-surface-container-low border-l-4 border-outline p-5 mt-4">
+            <p class="text-label-caps font-label-caps text-on-surface-variant mb-4">EJEMPLOS DE PROMPTS UTILIZADOS</p>
+            <ul class="space-y-3 text-caption font-caption text-on-surface-variant">
+              <li class="flex gap-3"><span class="text-primary flex-shrink-0 font-medium">P1.</span><span>"Explícame la diferencia entre la compuerta de olvido y la compuerta de entrada en una celda LSTM, en términos matemáticos simples."</span></li>
+              <li class="flex gap-3"><span class="text-secondary flex-shrink-0 font-medium">P2.</span><span>"Tengo una tabla de métricas por clase (precision, recall, F1). ¿Cómo presento esto en HTML con Tailwind CSS de forma clara?"</span></li>
+              <li class="flex gap-3"><span class="text-tertiary flex-shrink-0 font-medium">P3.</span><span>"¿Qué es la métrica NDCG@K y en qué se diferencia del Recall@K para evaluar sistemas de recomendación?"</span></li>
+            </ul>
+          </div>
+          <p class="text-caption font-caption text-on-surface-variant mt-4">El asistente no fue utilizado para generar conclusiones sobre los experimentos ni para interpretar los resultados de los modelos. La redacción final fue revisada y ajustada por los autores.</p>
+        </div>
+
+        <!-- Article footer -->
+        <div class="mt-12 pt-6 border-t-2 border-primary border-dashed flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div class="text-caption font-caption text-on-surface-variant">
+            <strong>Curso:</strong> Trabajo 3 · Aplicaciones en sistemas de recomendación e imágenes · Universidad Nacional de Colombia · 2026
+          </div>
+          <a href="index.html" class="border-2 border-secondary bg-transparent text-secondary hover:bg-secondary hover:text-on-secondary px-6 py-2 text-label-caps font-label-caps transition-colors rounded-none flex items-center gap-2">
+            <span class="material-symbols-outlined text-base">arrow_back</span> Volver a herramientas
+          </a>
+        </div>
+      </section>
+
+    </div><!-- /main content -->
+  </div><!-- /grid -->
+</main>
+
+<!-- Footer -->
+<footer class="bg-inverse-surface mt-stack-lg w-full border-t-4 border-primary">
+  <div class="flex flex-col md:flex-row justify-between items-center w-full px-margin-mobile md:px-margin-desktop py-stack-lg max-w-max-content-width mx-auto gap-8 md:gap-0">
+    <div class="flex flex-col items-center md:items-start">
+      <span class="text-headline-md font-headline-md text-inverse-on-surface mb-2 font-bold tracking-wider text-sm">SISTEMA INTELIGENTE DE TRANSPORTE</span>
+      <span class="text-caption font-caption text-surface-variant text-center md:text-left">
+        Universidad Nacional de Colombia · Trabajo 3 · Mayo 2026
+      </span>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6">
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="index.html">Herramientas</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="notebook01.html">Módulo 01</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="notebook02.html">Módulo 02</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="notebook03.html">Módulo 03</a>
+      <a class="text-label-caps font-label-caps text-surface-variant hover:text-primary-fixed transition-colors uppercase" href="https://github.com/AndresGuido9820/sistema-transporte-inteligente">GitHub</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
